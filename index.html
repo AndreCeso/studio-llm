@@ -1,0 +1,2424 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Piano Studio AI/LLM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root {
+  --bg: #0F1117;
+  --bg2: #171B26;
+  --bg3: #1E2333;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.13);
+  --text: #E8EAF0;
+  --text2: #9099B0;
+  --text3: #5A6278;
+  --accent: #5B8DEF;
+  --accent-dim: rgba(91,141,239,0.15);
+  --green: #4CAF82;
+  --green-dim: rgba(76,175,130,0.15);
+  --orange: #F5A623;
+  --orange-dim: rgba(245,166,35,0.12);
+  --red: #E85D75;
+  --red-dim: rgba(232,93,117,0.13);
+  --purple: #9B7FE8;
+  --purple-dim: rgba(155,127,232,0.13);
+  --teal: #3EC4C4;
+  --teal-dim: rgba(62,196,196,0.12);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font: 'Inter', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+
+/* LAYOUT */
+.app{display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:20px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.main{flex:1;min-width:0;padding:32px 28px;max-width:860px}
+
+/* SIDEBAR desktop */
+.sidebar-logo{font-size:13px;font-weight:600;color:var(--accent);padding:0 8px 16px;letter-spacing:0.02em;border-bottom:1px solid var(--border);margin-bottom:8px}
+.sidebar-logo span{color:var(--text2);font-weight:400}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s;color:var(--text2);font-size:13px;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.nav-item i{font-size:15px;flex-shrink:0}
+.nav-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-left:auto}
+.sidebar-section{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;padding:12px 10px 4px}
+
+/* TOP BAR mobile */
+.topbar{display:none;position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--border);padding:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.topbar::-webkit-scrollbar{display:none}
+.topbar-inner{display:flex;gap:0;min-width:max-content;padding:0 4px}
+.topbar-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 12px;border:none;background:none;color:var(--text2);font-size:10px;font-weight:500;cursor:pointer;font-family:var(--font);white-space:nowrap;border-bottom:2px solid transparent;transition:all 0.15s}
+.topbar-btn i{font-size:18px}
+.topbar-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.topbar-btn.locked-tab{opacity:0.4}
+
+/* BADGE TIPI MODULO */
+.badge-concettuale{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:rgba(91,141,239,0.15);color:#5B8DEF;border:1px solid rgba(91,141,239,0.25)}
+.badge-pratico{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:rgba(245,166,35,0.15);color:#F5A623;border:1px solid rgba(245,166,35,0.25)}
+.badge-misto{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:rgba(76,175,130,0.15);color:#4CAF82;border:1px solid rgba(76,175,130,0.25)}
+
+/* LEGENDA BADGE */
+.badge-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm)}
+.badge-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+
+/* GLOSSARIO */
+.gloss-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+@media(max-width:600px){.gloss-grid{grid-template-columns:1fr}}
+.gloss-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:border-color 0.15s}
+.gloss-card:hover{border-color:var(--border2)}
+.gloss-card.open{border-color:var(--accent)}
+.gloss-term{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.gloss-tag{font-size:10px;padding:1px 7px;border-radius:99px;font-weight:500}
+.gloss-def{font-size:12px;color:var(--text2);line-height:1.6;margin-top:8px;display:none}
+.gloss-card.open .gloss-def{display:block}
+.gloss-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.gloss-filter-btn{padding:4px 12px;border-radius:99px;font-size:12px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all 0.15s}
+.gloss-filter-btn.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(91,141,239,0.3)}
+.gloss-search{width:100%;padding:9px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;font-family:var(--font);margin-bottom:12px;outline:none}
+.gloss-search:focus{border-color:var(--accent)}
+
+/* HEADER */
+.page-header{margin-bottom:28px}
+.page-header h1{font-size:22px;font-weight:600;margin-bottom:6px}
+.page-header p{color:var(--text2);font-size:13px}
+.progress-overview{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.prog-chip{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.prog-chip strong{color:var(--text);font-size:14px}
+
+/* PHASE HEADER */
+.phase-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:20px}
+.phase-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;margin-bottom:10px;letter-spacing:0.02em}
+.phase-card h2{font-size:18px;font-weight:600;margin-bottom:5px}
+.phase-card .sub{color:var(--text2);font-size:13px;line-height:1.6}
+.phase-meta{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
+.phase-meta span{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:4px}
+
+/* MODULES */
+.modules{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.module{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color 0.15s}
+.module:hover{border-color:var(--border2)}
+.module.open{border-color:var(--border2)}
+.mod-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer}
+.mod-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.mod-title{flex:1;min-width:0}
+.mod-title h3{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px}
+.mod-title p{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mod-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;letter-spacing:0.02em}
+.chevron{font-size:14px;color:var(--text3);transition:transform 0.2s}
+.module.open .chevron{transform:rotate(180deg)}
+
+/* MODULE BODY */
+.mod-body{display:none;border-top:1px solid var(--border);padding:16px}
+.module.open .mod-body{display:block}
+
+/* TABS inside module */
+.mod-tabs{display:flex;gap:2px;background:var(--bg3);border-radius:8px;padding:3px;margin-bottom:16px;width:fit-content}
+.mod-tab{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:var(--text2);border:none;background:none;transition:all 0.15s}
+.mod-tab.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* SPIEGAZIONE */
+.spieg-intro{color:var(--text2);font-size:13px;line-height:1.7;margin-bottom:14px}
+.analogy-box{background:var(--bg3);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--text2);line-height:1.6}
+.analogy-box strong{color:var(--text)}
+.topics{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.topic{display:flex;gap:10px;align-items:flex-start}
+.topic-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.topic-text{font-size:13px;color:var(--text);line-height:1.6}
+.topic-text strong{color:var(--text)}
+.topic-text span{color:var(--text2)}
+
+/* DEEP EXPLAIN */
+.explain-block{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px}
+.explain-block h4{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.explain-block p{font-size:13px;color:var(--text2);line-height:1.7}
+.explain-block code{font-family:var(--mono);font-size:12px;background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--orange)}
+
+/* QUIZ */
+.quiz-q{margin-bottom:20px}
+.quiz-q p{font-size:14px;font-weight:500;margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s;font-size:13px;color:var(--text);text-align:left;width:100%}
+.quiz-opt:hover{border-color:var(--border2);background:var(--bg2)}
+.quiz-opt.correct{border-color:var(--green);background:var(--green-dim);color:var(--green)}
+.quiz-opt.wrong{border-color:var(--red);background:var(--red-dim);color:var(--red)}
+.quiz-opt.disabled{pointer-events:none;opacity:0.6}
+.quiz-opt.correct.disabled{opacity:1}
+.quiz-feedback{font-size:12px;margin-top:8px;padding:8px 12px;border-radius:6px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:var(--green-dim);color:var(--green)}
+.quiz-feedback.ko{background:var(--red-dim);color:var(--red)}
+.quiz-score{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center;display:none}
+.quiz-score.show{display:block}
+.quiz-score .score-num{font-size:36px;font-weight:600;color:var(--accent)}
+.quiz-score p{font-size:13px;color:var(--text2);margin-top:4px}
+
+/* ESERCIZIO */
+.lab-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px}
+.lab-card h4{font-size:13px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.lab-card p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:10px}
+.lab-steps{display:flex;flex-direction:column;gap:6px}
+.lab-step{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text2)}
+.lab-step-num{width:20px;height:20px;border-radius:50%;background:var(--accent-dim);color:var(--accent);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:var(--mono);font-size:12px;color:var(--text2);line-height:1.8;overflow-x:auto;margin-top:8px}
+.code-block .kw{color:var(--accent)}
+.code-block .str{color:var(--green)}
+.code-block .cm{color:var(--text3)}
+
+/* ASK BTN */
+.ask-btn{display:none}
+
+/* CASO PRATICO BOX */
+.case-box{background:linear-gradient(135deg,rgba(62,196,196,0.08),rgba(91,141,239,0.08));border:1px solid rgba(62,196,196,0.3);border-radius:8px;padding:12px 14px;margin-top:14px}
+.case-box-label{font-size:10px;font-weight:700;color:var(--teal);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.case-box-text{font-size:13px;color:var(--text2);line-height:1.7}
+.case-box-text strong{color:var(--text)}
+
+/* PROMPT ROW: bottone Claude + copia */
+.prompt-row{display:flex;gap:8px;margin-top:12px;align-items:stretch;flex-wrap:wrap}
+.claude-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid rgba(91,141,239,0.35);background:var(--accent-dim);color:var(--accent);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all 0.15s;white-space:nowrap}
+.claude-btn:hover{background:rgba(91,141,239,0.25)}
+.claude-btn i{font-size:14px}
+/* COPY PROMPT BOX */
+.prompt-box{margin-top:12px;background:var(--bg);border:1px solid rgba(91,141,239,0.25);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color 0.15s}
+.prompt-box:hover{border-color:var(--accent)}
+.prompt-box-label{font-size:11px;color:var(--text3);margin-bottom:3px;display:block}
+.prompt-box-text{font-size:12px;color:var(--accent);flex:1;font-family:var(--mono)}
+.copy-btn{flex-shrink:0;background:var(--accent-dim);border:none;color:var(--accent);padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:var(--font);white-space:nowrap}
+.copy-btn:hover{background:rgba(91,141,239,0.3)}
+.copied{color:var(--green)!important;background:var(--green-dim)!important}
+
+/* PROGRESS BAR */
+.prog-bar{height:3px;background:var(--bg3);border-radius:2px;margin-top:20px}
+.prog-fill{height:100%;border-radius:2px}
+
+/* DONE BTN */
+.done-btn{display:flex;align-items:center;gap:6px;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:none;margin-top:12px;transition:all 0.15s;font-family:var(--font)}
+.done-btn:hover{border-color:var(--green);color:var(--green)}
+.done-btn.marked{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+
+/* PHASE HIDDEN */
+.phase{display:none}
+.phase.active{display:block}
+
+/* LOCK */
+.phase-locked{display:none}
+.phase-locked.active{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:16px}
+.lock-icon{font-size:48px;color:var(--text3)}
+.lock-title{font-size:18px;font-weight:600;color:var(--text)}
+.lock-sub{font-size:13px;color:var(--text2);max-width:340px;line-height:1.7}
+.lock-btn{margin-top:8px;padding:10px 24px;background:var(--accent-dim);border:1px solid rgba(91,141,239,0.3);border-radius:8px;color:var(--accent);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)}
+.lock-btn:hover{background:rgba(91,141,239,0.25)}
+
+/* QUIZ SBLOCCO */
+.unlock-quiz{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:24px}
+.unlock-quiz h3{font-size:16px;font-weight:600;margin-bottom:4px}
+.unlock-quiz .sub{font-size:13px;color:var(--text2);margin-bottom:20px}
+.unlock-result{padding:14px;border-radius:8px;font-size:13px;font-weight:500;text-align:center;display:none;margin-top:12px}
+.unlock-result.pass{background:var(--green-dim);color:var(--green);display:block}
+.unlock-result.fail{background:var(--red-dim);color:var(--red);display:block}
+.unlock-next-btn{width:100%;margin-top:12px;padding:12px;background:var(--green-dim);border:1px solid rgba(76,175,130,0.3);border-radius:8px;color:var(--green);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);display:none}
+.unlock-next-btn:hover{background:rgba(76,175,130,0.25)}
+
+/* PROGETTO FINALE */
+.project-step{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;position:relative}
+.project-step.locked-step{opacity:0.4;pointer-events:none}
+.project-step.unlocked-step{opacity:1;pointer-events:auto}
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--accent-dim);color:var(--accent);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-num.done{background:var(--green-dim);color:var(--green)}
+.step-title{font-size:15px;font-weight:600}
+.step-phase{font-size:11px;color:var(--text3)}
+.step-body{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:12px}
+.step-tasks{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.step-task{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text)}
+.step-task input[type=checkbox]{margin-top:2px;accent-color:var(--green);flex-shrink:0}
+.step-complete-btn{padding:8px 18px;border-radius:6px;background:var(--accent-dim);border:1px solid rgba(91,141,239,0.3);color:var(--accent);font-size:12px;cursor:pointer;font-family:var(--font)}
+.step-complete-btn.done{background:var(--green-dim);border-color:rgba(76,175,130,0.3);color:var(--green)}
+
+/* NAV LOCK ICON */
+.nav-lock{margin-left:auto;font-size:12px;color:var(--text3)}
+
+/* FINAL QUIZ */
+.final-quiz-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px}
+.final-quiz-wrap h2{font-size:18px;font-weight:600;margin-bottom:6px}
+.final-quiz-wrap .sub{color:var(--text2);font-size:13px;margin-bottom:20px}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  .sidebar{display:none}
+  .topbar{display:block}
+  .main{padding:16px 14px}
+  .app{flex-direction:column}
+  .badge-concettuale,.badge-pratico,.badge-misto{display:none}
+  .gloss-grid{grid-template-columns:1fr}
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<div class="app">
+
+<!-- TOP BAR mobile -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <button class="topbar-btn active" id="tb0" onclick="goPhase(0,this)"><i class="ti ti-brain" style="color:#5B8DEF"></i>Fondamenta</button>
+    <button class="topbar-btn locked-tab" id="tb1" onclick="goPhase(1,this)"><i class="ti ti-route" style="color:#4CAF82"></i>RAG</button>
+    <button class="topbar-btn locked-tab" id="tb2" onclick="goPhase(2,this)"><i class="ti ti-box" style="color:#F5A623"></i>Infra</button>
+    <button class="topbar-btn locked-tab" id="tb3" onclick="goPhase(3,this)"><i class="ti ti-cloud" style="color:#9B7FE8"></i>Cloud</button>
+    <button class="topbar-btn locked-tab" id="tb4" onclick="goPhase(4,this)"><i class="ti ti-shield" style="color:#E85D75"></i>Sicurezza</button>
+    <button class="topbar-btn locked-tab" id="tb5" onclick="goPhase(5,this)"><i class="ti ti-trophy" style="color:#F5A623"></i>Quiz🔒</button>
+    <button class="topbar-btn locked-tab" id="tb6" onclick="goPhase(6,this)"><i class="ti ti-rocket" style="color:#9B7FE8"></i>Progetto🔒</button>
+    <button class="topbar-btn" id="tb7" onclick="goPhase(7,this)"><i class="ti ti-book-2" style="color:#3EC4C4"></i>Glossario</button>
+  </div>
+</nav>
+
+<!-- SIDEBAR desktop -->
+<aside class="sidebar">
+  <div class="sidebar-logo">AI/LLM <span>Studio</span></div>
+  <div class="sidebar-section">Fasi</div>
+  <button class="nav-item active" onclick="goPhase(0,this)"><i class="ti ti-brain"></i> Fondamenta<span class="nav-dot" style="background:#5B8DEF"></span></button>
+  <button class="nav-item" onclick="goPhase(1,this)"><i class="ti ti-route"></i> RAG & Ricerca<span class="nav-dot" style="background:#4CAF82"></span></button>
+  <button class="nav-item" onclick="goPhase(2,this)"><i class="ti ti-box"></i> Infrastruttura<span class="nav-dot" style="background:#F5A623"></span></button>
+  <button class="nav-item" onclick="goPhase(3,this)"><i class="ti ti-cloud"></i> Cloud & Prod<span class="nav-dot" style="background:#9B7FE8"></span></button>
+  <button class="nav-item" onclick="goPhase(4,this)"><i class="ti ti-shield"></i> Sicurezza & Ops<span class="nav-dot" style="background:#E85D75"></span></button>
+  <div class="sidebar-section" style="margin-top:8px">Extra</div>
+  <button class="nav-item" id="nav-5" onclick="goPhase(5,this)"><i class="ti ti-trophy"></i> Quiz Finale<i class="ti ti-lock nav-lock" id="lock-5"></i></button>
+  <button class="nav-item" id="nav-6" onclick="goPhase(6,this)"><i class="ti ti-rocket"></i> Progetto Finale<i class="ti ti-lock nav-lock" id="lock-6"></i></button>
+  <button class="nav-item" onclick="goPhase(7,this)"><i class="ti ti-book-2"></i> Glossario</button>
+  <div class="sidebar-section" style="margin-top:16px">Legenda moduli</div>
+  <div style="padding:4px 8px;display:flex;flex-direction:column;gap:6px">
+    <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2)"><span class="badge-concettuale">📖 Concettuale</span></div>
+    <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2)"><span class="badge-pratico">🔧 Pratico</span></div>
+    <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2)"><span class="badge-misto">📖🔧 Misto</span></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>Il tuo percorso AI/LLM</h1>
+  <p>6 mesi dal principiante al pratico. Spiegazioni, quiz per modulo ed esercizi hands-on.</p>
+  <div class="progress-overview">
+    <div class="prog-chip"><i class="ti ti-books" style="color:var(--accent)"></i> <strong>5</strong> fasi · 17 moduli</div>
+    <div class="prog-chip"><i class="ti ti-clock" style="color:var(--orange)"></i> ~<strong>6</strong> mesi</div>
+    <div class="prog-chip"><i class="ti ti-check" style="color:var(--green)"></i> Completati: <strong id="done-count">0</strong>/17</div>
+  </div>
+</div>
+
+<!-- CASO PRATICO BANNER -->
+<div style="background:linear-gradient(135deg,rgba(62,196,196,0.1),rgba(91,141,239,0.1));border:1px solid rgba(62,196,196,0.3);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px">
+  <div style="font-size:11px;font-weight:700;color:var(--teal);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">🏦 Il tuo filo conduttore</div>
+  <p style="font-size:13px;color:var(--text);line-height:1.7">Sei un developer in una <strong>banca</strong>. Il tuo team gestisce decine di procedure operative: reset password, apertura conto, blocco carta, successioni, bonifici. Ogni procedura ha un manuale PDF. Gli operatori perdono tempo a cercare nel documento giusto. <strong>Il tuo capo ti chiede di costruire un assistente AI interno</strong> che risponda alle domande degli operatori basandosi su quei manuali. Ogni modulo che studi è un pezzo di quel sistema.</p>
+</div>
+
+<!-- LEGENDA BADGE (desktop only) -->
+<div class="badge-legend">
+  <span style="font-size:12px;color:var(--text3);font-weight:500;margin-right:4px">Tipi di modulo:</span>
+  <span class="badge-legend-item"><span class="badge-concettuale">📖 Concettuale</span> Solo teoria da capire</span>
+  <span class="badge-legend-item"><span class="badge-pratico">🔧 Pratico</span> Metti le mani, scrivi codice</span>
+  <span class="badge-legend-item"><span class="badge-misto">📖🔧 Misto</span> Teoria + esercizio leggero</span>
+</div>
+
+<!-- ═══════════════════════════════════════ FASE 1 ═══════════════════════════════════════ -->
+<div class="phase active" id="phase-0">
+  <div class="phase-card">
+    <div class="phase-tag" style="background:var(--accent-dim);color:var(--accent)"><i class="ti ti-calendar"></i> Mese 1–2</div>
+    <h2>Fondamenta — Come funzionano gli LLM</h2>
+    <p class="sub">Prima di toccare codice o cloud, capisci cosa è un LLM, come "pensa" e come parlargli bene. La base di tutto.</p>
+    <div class="phase-meta">
+      <span><i class="ti ti-book"></i> 4 moduli</span>
+      <span><i class="ti ti-clock"></i> ~6 settimane</span>
+      <span><i class="ti ti-bulb"></i> Prevalentemente concettuale</span>
+    </div>
+  </div>
+
+  <div class="modules">
+
+    <!-- M0: LLM -->
+    <div class="module" id="m0">
+      <div class="mod-header" onclick="toggleMod('m0')">
+        <div class="mod-icon" style="background:var(--accent-dim)"><i class="ti ti-brain" style="color:var(--accent)"></i></div>
+        <div class="mod-title"><h3>Come funziona un LLM</h3><p>Token, probabilità, temperatura — il motore dietro ChatGPT e Claude</p></div>
+        <div class="mod-right">
+          <span class="badge-concettuale">📖 Concettuale</span>
+          <i class="ti ti-chevron-down chevron"></i>
+        </div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m0-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m0-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m0-spieg">
+          <p class="spieg-intro">Un LLM non "capisce" davvero — predice la parola più probabile dopo le precedenti. Sapere questo cambia tutto su come lo usi.</p>
+          <div class="analogy-box">🎲 <strong>Analogia:</strong> Immagina un gioco dove completi la frase <em>"Il gatto è sul..."</em>. Il modello ha letto miliardi di testi e sa che "tetto" viene dopo quella frase molto spesso. Fa questo miliardi di volte al secondo, producendo testo fluido.
+          </div>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--accent)"></div><div class="topic-text"><strong>Token</strong> <span>— non sono parole intere, sono pezzi di parola. "Gatto" = 1 token, "straordinario" = 3 token. Importante perché i modelli costano a token e hanno un limite massimo di token che "ricordano".</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--accent)"></div><div class="topic-text"><strong>Temperatura</strong> <span>— controlla quanto il modello è "creativo". Con 0 risponde sempre uguale. Con 1 è più variabile e imprevedibile. Per sistemi aziendali si usa bassa (0–0.2) per avere risposte stabili.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--accent)"></div><div class="topic-text"><strong>Hallucination</strong> <span>— il modello inventa cose con assoluta sicurezza. Non è un bug, è come funziona: predice testo plausibile anche quando non conosce la risposta. Ecco perché serve il RAG.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--accent)"></div><div class="topic-text"><strong>Context window</strong> <span>— quanto il modello "ricorda" in una conversazione. Oltre quel limite (es. 128k token) dimentica le cose più vecchie. Come la memoria a breve termine.</span></div></div>
+          </div>
+          <div class="explain-block">
+            <h4><i class="ti ti-bulb" style="color:var(--orange)"></i> Perché la temperatura è importante per te</h4>
+            <p>Nel sistema RAG aziendale che costruirai, userai temperatura <code>0.1</code> — vuoi risposte precise e ripetibili, non creative. Un modello "creativo" potrebbe inventare dettagli tecnici che non esistono nei tuoi documenti.</p>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">La banca ha 80 procedure operative in PDF. Prima di costruire qualsiasi sistema, devi capire cosa può e non può fare un LLM su quei documenti. Se la temperatura è alta, l'AI potrebbe inventare passaggi di procedura che non esistono — potenzialmente disastroso per un operatore che gestisce un conto.</div></div>
+          <button class="done-btn" id="done-m0" onclick="markDone('m0')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Spiegami i token e la temperatura degli LLM come se avessi 10 anni, con esempi pratici')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami i token e la temperatura degli LLM come se avessi 10 anni, con esempi pratici</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m0-quiz">
+          <div id="quiz-m0">
+            <div class="quiz-q">
+              <p>1. Un LLM con temperatura = 0 produce risposte…</p>
+              <div class="quiz-options">
+                <button class="quiz-opt" onclick="answerQ(this,'wrong','m0q1')">Sempre diverse e creative</button>
+                <button class="quiz-opt" onclick="answerQ(this,'correct','m0q1')">Sempre uguali e deterministiche</button>
+                <button class="quiz-opt" onclick="answerQ(this,'wrong','m0q1')">Più lente ma più accurate</button>
+              </div>
+              <div class="quiz-feedback" id="m0q1-fb-correct ok">✅ Esatto! Temperatura 0 = determinismo. Ogni volta che fai la stessa domanda ottieni la stessa risposta.</div>
+              <div class="quiz-feedback" id="m0q1-fb-wrong ko">❌ No. Temperatura 0 azzera la casualità: il modello sceglie sempre il token più probabile → risposta sempre uguale.</div>
+            </div>
+            <div class="quiz-q">
+              <p>2. Cos'è un "token" in un LLM?</p>
+              <div class="quiz-options">
+                <button class="quiz-opt" onclick="answerQ(this,'wrong','m0q2')">Una parola intera</button>
+                <button class="quiz-opt" onclick="answerQ(this,'wrong','m0q2')">Un carattere singolo</button>
+                <button class="quiz-opt" onclick="answerQ(this,'correct','m0q2')">Un pezzo di parola — l'unità base di elaborazione del modello</button>
+              </div>
+              <div class="quiz-feedback" id="m0q2-fb-correct ok">✅ Giusto! I token sono pezzi di parola. Parole comuni = 1 token, parole rare o lunghe = più token.</div>
+              <div class="quiz-feedback" id="m0q2-fb-wrong ko">❌ I token non sono né parole intere né caratteri singoli. Sono sottopezzi: "straordinario" potrebbe essere 3 token.</div>
+            </div>
+            <div class="quiz-q">
+              <p>3. Perché gli LLM allucinano?</p>
+              <div class="quiz-options">
+                <button class="quiz-opt" onclick="answerQ(this,'wrong','m0q3')">Per un bug nel codice che va corretto</button>
+                <button class="quiz-opt" onclick="answerQ(this,'correct','m0q3')">Perché predicono testo plausibile anche senza conoscere la risposta</button>
+                <button class="quiz-opt" onclick="answerQ(this,'wrong','m0q3')">Solo con temperatura alta</button>
+              </div>
+              <div class="quiz-feedback" id="m0q3-fb-correct ok">✅ Esatto! L'allucinazione è strutturale: il modello genera testo plausibile per costruzione, non perché "sa" la risposta.</div>
+              <div class="quiz-feedback" id="m0q3-fb-wrong ko">❌ L'allucinazione non è un bug e non dipende solo dalla temperatura. È insita nel modo in cui i modelli generano testo.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M1: PROMPT -->
+    <div class="module" id="m1">
+      <div class="mod-header" onclick="toggleMod('m1')">
+        <div class="mod-icon" style="background:var(--green-dim)"><i class="ti ti-message-circle" style="color:var(--green)"></i></div>
+        <div class="mod-title"><h3>Prompt Engineering</h3><p>Come parlare bene a un LLM — la skill più immediata e utile</p></div>
+        <div class="mod-right">
+          <span class="badge-misto">📖🔧 Misto</span>
+          <i class="ti ti-chevron-down chevron"></i>
+        </div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m1-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m1-quiz')">🧠 Quiz</button>
+          <button class="mod-tab" onclick="switchTab(this,'m1-lab')">🔬 Esercizio</button>
+        </div>
+        <div class="tab-content active" id="m1-spieg">
+          <p class="spieg-intro">Il modo in cui scrivi il messaggio al modello cambia radicalmente la qualità della risposta. Più contesto e struttura dai, meglio risponde.</p>
+          <div class="analogy-box">👨‍🍳 <strong>Analogia:</strong> Dire a un cuoco <em>"fai qualcosa di buono"</em> vs <em>"fai una pasta al pomodoro, 4 persone, senza aglio, pronta in 20 minuti"</em>. Più contesto = risultato migliore e più prevedibile.</div>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>Chain of Thought (CoT)</strong> <span>— chiedi al modello di ragionare passo per passo. Aggiungere <em>"pensa prima di rispondere"</em> o <em>"ragiona step by step"</em> migliora la qualità su problemi complessi.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>System prompt</strong> <span>— il messaggio iniziale che definisce chi è il modello e come si deve comportare. Es: "Sei un assistente tecnico aziendale. Rispondi solo basandoti sui documenti forniti. Se non sai, di' che non sai."</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>RAG-prompting</strong> <span>— tecnica per passare documenti al modello e dirgli di rispondere solo su quelli. Previene le allucinazioni perché il modello ha la risposta davanti.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>ReAct</strong> <span>— pattern in cui il modello ragiona, poi agisce (chiama un tool), poi osserva il risultato, e ripete. Base degli AI agent che eseguono compiti autonomi.</span></div></div>
+          </div>
+          <div class="explain-block">
+            <h4><i class="ti ti-code" style="color:var(--green)"></i> Esempio: system prompt RAG aziendale</h4>
+            <div class="code-block">
+              <span class="cm"># System prompt per il tuo assistente AI</span><br>
+              system = <span class="str">"""<br>
+Sei un assistente tecnico aziendale.<br>
+Rispondi SOLO basandoti sui documenti forniti nel contesto.<br>
+Se la risposta non è nei documenti, rispondi:<br>
+"Non ho informazioni sufficienti su questo argomento."<br>
+Non inventare mai dati, versioni o procedure.<br>
+"""</span>
+            </div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Il tuo system prompt per l'assistente bancario sarà tipo: <em>"Sei un assistente operativo. Rispondi SOLO basandoti sulle procedure fornite. Se la procedura non copre il caso, di' esplicitamente che non hai informazioni sufficienti."</em> Questo evita che l'AI inventi passaggi per il reset password.</div></div>
+          <button class="done-btn" id="done-m1" onclick="markDone('m1')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Fammi esercitare sul prompt engineering con esempi pratici e concreti, partendo da zero')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Fammi esercitare sul prompt engineering con esempi pratici e concreti, partendo da zero</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m1-quiz">
+          <div class="quiz-q">
+            <p>1. Cos'è il "system prompt"?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m1q1')">La prima domanda che fa l'utente</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m1q1')">Il messaggio iniziale che definisce il comportamento e il ruolo del modello</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m1q1')">Il prompt che genera il codice Python</button>
+            </div>
+            <div class="quiz-feedback" id="m1q1-fb-correct ok">✅ Esatto! Il system prompt è invisibile all'utente ma guida ogni risposta del modello.</div>
+            <div class="quiz-feedback" id="m1q1-fb-wrong ko">❌ Il system prompt è la configurazione iniziale del modello, non la domanda dell'utente.</div>
+          </div>
+          <div class="quiz-q">
+            <p>2. Chain of Thought serve a…</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m1q2')">Ridurre il numero di token usati</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m1q2')">Rendere il modello più veloce</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m1q2')">Far ragionare il modello passo per passo migliorando la qualità su problemi complessi</button>
+            </div>
+            <div class="quiz-feedback" id="m1q2-fb-correct ok">✅ Giusto! CoT rallenta un po' ma migliora molto la qualità su problemi che richiedono ragionamento.</div>
+            <div class="quiz-feedback" id="m1q2-fb-wrong ko">❌ CoT non riduce i token né accelera — fa l'opposto. Ma migliora la qualità del ragionamento.</div>
+          </div>
+        </div>
+        <div class="tab-content" id="m1-lab">
+          <div class="lab-card">
+            <h4><i class="ti ti-flask" style="color:var(--orange)"></i> Esercizio: scrivi il tuo primo system prompt RAG</h4>
+            <p>Scrivi un system prompt per un assistente che risponde solo basandosi sui manuali tecnici aziendali, in italiano, senza inventare nulla.</p>
+            <div class="lab-steps">
+              <div class="lab-step"><div class="lab-step-num">1</div><span>Apri <a href="https://claude.ai" style="color:var(--accent)" target="_blank">claude.ai</a> o qualsiasi chatbot AI</span></div>
+              <div class="lab-step"><div class="lab-step-num">2</div><span>Inizia la conversazione con: <em>"Voglio che tu agisca come assistente tecnico aziendale. Puoi rispondere solo basandoti sui documenti che ti fornisco."</em></span></div>
+              <div class="lab-step"><div class="lab-step-num">3</div><span>Poi incolla un paragrafo di un manuale tecnico qualsiasi e fai una domanda su di esso</span></div>
+              <div class="lab-step"><div class="lab-step-num">4</div><span>Poi fai una domanda su qualcosa che NON è nel documento e osserva come risponde</span></div>
+              <div class="lab-step"><div class="lab-step-num">5</div><span>Modifica il prompt per migliorare il comportamento e ripeti</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M2: EMBEDDING -->
+    <div class="module" id="m2">
+      <div class="mod-header" onclick="toggleMod('m2')">
+        <div class="mod-icon" style="background:var(--orange-dim)"><i class="ti ti-vector" style="color:var(--orange)"></i></div>
+        <div class="mod-title"><h3>Embedding & Similarità Semantica</h3><p>Come un computer capisce che "auto" e "macchina" significano la stessa cosa</p></div>
+        <div class="mod-right">
+          <span class="badge" style="background:var(--orange-dim);color:var(--orange)">Concettuale</span>
+          <i class="ti ti-chevron-down chevron"></i>
+        </div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m2-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m2-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m2-spieg">
+          <p class="spieg-intro">Gli embedding trasformano testi in numeri in modo che testi con significato simile abbiano numeri simili. È la magia che permette la ricerca semantica.</p>
+          <div class="analogy-box">🗺️ <strong>Analogia:</strong> Immagina una mappa dove città con clima simile sono fisicamente vicine. Gli embedding fanno lo stesso con i testi: "gatto" e "felino" finiscono vicini sulla mappa, "gatto" e "automobile" lontani — anche se non condividono lettere.</div>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--orange)"></div><div class="topic-text"><strong>Vettore</strong> <span>— lista di numeri che rappresenta il "significato" di un testo. Es: "motore guasto" → [0.23, -0.87, 0.12, 0.54, ...] (centinaia di numeri).</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--orange)"></div><div class="topic-text"><strong>Cosine similarity</strong> <span>— come si misura quanto due vettori sono vicini. Valore 1 = identici come significato. Valore 0 = nessuna relazione. Valore -1 = opposti.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--orange)"></div><div class="topic-text"><strong>Modelli embedding</strong> <span>— servizi che generano i vettori: OpenAI (text-embedding-3), BGE (open source), Cohere. Non sono gli stessi LLM che rispondono alle domande — sono specializzati.</span></div></div>
+          </div>
+          <div class="explain-block">
+            <h4><i class="ti ti-bulb" style="color:var(--orange)"></i> Perché ti serve capire questo</h4>
+            <p>Quando un utente scrive <em>"problema con il propulsore"</em> e nel manuale c'è scritto <em>"guasto al motore"</em>, la ricerca per parola chiave fallisce. L'embedding le capisce come sinonime e trova il risultato giusto. Questo è il cuore della ricerca semantica nel tuo sistema RAG.</p>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">"Reset password" e "reimpostazione credenziali" sono la stessa cosa ma scritte diversamente. Senza embedding, una ricerca per parola chiave non le collega. Con gli embedding, l'operatore che scrive "non riesco ad accedere" trova automaticamente la procedura di reset — anche senza usare le parole esatte.</div></div>
+          <button class="done-btn" id="done-m2" onclick="markDone('m2')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Spiegami gli embedding vettoriali con un esempio visivo e pratico, parto da zero')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami gli embedding vettoriali con un esempio visivo e pratico, parto da zero</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m2-quiz">
+          <div class="quiz-q">
+            <p>1. Due frasi con cosine similarity = 0.95 sono…</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m2q1')">Molto simili nel significato</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m2q1')">Completamente opposte</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m2q1')">Identiche parola per parola</button>
+            </div>
+            <div class="quiz-feedback" id="m2q1-fb-correct ok">✅ Giusto! Similarity vicina a 1 = significato quasi identico, anche se le parole usate sono diverse.</div>
+            <div class="quiz-feedback" id="m2q1-fb-wrong ko">❌ Similarity 0.95 (vicina a 1) significa semanticamente molto simili, non opposte né identiche letteralmente.</div>
+          </div>
+          <div class="quiz-q">
+            <p>2. Perché la ricerca per embedding è utile rispetto alla ricerca per parola chiave?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m2q2')">È più veloce</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m2q2')">Trova risultati anche quando si usano parole diverse ma con lo stesso significato</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m2q2')">Consuma meno risorse computazionali</button>
+            </div>
+            <div class="quiz-feedback" id="m2q2-fb-correct ok">✅ Esatto! "Propulsore" e "motore" sono parole diverse ma embedding vicini. La ricerca semantica le collega.</div>
+            <div class="quiz-feedback" id="m2q2-fb-wrong ko">❌ La ricerca per embedding è più lenta e costosa, ma trova risultati semanticamente correlati anche con sinonimi.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M3: VECTOR DB -->
+    <div class="module" id="m3">
+      <div class="mod-header" onclick="toggleMod('m3')">
+        <div class="mod-icon" style="background:var(--purple-dim)"><i class="ti ti-database" style="color:var(--purple)"></i></div>
+        <div class="mod-title"><h3>Vector Database</h3><p>Il "Google" per testi — cerca per significato, non per parola chiave</p></div>
+        <div class="mod-right">
+          <span class="badge" style="background:var(--purple-dim);color:var(--purple)">Concettuale</span>
+          <i class="ti ti-chevron-down chevron"></i>
+        </div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m3-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m3-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m3-spieg">
+          <p class="spieg-intro">Un vector DB è un database ottimizzato per cercare vettori simili molto velocemente. È dove vengono salvati gli embedding dei tuoi documenti.</p>
+          <div class="analogy-box">📚 <strong>Analogia:</strong> Una biblioteca normale cerca per titolo esatto. Un vector DB cerca per <em>"libri con argomento simile a questo"</em> — anche se non condividono nemmeno una parola nel titolo. È come un bibliotecario che conosce il significato di ogni libro.</div>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--purple)"></div><div class="topic-text"><strong>pgvector</strong> <span>— il più semplice da iniziare: è un'estensione di PostgreSQL (database che probabilmente esiste già in azienda). Aggiungi una colonna "vettore" a una tabella normale.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--purple)"></div><div class="topic-text"><strong>Pinecone / Chroma / Weaviate</strong> <span>— soluzioni dedicate, più potenti per grandi volumi. Chroma è ottima per iniziare in locale, Pinecone per produzione scalabile.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--purple)"></div><div class="topic-text"><strong>Hybrid search (BM25 + vettoriale)</strong> <span>— combina ricerca per parola chiave esatta (BM25) + ricerca semantica (embedding). Meglio di entrambe da sole: trova codici esatti E sinonimi.</span></div></div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Userai pgvector (estensione del database PostgreSQL che probabilmente la banca ha già) per salvare gli embedding delle 80 procedure. La hybrid search è cruciale: "blocco carta n. 4929..." richiede BM25 per il numero esatto, ma "carta bloccata per furto" richiede la ricerca semantica.</div></div>
+          <button class="done-btn" id="done-m3" onclick="markDone('m3')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Spiegami i vector database e la hybrid search con esempi semplici')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami i vector database e la hybrid search con esempi semplici</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m3-quiz">
+          <div class="quiz-q">
+            <p>1. Qual è il vantaggio dell'hybrid search rispetto alla sola ricerca vettoriale?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m3q1')">È molto più veloce</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m3q1')">Trova sia corrispondenze esatte (codici, nomi) sia corrispondenze semantiche (sinonimi)</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m3q1')">Usa meno memoria</button>
+            </div>
+            <div class="quiz-feedback" id="m3q1-fb-correct ok">✅ Giusto! BM25 trova "errore AB-2234" esatto. Il vettoriale trova "guasto al motore" anche scritto diversamente. Insieme coprono entrambi i casi.</div>
+            <div class="quiz-feedback" id="m3q1-fb-wrong ko">❌ L'hybrid search è più lenta, non più veloce. Il vantaggio è la completezza: trova sia corrispondenze esatte che semantiche.</div>
+          </div>
+          <div class="quiz-q">
+            <p>2. Quale vector DB è più adatto per iniziare in locale senza configurazioni complesse?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m3q2')">Chroma o pgvector</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m3q2')">Pinecone</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m3q2')">Elasticsearch</button>
+            </div>
+            <div class="quiz-feedback" id="m3q2-fb-correct ok">✅ Esatto! Chroma si installa con pip in 2 minuti. pgvector è un'estensione di Postgres che potresti già avere. Ottimi per iniziare.</div>
+            <div class="quiz-feedback" id="m3q2-fb-wrong ko">❌ Pinecone ed Elasticsearch sono ottimi in produzione ma richiedono più configurazione. Meglio Chroma o pgvector per iniziare.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="prog-bar"><div class="prog-fill" style="width:100%;background:var(--accent)"></div></div>
+
+  <!-- QUIZ SBLOCCO FASE 1 -->
+  <div class="unlock-quiz" id="uq1">
+    <h3>🔓 Quiz di Sblocco — Fase 1</h3>
+    <p class="sub">Rispondi a 3 domande per sbloccare la Fase 2: RAG & Ricerca. Devi prendere almeno 2/3.</p>
+    <div class="quiz-q"><p>1. Cos'è un embedding?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'wrong','u1q1',1)">Una versione compressa di un documento</button>
+      <button class="quiz-opt" onclick="uq(this,'correct','u1q1',1)">Una rappresentazione numerica (vettore) del significato di un testo</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u1q1',1)">Il processo di chunking dei documenti</button>
+    </div><div class="quiz-feedback" id="u1q1-fb-correct ok">✅ Esatto! Il testo diventa un vettore di numeri che ne rappresenta il significato.</div>
+    <div class="quiz-feedback" id="u1q1-fb-wrong ko">❌ Un embedding è un vettore numerico che rappresenta il significato semantico di un testo.</div></div>
+
+    <div class="quiz-q"><p>2. Perché la temperatura bassa è preferita nei sistemi RAG aziendali?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'wrong','u1q2',1)">Perché è più veloce</button>
+      <button class="quiz-opt" onclick="uq(this,'correct','u1q2',1)">Perché produce risposte stabili e deterministiche, senza creatività incontrollata</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u1q2',1)">Perché costa meno token</button>
+    </div><div class="quiz-feedback" id="u1q2-fb-correct ok">✅ Giusto! In ambito aziendale vuoi risposte prevedibili, non creative.</div>
+    <div class="quiz-feedback" id="u1q2-fb-wrong ko">❌ La temperatura bassa garantisce risposte stabili e ripetibili — fondamentale in contesti aziendali.</div></div>
+
+    <div class="quiz-q"><p>3. Cosa fa il "system prompt" in un LLM?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'correct','u1q3',1)">Definisce il comportamento e il ruolo del modello per tutta la conversazione</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u1q3',1)">Genera la risposta finale</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u1q3',1)">Comprime i token per risparmiare costi</button>
+    </div><div class="quiz-feedback" id="u1q3-fb-correct ok">✅ Esatto! Il system prompt è la configurazione iniziale invisibile all'utente che guida ogni risposta.</div>
+    <div class="quiz-feedback" id="u1q3-fb-wrong ko">❌ Il system prompt non genera risposte né comprime token: definisce chi è e come si comporta il modello.</div></div>
+
+    <div id="u1-result" class="unlock-result"></div>
+    <button class="unlock-next-btn" id="u1-next" onclick="goPhaseUnlocked(1)">Sblocca Fase 2: RAG & Ricerca →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ FASE 2 ═══════════════════════════════════════ -->
+<div class="phase" id="phase-1">
+  <div class="phase-card">
+    <div class="phase-tag" style="background:var(--green-dim);color:var(--green)"><i class="ti ti-calendar"></i> Mese 2–3</div>
+    <h2>RAG end-to-end — Il cuore dei sistemi AI aziendali</h2>
+    <p class="sub">RAG = Retrieval Augmented Generation. Il modo con cui un LLM risponde basandosi sui tuoi documenti, senza inventare nulla.</p>
+    <div class="phase-meta">
+      <span><i class="ti ti-book"></i> 3 moduli</span>
+      <span><i class="ti ti-clock"></i> ~4 settimane</span>
+      <span><i class="ti ti-code"></i> Prevalentemente pratico</span>
+    </div>
+  </div>
+  <div class="modules">
+
+    <!-- M4: CHUNKING -->
+    <div class="module" id="m4">
+      <div class="mod-header" onclick="toggleMod('m4')">
+        <div class="mod-icon" style="background:var(--green-dim)"><i class="ti ti-cut" style="color:var(--green)"></i></div>
+        <div class="mod-title"><h3>Chunking — Come spezzare i documenti</h3><p>I documenti lunghi vanno spezzati. Come e quanto conta moltissimo.</p></div>
+        <div class="mod-right">
+          <span class="badge-pratico">🔧 Pratico</span>
+          <i class="ti ti-chevron-down chevron"></i>
+        </div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m4-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m4-quiz')">🧠 Quiz</button>
+          <button class="mod-tab" onclick="switchTab(this,'m4-lab')">🔬 Esercizio</button>
+        </div>
+        <div class="tab-content active" id="m4-spieg">
+          <p class="spieg-intro">Un manuale di 500 pagine non entra nella context window di un LLM. Va spezzato in pezzi (chunk) da indicizzare. Come lo spezzi influenza la qualità delle risposte.</p>
+          <div class="analogy-box">✂️ <strong>Analogia:</strong> Devi fare un riassunto di un'enciclopedia. Non la leggi tutta — trovi le pagine giuste e le passi al modello. Il chunking decide come sono organizzate quelle pagine: troppo piccole perdi il contesto, troppo grandi sprechi token.</div>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>Chunk size</strong> <span>— quanto è grande ogni pezzo (in token). Tipicamente 200–500 token. Troppo piccolo = perdi contesto. Troppo grande = sprechi token e il retrieval è meno preciso.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>Sliding window (overlap)</strong> <span>— i chunk si sovrappongono un po' (es. 50 token di overlap). Così se un'informazione importante è a cavallo tra due pezzi, non viene persa.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>Metadata per chunk</strong> <span>— ogni chunk porta con sé informazioni extra: da quale documento viene, che versione, che capitolo, che data. Essenziale per filtrare risultati.</span></div></div>
+          </div>
+          <div class="explain-block">
+            <h4><i class="ti ti-code" style="color:var(--green)"></i> Come appare in Python (LangChain)</h4>
+            <div class="code-block">
+              <span class="kw">from</span> langchain.text_splitter <span class="kw">import</span> RecursiveCharacterTextSplitter<br><br>
+              splitter = RecursiveCharacterTextSplitter(<br>
+              &nbsp;&nbsp;chunk_size=<span class="str">400</span>,  <span class="cm"># ~400 token per pezzo</span><br>
+              &nbsp;&nbsp;chunk_overlap=<span class="str">50</span>,  <span class="cm"># 50 token di overlap</span><br>
+              )<br>
+              chunks = splitter.split_text(testo_manuale)
+            </div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">La procedura "Apertura Conto Corrente" è 12 pagine. Con chunk_size=400 e overlap=50 diventa circa 35 chunk. Ogni chunk porta i metadata: <em>procedura="apertura_conto", versione="2.3", data="2024-01"</em>. Quando esce la versione 2.4, i vecchi chunk vengono marcati obsoleti automaticamente.</div></div>
+          <button class="done-btn" id="done-m4" onclick="markDone('m4')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Spiegami il chunking dei documenti per RAG con esempi pratici e concreti')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami il chunking dei documenti per RAG con esempi pratici e concreti</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m4-quiz">
+          <div class="quiz-q">
+            <p>1. Perché si usa l'overlap (sliding window) nel chunking?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m4q1')">Per ridurre il numero di chunk totali</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m4q1')">Per non perdere informazioni che si trovano a cavallo tra due chunk consecutivi</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m4q1')">Per velocizzare l'embedding</button>
+            </div>
+            <div class="quiz-feedback" id="m4q1-fb-correct ok">✅ Esatto! Se taglia esattamente dove c'è una frase importante, senza overlap la perdi. Con overlap quella frase appare in entrambi i chunk vicini.</div>
+            <div class="quiz-feedback" id="m4q1-fb-wrong ko">❌ L'overlap aumenta il numero di chunk (non lo riduce) ma garantisce che nessuna informazione venga tagliata via.</div>
+          </div>
+        </div>
+        <div class="tab-content" id="m4-lab">
+          <div class="lab-card">
+            <h4><i class="ti ti-flask" style="color:var(--orange)"></i> Esercizio concettuale: chunking a mano</h4>
+            <p>Prendi un documento di testo qualsiasi (anche una pagina Wikipedia) e prova a suddividerlo mentalmente in chunk da ~300 parole. Poi rispondi:</p>
+            <div class="lab-steps">
+              <div class="lab-step"><div class="lab-step-num">1</div><span>Dove taglieresti i chunk? Dopo ogni paragrafo? Ogni N caratteri?</span></div>
+              <div class="lab-step"><div class="lab-step-num">2</div><span>Ci sono informazioni a cavallo tra due paragrafi che perderesti tagliando lì?</span></div>
+              <div class="lab-step"><div class="lab-step-num">3</div><span>Che metadata aggiungeresti a ogni chunk? (es. numero pagina, titolo sezione)</span></div>
+              <div class="lab-step"><div class="lab-step-num">4</div><span>Chiedi a Claude di chuncare quel documento per te e confronta la sua strategia con la tua</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M5: PIPELINE RAG -->
+    <div class="module" id="m5">
+      <div class="mod-header" onclick="toggleMod('m5')">
+        <div class="mod-icon" style="background:var(--teal-dim)"><i class="ti ti-route" style="color:var(--teal)"></i></div>
+        <div class="mod-title"><h3>Pipeline RAG completa</h3><p>Il flusso completo: dall'utente che fa una domanda alla risposta finale</p></div>
+        <div class="mod-right">
+          <span class="badge-pratico">🔧 Pratico</span>
+          <i class="ti ti-chevron-down chevron"></i>
+        </div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m5-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m5-quiz')">🧠 Quiz</button>
+          <button class="mod-tab" onclick="switchTab(this,'m5-lab')">🔬 Esercizio</button>
+        </div>
+        <div class="tab-content active" id="m5-spieg">
+          <p class="spieg-intro">La pipeline RAG è la sequenza completa di operazioni che trasforma una domanda dell'utente in una risposta basata sui tuoi documenti.</p>
+          <div class="analogy-box">🔧 <strong>Il flusso:</strong> Utente fa domanda → domanda diventa vettore → si cercano chunk simili nel DB → i chunk rilevanti + la domanda vanno all'LLM → l'LLM risponde basandosi <em>solo</em> su quei chunk.</div>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--teal)"></div><div class="topic-text"><strong>Retrieval (Recall@K)</strong> <span>— trovare i K chunk più rilevanti. Recall@K misura quante risposte giuste trovi nei top K risultati. Se la risposta è sempre nel top 5, Recall@5 = 1.0.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--teal)"></div><div class="topic-text"><strong>Reranking</strong> <span>— dopo aver trovato i candidati con BM25+vettoriale, un secondo modello (cross-encoder) li riordina per rilevanza. È più preciso ma più lento, quindi si applica solo ai top candidati.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--teal)"></div><div class="topic-text"><strong>Faithfulness / Groundedness</strong> <span>— la risposta dell'LLM è veramente basata sui documenti recuperati? O sta inventando? È la metrica più importante da monitorare in produzione.</span></div></div>
+          </div>
+          <div class="explain-block">
+            <h4><i class="ti ti-arrows-right" style="color:var(--teal)"></i> Pipeline visiva</h4>
+            <div class="code-block">
+              <span class="cm"># INGESTION (fatto una volta)</span><br>
+              Documento → Chunking → Embedding → Vector DB<br><br>
+              <span class="cm"># QUERY (ad ogni domanda)</span><br>
+              Domanda → Embedding domanda → Ricerca DB<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;→ BM25 + Vettoriale → Reranking<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;→ Top chunks + Domanda → LLM<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;→ Risposta (basata sui documenti)
+            </div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Operatore scrive: <em>"Come blocco una carta per smarrimento?"</em> → la domanda diventa vettore → il sistema trova i 5 chunk più rilevanti della procedura "Blocco Carta" → li passa all'LLM → risposta precisa con i passi da seguire. Faithfulness alta = l'AI cita la procedura, non inventa.</div></div>
+          <button class="done-btn" id="done-m5" onclick="markDone('m5')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Disegnami e spiegami la pipeline RAG end-to-end con un esempio concreto aziendale')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Disegnami e spiegami la pipeline RAG end-to-end con un esempio concreto aziendale</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m5-quiz">
+          <div class="quiz-q">
+            <p>1. In quale ordine avviene la pipeline RAG per rispondere a una domanda?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m5q1')">LLM → Retrieval → Embedding → Risposta</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m5q1')">Embedding domanda → Retrieval → Reranking → LLM → Risposta</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m5q1')">Chunking → Embedding → LLM → Risposta</button>
+            </div>
+            <div class="quiz-feedback" id="m5q1-fb-correct ok">✅ Perfetto! Prima trasformi la domanda in vettore, poi cerchi, poi riordini i risultati, poi mandi tutto all'LLM.</div>
+            <div class="quiz-feedback" id="m5q1-fb-wrong ko">❌ L'ordine corretto è: trasformi la domanda in embedding → cerchi chunk simili → reranking → mandi a LLM → risposta.</div>
+          </div>
+          <div class="quiz-q">
+            <p>2. Cos'è la "faithfulness" in un sistema RAG?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m5q2')">La velocità di risposta del sistema</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m5q2')">Il numero di documenti indicizzati</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m5q2')">Quanto la risposta dell'LLM è effettivamente basata sui documenti recuperati</button>
+            </div>
+            <div class="quiz-feedback" id="m5q2-fb-correct ok">✅ Esatto! Faithfulness alta = il modello cita e usa i documenti. Bassa = sta inventando nonostante abbia i documenti davanti.</div>
+            <div class="quiz-feedback" id="m5q2-fb-wrong ko">❌ Faithfulness misura la fedeltà della risposta ai documenti. È la metrica anti-allucinazione più importante.</div>
+          </div>
+        </div>
+        <div class="tab-content" id="m5-lab">
+          <div class="lab-card">
+            <h4><i class="ti ti-flask" style="color:var(--orange)"></i> Esercizio: simula una pipeline RAG manualmente</h4>
+            <p>Senza scrivere codice, simula a mano i passaggi di una query RAG usando Claude come LLM.</p>
+            <div class="lab-steps">
+              <div class="lab-step"><div class="lab-step-num">1</div><span>Prendi 3 paragrafi da documenti diversi (simula il tuo "vector DB")</span></div>
+              <div class="lab-step"><div class="lab-step-num">2</div><span>Scrivi una domanda. Quale paragrafo risponde meglio? (simula il retrieval a mano)</span></div>
+              <div class="lab-step"><div class="lab-step-num">3</div><span>Incolla il paragrafo + la domanda in Claude con questo prompt: <em>"Rispondi solo basandoti sul testo seguente: [paragrafo]. Domanda: [tua domanda]"</em></span></div>
+              <div class="lab-step"><div class="lab-step-num">4</div><span>Ora fai la stessa domanda a Claude senza il paragrafo. Confronta le risposte.</span></div>
+              <div class="lab-step"><div class="lab-step-num">5</div><span>Nota la differenza: senza contesto allucinazione possibile, con contesto risposta basata su fatti.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M6: OLLAMA -->
+    <div class="module" id="m6">
+      <div class="mod-header" onclick="toggleMod('m6')">
+        <div class="mod-icon" style="background:var(--orange-dim)"><i class="ti ti-cpu" style="color:var(--orange)"></i></div>
+        <div class="mod-title"><h3>Ollama — Modelli LLM in locale</h3><p>Fai girare un LLM sul tuo laptop, senza internet, senza costi</p></div>
+        <div class="mod-right">
+          <span class="badge-pratico">🔧 Pratico</span>
+          <i class="ti ti-chevron-down chevron"></i>
+        </div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m6-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m6-quiz')">🧠 Quiz</button>
+          <button class="mod-tab" onclick="switchTab(this,'m6-lab')">🔬 Esercizio</button>
+        </div>
+        <div class="tab-content active" id="m6-spieg">
+          <p class="spieg-intro">Ollama ti permette di scaricare e usare modelli open-source (Llama, Mistral, Qwen...) direttamente sul tuo computer. Utile per sviluppo e per situazioni offline.</p>
+          <div class="analogy-box">💻 <strong>Analogia:</strong> È come avere ChatGPT installato sul tuo PC. Fai domande e ottieni risposte, ma tutto resta locale, gratis e privato. Nessun dato esce dalla tua macchina.</div>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--orange)"></div><div class="topic-text"><strong>ollama pull llama3</strong> <span>— scarica il modello sul tuo PC. Come un "npm install" per gli LLM. Pesa da 4 a 70 GB a seconda del modello.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--orange)"></div><div class="topic-text"><strong>ollama run llama3</strong> <span>— avvia il modello e apre una chat interattiva nel terminale. Scrivi la tua domanda e rispondi come con ChatGPT.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--orange)"></div><div class="topic-text"><strong>API locale su :11434</strong> <span>— Ollama espone automaticamente un'API HTTP identica a quella OpenAI. Il tuo codice Python può usarlo esattamente come farebbe con ChatGPT, solo cambiando la URL.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--orange)"></div><div class="topic-text"><strong>Quantizzazione Q4/Q8</strong> <span>— versioni "compresse" del modello. Q4 = più piccolo e veloce ma meno preciso (4 bit per peso). Q8 = più pesante ma più fedele all'originale.</span></div></div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">In sviluppo usi Ollama con llama3.2 sul tuo PC: testi l'assistente gratuitamente senza mandare dati bancari fuori dall'azienda. In produzione switchi su Azure OpenAI. Se Azure è giù, il circuit breaker torna automaticamente su Ollama locale — zero downtime per gli operatori.</div></div>
+          <button class="done-btn" id="done-m6" onclick="markDone('m6')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Guidami passo passo per installare Ollama e far girare il mio primo modello LLM in locale')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Guidami passo passo per installare Ollama e far girare il mio primo modello LLM in locale</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m6-quiz">
+          <div class="quiz-q">
+            <p>1. Qual è il vantaggio principale di Ollama rispetto a OpenAI per lo sviluppo?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m6q1')">Ha modelli più intelligenti</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m6q1')">Gira in locale: zero costi per token, zero dati inviati fuori, funziona offline</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m6q1')">È più veloce di OpenAI</button>
+            </div>
+            <div class="quiz-feedback" id="m6q1-fb-correct ok">✅ Esatto! Sviluppo locale = test infiniti senza costi. E i dati aziendali restano in casa.</div>
+            <div class="quiz-feedback" id="m6q1-fb-wrong ko">❌ Ollama non è più intelligente né più veloce di OpenAI. Il vantaggio è locale, gratuito e privato.</div>
+          </div>
+        </div>
+        <div class="tab-content" id="m6-lab">
+          <div class="lab-card">
+            <h4><i class="ti ti-flask" style="color:var(--orange)"></i> Esercizio: installa Ollama e prova il tuo primo modello locale</h4>
+            <div class="lab-steps">
+              <div class="lab-step"><div class="lab-step-num">1</div><span>Vai su <strong>ollama.ai</strong> e scarica Ollama per il tuo sistema operativo</span></div>
+              <div class="lab-step"><div class="lab-step-num">2</div><span>Apri il terminale e scrivi: <code style="font-family:monospace;background:var(--bg);padding:2px 5px;border-radius:4px;color:var(--orange)">ollama pull llama3.2</code> (modello leggero, ~2GB)</span></div>
+              <div class="lab-step"><div class="lab-step-num">3</div><span>Avvia la chat: <code style="font-family:monospace;background:var(--bg);padding:2px 5px;border-radius:4px;color:var(--orange)">ollama run llama3.2</code> e fai una domanda</span></div>
+              <div class="lab-step"><div class="lab-step-num">4</div><span>Confronta la risposta con quella di ChatGPT sulla stessa domanda. Nota le differenze.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="prog-bar"><div class="prog-fill" style="width:100%;background:var(--green)"></div></div>
+
+  <!-- QUIZ SBLOCCO FASE 2 -->
+  <div class="unlock-quiz" id="uq2">
+    <h3>🔓 Quiz di Sblocco — Fase 2</h3>
+    <p class="sub">3 domande per sbloccare la Fase 3: Infrastruttura. Servono almeno 2/3.</p>
+    <div class="quiz-q"><p>1. In una pipeline RAG, cosa succede PRIMA del retrieval?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'wrong','u2q1',2)">La risposta dell'LLM</button>
+      <button class="quiz-opt" onclick="uq(this,'correct','u2q1',2)">La domanda viene trasformata in un vettore (embedding)</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u2q1',2)">Il reranking dei risultati</button>
+    </div><div class="quiz-feedback" id="u2q1-fb-correct ok">✅ Sì! Prima trasformi la domanda in vettore, poi cerchi nel DB i chunk simili.</div>
+    <div class="quiz-feedback" id="u2q1-fb-wrong ko">❌ L'ordine è: embedding della domanda → retrieval → reranking → LLM → risposta.</div></div>
+
+    <div class="quiz-q"><p>2. Perché si usa l'overlap nel chunking?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'correct','u2q2',2)">Per non perdere informazioni a cavallo tra due chunk consecutivi</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u2q2',2)">Per ridurre il numero totale di chunk</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u2q2',2)">Per velocizzare l'embedding</button>
+    </div><div class="quiz-feedback" id="u2q2-fb-correct ok">✅ Esatto! Se un'info è a cavallo del taglio, l'overlap garantisce che appaia in almeno uno dei due chunk.</div>
+    <div class="quiz-feedback" id="u2q2-fb-wrong ko">❌ L'overlap aumenta i chunk ma evita di perdere informazioni che si trovano esattamente al punto di taglio.</div></div>
+
+    <div class="quiz-q"><p>3. Cosa misura la "faithfulness" in un sistema RAG?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'wrong','u2q3',2)">La velocità di risposta</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u2q3',2)">Il numero di documenti indicizzati</button>
+      <button class="quiz-opt" onclick="uq(this,'correct','u2q3',2)">Quanto la risposta è basata sui documenti recuperati e non inventata</button>
+    </div><div class="quiz-feedback" id="u2q3-fb-correct ok">✅ Esatto! È la metrica anti-allucinazione più importante in un sistema RAG.</div>
+    <div class="quiz-feedback" id="u2q3-fb-wrong ko">❌ Faithfulness misura la fedeltà della risposta ai documenti — la metrica più critica contro le allucinazioni.</div></div>
+
+    <div id="u2-result" class="unlock-result"></div>
+    <button class="unlock-next-btn" id="u2-next" onclick="goPhaseUnlocked(2)">Sblocca Fase 3: Infrastruttura →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ FASE 3 ═══════════════════════════════════════ -->
+<div class="phase" id="phase-2">
+  <div class="phase-card">
+    <div class="phase-tag" style="background:var(--orange-dim);color:var(--orange)"><i class="ti ti-calendar"></i> Mese 3–4</div>
+    <h2>Infrastruttura — Container, Messaggistica, Microservizi</h2>
+    <p class="sub">Come si "imballa" e si fa girare tutto in modo affidabile. Più tecnico, ma con analogie per ogni concetto.</p>
+    <div class="phase-meta">
+      <span><i class="ti ti-book"></i> 4 moduli</span>
+      <span><i class="ti ti-clock"></i> ~5 settimane</span>
+      <span><i class="ti ti-settings"></i> Tecnico pratico</span>
+    </div>
+  </div>
+  <div class="modules">
+
+    <div class="module" id="m7">
+      <div class="mod-header" onclick="toggleMod('m7')">
+        <div class="mod-icon" style="background:var(--purple-dim)"><i class="ti ti-box" style="color:var(--purple)"></i></div>
+        <div class="mod-title"><h3>Container con Podman</h3><p>Impacchetta applicazioni così funzionano ovunque — come Docker ma più sicuro</p></div>
+        <div class="mod-right"><span class="badge-pratico">🔧 Pratico</span><i class="ti ti-chevron-down chevron"></i></div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m7-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m7-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m7-spieg">
+          <p class="spieg-intro">Un container è come una scatola che contiene un'applicazione con tutto il necessario per farla girare. Porti la scatola su qualsiasi server e funziona identicamente.</p>
+          <div class="analogy-box">📦 <strong>Analogia:</strong> IKEA ti manda un pacco con il mobile + istruzioni + tutti i pezzi. Non serve che tu abbia già viti speciali — è tutto dentro. Il container è il pacco: funziona su qualsiasi "tavolo" (server).</div>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--purple)"></div><div class="topic-text"><strong>Podman vs Docker</strong> <span>— praticamente la stessa CLI, ma Podman non richiede un processo root sempre attivo. Più sicuro in ambito aziendale dove i permessi root sono limitati.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--purple)"></div><div class="topic-text"><strong>Containerfile/Dockerfile</strong> <span>— il "ricettario" per costruire il container. Dice quali file copiare, quale sistema operativo usare, quali comandi eseguire all'avvio.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--purple)"></div><div class="topic-text"><strong>Podman Compose</strong> <span>— fa girare più container insieme con un solo comando. Per il tuo stack RAG: API + Vector DB + Ollama + Kafka, tutti insieme con un file YAML.</span></div></div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Il tuo Containerfile impacchetta l'assistente bancario con tutte le dipendenze. Il Podman Compose fa partire insieme: API + ChromaDB + Ollama. In ambienti bancari Podman è preferito a Docker perché non richiede privilegi root — requisito standard di sicurezza.</div></div>
+          <button class="done-btn" id="done-m7" onclick="markDone('m7')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Spiegami i container e Podman partendo da zero con analogie semplici ed esempi pratici')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami i container e Podman partendo da zero con analogie semplici ed esempi pratici</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m7-quiz">
+          <div class="quiz-q">
+            <p>1. Qual è il vantaggio principale di usare un container?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m7q1')">L'applicazione diventa più veloce</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m7q1')">Funziona identicamente su qualsiasi server senza dipendenze da installare</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m7q1')">Occupa meno spazio su disco</button>
+            </div>
+            <div class="quiz-feedback" id="m7q1-fb-correct ok">✅ Esatto! "Works on my machine" addio. Il container porta tutto con sé: stesso comportamento ovunque.</div>
+            <div class="quiz-feedback" id="m7q1-fb-wrong ko">❌ I container non aumentano la velocità né riducono lo spazio. Il vantaggio è la portabilità: stesso comportamento su qualsiasi server.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="m8">
+      <div class="mod-header" onclick="toggleMod('m8')">
+        <div class="mod-icon" style="background:var(--red-dim)"><i class="ti ti-arrows-exchange" style="color:var(--red)"></i></div>
+        <div class="mod-title"><h3>Kafka & Pub/Sub — Messaggistica asincrona</h3><p>Come i servizi si parlano senza bloccarsi a vicenda</p></div>
+        <div class="mod-right"><span class="badge-concettuale">📖 Concettuale</span><i class="ti ti-chevron-down chevron"></i></div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m8-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m8-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m8-spieg">
+          <p class="spieg-intro">Le chiamate LLM sono lente (10–30 secondi). Non puoi bloccare l'utente nell'attesa. La messaggistica asincrona risolve questo.</p>
+          <div class="analogy-box">📬 <strong>Analogia:</strong> Invece di chiamare il pizzaiolo e aspettare in attesa al telefono, lasci il numero e ti richiama quando la pizza è pronta. Il "lascio il numero" = messaggio su Kafka. Il "ti richiamo" = risposta asincrona al tuo sistema.</div>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>Topic</strong> <span>— una "coda" con un nome. Es: <em>documenti-da-indicizzare</em>. I servizi pubblicano messaggi lì e altri servizi li leggono quando sono pronti.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>Consumer group</strong> <span>— più istanze del stesso servizio leggono lo stesso topic ma ognuna riceve messaggi diversi. Scalabilità automatica: aggiungi istanze e la velocità aumenta.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>DLQ (Dead Letter Queue)</strong> <span>— se un messaggio fallisce N volte (es. il documento è corrotto), va in questa coda speciale. Così non si perde e si può analizzare il problema.</span></div></div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Quando un operatore carica una nuova procedura PDF, il messaggio va su Kafka topic <em>"procedure-da-indicizzare"</em>. Il servizio di embedding lo processa in background. L'operatore non aspetta — continua a lavorare e la procedura è disponibile in pochi secondi.</div></div>
+          <button class="done-btn" id="done-m8" onclick="markDone('m8')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Spiegami Kafka e la messaggistica asincrona con esempi pratici in un contesto RAG e LLM')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami Kafka e la messaggistica asincrona con esempi pratici in un contesto RAG e LLM</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m8-quiz">
+          <div class="quiz-q">
+            <p>1. Perché si usa la messaggistica asincrona con le chiamate LLM?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m8q1')">Per rendere l'LLM più veloce</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m8q1')">Per non bloccare l'utente mentre aspetta una risposta che può richiedere 10–30 secondi</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m8q1')">Per risparmiare token</button>
+            </div>
+            <div class="quiz-feedback" id="m8q1-fb-correct ok">✅ Esatto! L'utente non resta bloccato ad aspettare. Il sistema lavora in background e notifica quando ha finito.</div>
+            <div class="quiz-feedback" id="m8q1-fb-wrong ko">❌ Kafka non velocizza l'LLM né risparmia token. Serve a non bloccare l'utente in attesa di risposte lente.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="m9">
+      <div class="mod-header" onclick="toggleMod('m9')">
+        <div class="mod-icon" style="background:var(--teal-dim)"><i class="ti ti-puzzle" style="color:var(--teal)"></i></div>
+        <div class="mod-title"><h3>Microservizi per RAG</h3><p>Come spezzare il sistema in pezzi indipendenti che collaborano</p></div>
+        <div class="mod-right"><span class="badge-concettuale">📖 Concettuale</span><i class="ti ti-chevron-down chevron"></i></div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m9-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m9-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m9-spieg">
+          <p class="spieg-intro">Un sistema RAG aziendale non è un singolo programma. È fatto di servizi specializzati che collaborano, ognuno con un compito preciso.</p>
+          <div class="analogy-box">🏭 <strong>Analogia:</strong> In fabbrica hai reparti separati: uno riceve materie prime, uno trasforma, uno controlla qualità, uno spedisce. Se il reparto qualità è lento, gli altri continuano. I microservizi funzionano così.</div>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--teal)"></div><div class="topic-text"><strong>Ingestion service</strong> <span>— riceve documenti, li parsa, li chunka, li manda all'embedding service.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--teal)"></div><div class="topic-text"><strong>Retrieval service</strong> <span>— riceve una domanda, cerca i chunk rilevanti nel vector DB con hybrid search.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--teal)"></div><div class="topic-text"><strong>LLM Orchestrator</strong> <span>— prende il contesto recuperato + domanda, chiama il provider LLM (Azure/AWS/Ollama), restituisce la risposta. Gestisce lo switch automatico se un provider è giù.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--teal)"></div><div class="topic-text"><strong>Circuit breaker</strong> <span>— se OpenAI è giù per 3 chiamate consecutive, smette di provarci e switcha subito su Ollama. Evita di sprecare tempo su un servizio che non risponde.</span></div></div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Il tuo sistema ha 4 microservizi: <em>ingestion</em> (riceve i PDF), <em>embedding</em> (li indicizza), <em>retrieval</em> (cerca le procedure rilevanti), <em>orchestrator</em> (chiama l'LLM e restituisce la risposta). Se il retrieval è lento, non blocca l'ingestion — lavorano in parallelo.</div></div>
+          <button class="done-btn" id="done-m9" onclick="markDone('m9')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Disegnami l\'architettura a microservizi di un sistema RAG aziendale spiegata in modo semplice')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Disegnami l'architettura a microservizi di un sistema RAG aziendale spiegata in modo semplice</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m9-quiz">
+          <div class="quiz-q">
+            <p>1. Cosa fa il "circuit breaker" in un sistema RAG?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m9q1')">Spegne il sistema in caso di sovraccarico</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m9q1')">Smette di chiamare un provider che non risponde e passa automaticamente a un altro</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m9q1')">Limita il numero di richieste per utente</button>
+            </div>
+            <div class="quiz-feedback" id="m9q1-fb-correct ok">✅ Esatto! Se OpenAI è down, il circuit breaker "apre" e devia tutto su Ollama o Bedrock. Nessun downtime per l'utente.</div>
+            <div class="quiz-feedback" id="m9q1-fb-wrong ko">❌ Il circuit breaker non spegne nulla. Rileva che un servizio non risponde e switcha automaticamente al fallback (es. Ollama locale).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="m10">
+      <div class="mod-header" onclick="toggleMod('m10')">
+        <div class="mod-icon" style="background:var(--red-dim)"><i class="ti ti-file-text" style="color:var(--red)"></i></div>
+        <div class="mod-title"><h3>Ingestion & Parsing Documenti</h3><p>PDF, Word, ticket, HTML — come si trasformano in knowledge per l'AI</p></div>
+        <div class="mod-right"><span class="badge-pratico">🔧 Pratico</span><i class="ti ti-chevron-down chevron"></i></div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m10-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m10-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m10-spieg">
+          <p class="spieg-intro">Prima di indicizzare, i documenti grezzi vanno "letti" e normalizzati. Questa fase è spesso sottovalutata ma determinante per la qualità finale.</p>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>PDF parsing</strong> <span>— strumenti come PDFPlumber o LlamaParse estraggono testo, tabelle e immagini. Se il PDF è scansionato (foto di un documento) serve l'OCR per convertirlo in testo leggibile.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>Normalizzazione</strong> <span>— rimuovi header e footer che si ripetono su ogni pagina, standardizza la struttura, gestisci encoding diversi (UTF-8 vs Latin-1).</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>Deduplication</strong> <span>— stesso documento caricato due volte? Il sistema deve riconoscerlo (tramite hash del contenuto) e non duplicare l'indice.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>Versioning</strong> <span>— quando un manuale v2.0 sostituisce il v1.0, i vecchi chunk devono essere rimossi o marcati come obsoleti per non confondere il modello.</span></div></div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Le procedure bancarie hanno spesso tabelle (es. limiti di importo per tipo di operazione) e header ripetuti su ogni pagina ("USO INTERNO - RISERVATO"). Il parser deve estrarre le tabelle correttamente e rimuovere gli header, altrimenti ogni chunk conterrà testo inutile che confonde il retrieval.</div></div>
+          <button class="done-btn" id="done-m10" onclick="markDone('m10')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Spiegami come funziona l\'ingestion e il parsing di documenti in una pipeline RAG')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami come funziona l'ingestion e il parsing di documenti in una pipeline RAG</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m10-quiz">
+          <div class="quiz-q">
+            <p>1. Perché la deduplication è importante nell'ingestion?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m10q1')">Per velocizzare il retrieval</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m10q1')">Per evitare che lo stesso documento caricato due volte duplichi i chunk nel vector DB</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m10q1')">Per ridurre la dimensione del modello</button>
+            </div>
+            <div class="quiz-feedback" id="m10q1-fb-correct ok">✅ Esatto! Chunk duplicati = risposte che ripetono la stessa fonte più volte e indice gonfio senza motivo.</div>
+            <div class="quiz-feedback" id="m10q1-fb-wrong ko">❌ La deduplication serve a non avere chunk identici nel DB. Se il doc è caricato due volte, senza dedup avresti ogni chunk duplicato.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="prog-bar"><div class="prog-fill" style="width:100%;background:var(--orange)"></div></div>
+
+  <!-- QUIZ SBLOCCO FASE 3 -->
+  <div class="unlock-quiz" id="uq3">
+    <h3>🔓 Quiz di Sblocco — Fase 3</h3>
+    <p class="sub">3 domande per sbloccare la Fase 4: Cloud & Produzione. Servono almeno 2/3.</p>
+    <div class="quiz-q"><p>1. Qual è il vantaggio principale dei container?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'wrong','u3q1',3)">Rendono le app più veloci</button>
+      <button class="quiz-opt" onclick="uq(this,'correct','u3q1',3)">L'app funziona identicamente su qualsiasi server senza dipendenze da installare</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u3q1',3)">Occupano meno spazio su disco</button>
+    </div><div class="quiz-feedback" id="u3q1-fb-correct ok">✅ Portabilità totale — stessa app, stesso comportamento, ovunque.</div>
+    <div class="quiz-feedback" id="u3q1-fb-wrong ko">❌ Il vantaggio dei container è la portabilità: funzionano identicamente su qualsiasi server.</div></div>
+
+    <div class="quiz-q"><p>2. Perché si usa Kafka con le chiamate LLM?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'correct','u3q2',3)">Le chiamate LLM sono lente: la messaggistica asincrona evita di bloccare l'utente</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u3q2',3)">Per rendere il modello più preciso</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u3q2',3)">Per ridurre il numero di token</button>
+    </div><div class="quiz-feedback" id="u3q2-fb-correct ok">✅ Giusto! L'utente non aspetta bloccato — il sistema lavora in background e lo notifica.</div>
+    <div class="quiz-feedback" id="u3q2-fb-wrong ko">❌ Kafka non migliora la precisione né riduce i token. Serve per la comunicazione asincrona tra servizi.</div></div>
+
+    <div class="quiz-q"><p>3. Cosa fa il "circuit breaker" in un sistema RAG?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'wrong','u3q3',3)">Limita le richieste degli utenti</button>
+      <button class="quiz-opt" onclick="uq(this,'correct','u3q3',3)">Rileva che un provider LLM è giù e switcha automaticamente al fallback</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u3q3',3)">Cripta i messaggi in transito</button>
+    </div><div class="quiz-feedback" id="u3q3-fb-correct ok">✅ Esatto! Se OpenAI è giù, il circuit breaker devia automaticamente su Ollama o Bedrock.</div>
+    <div class="quiz-feedback" id="u3q3-fb-wrong ko">❌ Il circuit breaker gestisce i fallback automatici tra provider, non il rate limiting né la crittografia.</div></div>
+
+    <div id="u3-result" class="unlock-result"></div>
+    <button class="unlock-next-btn" id="u3-next" onclick="goPhaseUnlocked(3)">Sblocca Fase 4: Cloud & Produzione →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ FASE 4 ═══════════════════════════════════════ -->
+<div class="phase" id="phase-3">
+  <div class="phase-card">
+    <div class="phase-tag" style="background:var(--purple-dim);color:var(--purple)"><i class="ti ti-calendar"></i> Mese 4–5</div>
+    <h2>Cloud & Produzione — GCP, Azure, AWS</h2>
+    <p class="sub">Come si porta tutto in cloud, in modo sicuro, scalabile e accessibile dall'esterno.</p>
+    <div class="phase-meta">
+      <span><i class="ti ti-book"></i> 3 moduli</span>
+      <span><i class="ti ti-clock"></i> ~4 settimane</span>
+      <span><i class="ti ti-cloud"></i> Cloud pratico</span>
+    </div>
+  </div>
+  <div class="modules">
+
+    <div class="module" id="m11">
+      <div class="mod-header" onclick="toggleMod('m11')">
+        <div class="mod-icon" style="background:var(--accent-dim)"><i class="ti ti-cloud" style="color:var(--accent)"></i></div>
+        <div class="mod-title"><h3>Cloud per LLM — GCP, Azure, AWS</h3><p>Dove gira il tuo sistema in produzione e come lo esponi al mondo</p></div>
+        <div class="mod-right"><span class="badge-pratico">🔧 Pratico</span><i class="ti ti-chevron-down chevron"></i></div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m11-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m11-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m11-spieg">
+          <p class="spieg-intro">I tre cloud provider principali. In azienda tipicamente si usa uno dei tre o un mix. I concetti comuni ti permettono di adattarti a qualsiasi.</p>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--accent)"></div><div class="topic-text"><strong>GCP — Vertex AI</strong> <span>— il servizio di Google per LLM managed. Cloud Run = serverless per le tue API (paghi solo quando vengono chiamate).</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--accent)"></div><div class="topic-text"><strong>Azure — Azure OpenAI</strong> <span>— GPT-4 e embedding via API Microsoft. Ottimo per ambienti enterprise già su Azure. Ha anche Azure AI Search per hybrid search managed.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--accent)"></div><div class="topic-text"><strong>AWS — Bedrock</strong> <span>— accesso a Claude (Anthropic), Llama, Cohere, Mistral via un'unica API. Knowledge Bases gestisce il RAG in modo nativo.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--accent)"></div><div class="topic-text"><strong>API Gateway</strong> <span>— il "portiere" davanti alle tue API. Gestisce autenticazione JWT, rate limiting (max N richieste al minuto), versioning (/v1/, /v2/).</span></div></div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">La banca è già su Azure → usi Azure OpenAI per i modelli GPT e Azure AI Search per il retrieval ibrido managed. Le procedure stanno su Azure Blob Storage. L'API è esposta tramite Azure API Management con autenticazione Azure AD — gli operatori accedono con le stesse credenziali aziendali.</div></div>
+          <button class="done-btn" id="done-m11" onclick="markDone('m11')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Spiegami le differenze tra GCP Vertex AI, Azure OpenAI e AWS Bedrock per un sistema RAG aziendale')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami le differenze tra GCP Vertex AI, Azure OpenAI e AWS Bedrock per un sistema RAG aziendale</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m11-quiz">
+          <div class="quiz-q">
+            <p>1. Se sei già in un ambiente Microsoft con Active Directory, quale cloud è più naturale usare?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m11q1')">AWS Bedrock</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m11q1')">Azure (con Azure OpenAI e Entra ID)</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m11q1')">GCP Vertex AI</button>
+            </div>
+            <div class="quiz-feedback" id="m11q1-fb-correct ok">✅ Esatto! Azure si integra nativamente con Active Directory (ora Entra ID), SSO aziendale e tutti i tool Microsoft già in uso.</div>
+            <div class="quiz-feedback" id="m11q1-fb-wrong ko">❌ In un ambiente Microsoft, Azure è la scelta più naturale perché si integra con Active Directory, Teams, e il resto dello stack Microsoft.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="m12">
+      <div class="mod-header" onclick="toggleMod('m12')">
+        <div class="mod-icon" style="background:var(--purple-dim)"><i class="ti ti-shield-lock" style="color:var(--purple)"></i></div>
+        <div class="mod-title"><h3>IAM & Sicurezza Cloud</h3><p>Chi può fare cosa — il principio del minimo privilegio</p></div>
+        <div class="mod-right"><span class="badge-concettuale">📖 Concettuale</span><i class="ti ti-chevron-down chevron"></i></div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m12-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m12-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m12-spieg">
+          <p class="spieg-intro">In cloud ogni servizio deve poter fare solo quello che gli serve, niente di più. Questo limita i danni in caso di compromissione.</p>
+          <div class="analogy-box">🏨 <strong>Analogia:</strong> In hotel il personale delle pulizie ha la chiave delle camere ma non della cassaforte. Il direttore ha la cassaforte ma non la cucina. IAM fa lo stesso con i servizi cloud: ognuno ha solo i permessi che servono al suo lavoro.</div>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--purple)"></div><div class="topic-text"><strong>Service Account / Managed Identity</strong> <span>— ogni microservizio ha la sua "identità" cloud con permessi minimi. Il retrieval service può solo leggere il vector DB, non scrivere.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--purple)"></div><div class="topic-text"><strong>Secret Manager</strong> <span>— le chiavi API non vanno nel codice o nelle immagini container. Vanno nel Secret Manager e si leggono a runtime. Se il container viene rubato, le chiavi sono al sicuro.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--purple)"></div><div class="topic-text"><strong>Zero trust</strong> <span>— non ci si fida di nessun servizio per default, neanche di quelli interni. Ogni chiamata tra microservizi deve essere autenticata con certificati (mTLS).</span></div></div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Il microservizio di retrieval ha un Service Account che può SOLO leggere il vector DB — non scrivere, non cancellare. Le chiavi API di Azure OpenAI stanno nel Key Vault, non nel codice. Se un container viene compromesso, l'attaccante non trova nessuna chiave.</div></div>
+          <button class="done-btn" id="done-m12" onclick="markDone('m12')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Spiegami IAM, zero-trust e gestione segreti in cloud per sistemi AI con esempi pratici')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami IAM, zero-trust e gestione segreti in cloud per sistemi AI con esempi pratici</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m12-quiz">
+          <div class="quiz-q">
+            <p>1. Perché le chiavi API non vanno messe nel codice sorgente?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m12q1')">Perché rallentano il codice</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m12q1')">Perché chiunque abbia accesso al repository o all'immagine container le vedrebbe in chiaro</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m12q1')">Perché i modelli non le accettano in quel formato</button>
+            </div>
+            <div class="quiz-feedback" id="m12q1-fb-correct ok">✅ Esatto! Una chiave nel codice = chiunque legga il repo (anche su GitHub) può usarla. Secret Manager le cripta e le rende disponibili solo ai servizi autorizzati.</div>
+            <div class="quiz-feedback" id="m12q1-fb-wrong ko">❌ Le chiavi nel codice sono un rischio di sicurezza enorme: chiunque legga il repo, il container o i log le vede e può usarle a tue spese.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="m13">
+      <div class="mod-header" onclick="toggleMod('m13')">
+        <div class="mod-icon" style="background:var(--teal-dim)"><i class="ti ti-activity" style="color:var(--teal)"></i></div>
+        <div class="mod-title"><h3>Observability — Capire cosa sta succedendo</h3><p>Log, tracing e metriche per un sistema AI in produzione</p></div>
+        <div class="mod-right"><span class="badge-pratico">🔧 Pratico</span><i class="ti ti-chevron-down chevron"></i></div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m13-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m13-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m13-spieg">
+          <p class="spieg-intro">Se qualcosa va storto in produzione, come lo scopri? Come tracci una richiesta dall'utente fino alla risposta LLM e capisci dov'è il problema?</p>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--teal)"></div><div class="topic-text"><strong>OpenTelemetry</strong> <span>— standard aperto per raccogliere log, metriche e trace da tutti i microservizi con un unico sistema. Non sei legato a un vendor specifico.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--teal)"></div><div class="topic-text"><strong>Trace distribuito</strong> <span>— segui una richiesta attraverso tutti i microservizi con un unico ID. Vedi: l'ingestion ha impiegato 2s, il retrieval 0.5s, l'LLM 8s. Sai dove ottimizzare.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--teal)"></div><div class="topic-text"><strong>Metriche RAG chiave</strong> <span>— latency p95 (il 95% delle richieste risponde in meno di X ms), costo per query, groundedness score, refusal rate. Queste dicono se il sistema funziona bene.</span></div></div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Con OpenTelemetry tracci ogni richiesta: operatore chiede → 45ms retrieval → 8.2s LLM → risposta. Se gli operatori si lamentano che "è lento", sai subito che il collo di bottiglia è l'LLM, non il retrieval. La latency p95 target è sotto 10 secondi.</div></div>
+          <button class="done-btn" id="done-m13" onclick="markDone('m13')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Spiegami come si monitora un sistema RAG in produzione con OpenTelemetry e metriche pratiche')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami come si monitora un sistema RAG in produzione con OpenTelemetry e metriche pratiche</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m13-quiz">
+          <div class="quiz-q">
+            <p>1. Cosa ti permette di fare il "trace distribuito"?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m13q1')">Seguire una singola richiesta attraverso tutti i microservizi e vedere dove si perde tempo</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m13q1')">Velocizzare le chiamate LLM</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m13q1')">Ridurre il costo per token</button>
+            </div>
+            <div class="quiz-feedback" id="m13q1-fb-correct ok">✅ Giusto! Con il trace distribuito vedi esattamente dove va ogni millisecondo. Retrieval lento? LLM lento? Lo sai subito.</div>
+            <div class="quiz-feedback" id="m13q1-fb-wrong ko">❌ Il trace distribuito è uno strumento di debug e monitoring, non di ottimizzazione diretta. Ti dice dove guardare per ottimizzare.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="prog-bar"><div class="prog-fill" style="width:100%;background:var(--purple)"></div></div>
+
+  <!-- QUIZ SBLOCCO FASE 4 -->
+  <div class="unlock-quiz" id="uq4">
+    <h3>🔓 Quiz di Sblocco — Fase 4</h3>
+    <p class="sub">3 domande per sbloccare la Fase 5: Sicurezza & Ops. Servono almeno 2/3.</p>
+    <div class="quiz-q"><p>1. Perché le chiavi API non vanno nel codice sorgente?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'correct','u4q1',4)">Chiunque acceda al repository o al container le vedrebbe e potrebbe usarle</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u4q1',4)">Rallentano il build</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u4q1',4)">I modelli non le accettano in quel formato</button>
+    </div><div class="quiz-feedback" id="u4q1-fb-correct ok">✅ Esatto! Chiave nel codice = leak immediato. Vanno nel Secret Manager.</div>
+    <div class="quiz-feedback" id="u4q1-fb-wrong ko">❌ È un rischio di sicurezza: chiunque legga il repo o il container vede la chiave e può usarla a tue spese.</div></div>
+
+    <div class="quiz-q"><p>2. Quale cloud è più naturale in un ambiente già Microsoft?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'wrong','u4q2',4)">AWS Bedrock</button>
+      <button class="quiz-opt" onclick="uq(this,'correct','u4q2',4)">Azure (con Azure OpenAI e Entra ID)</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u4q2',4)">GCP Vertex AI</button>
+    </div><div class="quiz-feedback" id="u4q2-fb-correct ok">✅ Azure si integra nativamente con Active Directory, Teams e tutto lo stack Microsoft.</div>
+    <div class="quiz-feedback" id="u4q2-fb-wrong ko">❌ In un ambiente Microsoft, Azure è la scelta naturale per l'integrazione con Active Directory e i tool già in uso.</div></div>
+
+    <div class="quiz-q"><p>3. Cosa permette di fare il "trace distribuito"?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'correct','u4q3',4)">Seguire una richiesta attraverso tutti i microservizi e vedere dove si perde tempo</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u4q3',4)">Velocizzare le chiamate LLM</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u4q3',4)">Ridurre il costo per token</button>
+    </div><div class="quiz-feedback" id="u4q3-fb-correct ok">✅ Con il trace vedi ogni millisecondo dove va. Essenziale per capire dove ottimizzare.</div>
+    <div class="quiz-feedback" id="u4q3-fb-wrong ko">❌ Il trace distribuito è per il monitoring e il debug, non per velocizzare o ridurre costi direttamente.</div></div>
+
+    <div id="u4-result" class="unlock-result"></div>
+    <button class="unlock-next-btn" id="u4-next" onclick="goPhaseUnlocked(4)">Sblocca Fase 5: Sicurezza & Ops →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ FASE 5 ═══════════════════════════════════════ -->
+<div class="phase" id="phase-4">
+  <div class="phase-card">
+    <div class="phase-tag" style="background:var(--red-dim);color:var(--red)"><i class="ti ti-calendar"></i> Mese 5–6</div>
+    <h2>Sicurezza, Evaluation & Ops — Il sistema che dura</h2>
+    <p class="sub">Valutare la qualità, gestire i costi, rispondere agli incidenti. La differenza tra un prototipo e un sistema reale.</p>
+    <div class="phase-meta">
+      <span><i class="ti ti-book"></i> 3 moduli</span>
+      <span><i class="ti ti-clock"></i> ~4 settimane</span>
+      <span><i class="ti ti-shield"></i> Operativo</span>
+    </div>
+  </div>
+  <div class="modules">
+
+    <div class="module" id="m14">
+      <div class="mod-header" onclick="toggleMod('m14')">
+        <div class="mod-icon" style="background:var(--red-dim)"><i class="ti ti-clipboard-check" style="color:var(--red)"></i></div>
+        <div class="mod-title"><h3>Evaluation & Guardrail</h3><p>Come sai che il tuo sistema RAG dà risposte giuste e sicure?</p></div>
+        <div class="mod-right"><span class="badge-misto">📖🔧 Misto</span><i class="ti ti-chevron-down chevron"></i></div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m14-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m14-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m14-spieg">
+          <p class="spieg-intro">Un sistema RAG non si valuta "a occhio". Serve un framework di testing automatico che dica se le risposte sono corrette, fedeli ai documenti e sicure.</p>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>Gold dataset</strong> <span>— set di domande con risposta "giusta" nota. Si usa per testare che un aggiornamento non abbia peggiorato le risposte (regression testing). Es: 100 domande con risposta attesa.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>Groundedness score</strong> <span>— metrica che misura se la risposta è supportata dai documenti recuperati. La metrica più critica per RAG aziendale: alto = il modello usa i documenti, basso = sta inventando.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>PII Redaction</strong> <span>— rimuovi automaticamente dati personali (nomi, email, codice fiscale) dalle risposte prima di mostrarle. Obbligatorio per compliance GDPR.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>Content filter</strong> <span>— blocca risposte inappropriate, off-topic o che violano policy aziendali. Sia in input (cosa chiede l'utente) che in output (cosa risponde il sistema).</span></div></div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Il gold dataset contiene 50 domande reali degli operatori con la risposta corretta. Il PII redaction è critico: se un operatore chiede di un cliente specifico, la risposta non deve contenere nome, IBAN o dati personali. Il content filter blocca domande fuori scope ("come faccio un bonifico personale?").</div></div>
+          <button class="done-btn" id="done-m14" onclick="markDone('m14')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Spiegami come si valuta e si mette in sicurezza un sistema RAG con guardrail e evaluation framework')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami come si valuta e si mette in sicurezza un sistema RAG con guardrail e evaluation framework</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m14-quiz">
+          <div class="quiz-q">
+            <p>1. Cos'è un "gold dataset" nel contesto dell'evaluation RAG?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m14q1')">Il dataset di training del modello LLM</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m14q1')">Un set di domande con risposta corretta nota, usato per testare regressioni</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m14q1')">I documenti più importanti dell'azienda</button>
+            </div>
+            <div class="quiz-feedback" id="m14q1-fb-correct ok">✅ Esatto! Con 100 domande "gold", puoi misurare automaticamente se un aggiornamento ha migliorato o peggiorato le risposte.</div>
+            <div class="quiz-feedback" id="m14q1-fb-wrong ko">❌ Il gold dataset non è usato per training. Serve per testing: hai le domande e le risposte giuste, e misuri se il sistema le trova.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="m15">
+      <div class="mod-header" onclick="toggleMod('m15')">
+        <div class="mod-icon" style="background:var(--green-dim)"><i class="ti ti-coin" style="color:var(--green)"></i></div>
+        <div class="mod-title"><h3>Cost Management</h3><p>Gli LLM costano a token. Come non bruciare budget senza accorgersene.</p></div>
+        <div class="mod-right"><span class="badge-concettuale">📖 Concettuale</span><i class="ti ti-chevron-down chevron"></i></div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m15-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m15-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m15-spieg">
+          <p class="spieg-intro">In produzione, ogni richiesta LLM costa. Con migliaia di query al giorno, il costo esplode se non gestito bene.</p>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>Model routing</strong> <span>— per domande semplici ("qual è l'orario di apertura?") usa un modello economico (Haiku, Mistral mini). Solo per quelle complesse usa il modello costoso (GPT-4, Claude Opus).</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>Embedding cache</strong> <span>— se lo stesso chunk viene embeddato più volte (es. stessa pagina del manuale), salva il risultato e riusalo. L'embedding è costoso e deterministico: stesso testo = stesso vettore.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>Tracciamento per feature</strong> <span>— sapere quale funzionalità del sistema spende di più ti permette di ottimizzare dove conta. Es: la ricerca ibrida costa il 70% del budget? Ottimizza quella.</span></div></div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">"Come faccio il reset password?" è semplice → usi un modello economico (Claude Haiku). "Analizza questo caso di successione complesso" richiede più ragionamento → usi Claude Sonnet. Il routing automatico riduce i costi del 60-70% senza impatto sulla qualità percepita.</div></div>
+          <button class="done-btn" id="done-m15" onclick="markDone('m15')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Come si ottimizzano e tracciano i costi di un sistema LLM in produzione? Esempi pratici.')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Come si ottimizzano e tracciano i costi di un sistema LLM in produzione? Esempi pratici.</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m15-quiz">
+          <div class="quiz-q">
+            <p>1. Perché ha senso cachare i risultati dell'embedding?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m15q1')">Perché lo stesso testo produce sempre lo stesso vettore: ricalcolarlo ogni volta è uno spreco di tempo e denaro</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m15q1')">Perché i vettori cambiano nel tempo</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m15q1')">Per migliorare la qualità delle risposte</button>
+            </div>
+            <div class="quiz-feedback" id="m15q1-fb-correct ok">✅ Esatto! L'embedding è deterministico. "Motore guasto" produce sempre gli stessi 1536 numeri. Calcolarlo due volte è uno spreco.</div>
+            <div class="quiz-feedback" id="m15q1-fb-wrong ko">❌ I vettori non cambiano nel tempo per lo stesso testo. Sono deterministici: calcolarlo più volte è uno spreco puro.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="m16">
+      <div class="mod-header" onclick="toggleMod('m16')">
+        <div class="mod-icon" style="background:var(--red-dim)"><i class="ti ti-first-aid-kit" style="color:var(--red)"></i></div>
+        <div class="mod-title"><h3>Playbook Operativo — Quando le cose si rompono</h3><p>OpenAI è down. Il vector DB ha perso dati. Cosa fai?</p></div>
+        <div class="mod-right"><span class="badge-pratico">🔧 Pratico</span><i class="ti ti-chevron-down chevron"></i></div>
+      </div>
+      <div class="mod-body">
+        <div class="mod-tabs">
+          <button class="mod-tab active" onclick="switchTab(this,'m16-spieg')">📖 Spiegazione</button>
+          <button class="mod-tab" onclick="switchTab(this,'m16-quiz')">🧠 Quiz</button>
+        </div>
+        <div class="tab-content active" id="m16-spieg">
+          <p class="spieg-intro">I sistemi AI hanno failure modes specifici. Prepararsi prima significa rispondere in minuti invece che in ore.</p>
+          <div class="topics">
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>Provider failover</strong> <span>— se Azure OpenAI ha un outage, il sistema switcha automaticamente su Ollama locale o Bedrock. Il circuit breaker gestisce questo in modo automatico.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>Key rotation</strong> <span>— le chiavi API scadono o vengono compromesse. Il runbook descrive esattamente come ruotarle senza downtime: nuovo secret → deploy graduale → revoca vecchio.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>Index rollover</strong> <span>— re-indicizzare i documenti senza fermare il servizio. Si indicizza su un indice "cold" parallelo, poi si fa swap atomico. Gli utenti non vedono nulla.</span></div></div>
+            <div class="topic"><div class="topic-dot" style="background:var(--red)"></div><div class="topic-text"><strong>Backup vector DB</strong> <span>— gli embedding si possono ricalcolare (costoso ma possibile), ma i metadati e la struttura dell'indice vanno backuppati regolarmente.</span></div></div>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Azure OpenAI è giù alle 14:30. Il playbook dice: circuit breaker attivo → sistema switcha su Ollama locale → alert al team → in parallelo si verifica lo stato Azure. Gli operatori non si accorgono di niente. Il runbook di rollback delle procedure permette di tornare a una versione precedente in 5 minuti.</div></div>
+          <button class="done-btn" id="done-m16" onclick="markDone('m16')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Crea un playbook operativo per un sistema RAG in produzione: incident response, failover, key rotation')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Crea un playbook operativo per un sistema RAG in produzione: incident response, failover, key rotation</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="m16-quiz">
+          <div class="quiz-q">
+            <p>1. Cos'è l'"index rollover" e perché è importante?</p>
+            <div class="quiz-options">
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m16q1')">È un backup automatico del vector DB</button>
+              <button class="quiz-opt" onclick="answerQ(this,'correct','m16q1')">È la tecnica per aggiornare l'indice dei documenti senza fermare il servizio per gli utenti</button>
+              <button class="quiz-opt" onclick="answerQ(this,'wrong','m16q1')">È la rotazione automatica delle chiavi API</button>
+            </div>
+            <div class="quiz-feedback" id="m16q1-fb-correct ok">✅ Esatto! Si re-indicizza su un indice parallelo "cold", poi si fa swap. Gli utenti continuano ad usare il vecchio finché il nuovo è pronto.</div>
+            <div class="quiz-feedback" id="m16q1-fb-wrong ko">❌ L'index rollover riguarda l'aggiornamento dei documenti nel vector DB senza downtime, non i backup né le chiavi.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="prog-bar"><div class="prog-fill" style="width:100%;background:var(--red)"></div></div>
+
+  <!-- QUIZ SBLOCCO FASE 5 -->
+  <div class="unlock-quiz" id="uq5">
+    <h3>🔓 Quiz di Sblocco — Fase 5</h3>
+    <p class="sub">Ultimo quiz! 3 domande per sbloccare il Quiz Finale e il Progetto. Servono almeno 2/3.</p>
+    <div class="quiz-q"><p>1. Cos'è un "gold dataset" nel contesto RAG?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'wrong','u5q1',5)">I documenti più importanti dell'azienda</button>
+      <button class="quiz-opt" onclick="uq(this,'correct','u5q1',5)">Un set di domande con risposta corretta nota, usato per testare regressioni</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u5q1',5)">Il dataset di training del modello LLM</button>
+    </div><div class="quiz-feedback" id="u5q1-fb-correct ok">✅ Esatto! Con il gold dataset misuri automaticamente se un aggiornamento ha migliorato o peggiorato le risposte.</div>
+    <div class="quiz-feedback" id="u5q1-fb-wrong ko">❌ Il gold dataset è un set di test con risposte note. Serve per misurare la qualità del sistema, non per il training.</div></div>
+
+    <div class="quiz-q"><p>2. Perché ha senso cachare i risultati dell'embedding?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'correct','u5q2',5)">Lo stesso testo produce sempre lo stesso vettore: ricalcolarlo è uno spreco di tempo e denaro</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u5q2',5)">Per migliorare la qualità delle risposte</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u5q2',5)">Perché i vettori cambiano nel tempo</button>
+    </div><div class="quiz-feedback" id="u5q2-fb-correct ok">✅ L'embedding è deterministico. Cacharlo significa non pagarlo due volte per lo stesso testo.</div>
+    <div class="quiz-feedback" id="u5q2-fb-wrong ko">❌ I vettori non cambiano per lo stesso testo. Sono deterministici: calcolarlo più volte è puro spreco.</div></div>
+
+    <div class="quiz-q"><p>3. Cos'è l'"index rollover"?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'wrong','u5q3',5)">Un backup automatico del vector DB</button>
+      <button class="quiz-opt" onclick="uq(this,'correct','u5q3',5)">La tecnica per aggiornare l'indice dei documenti senza fermare il servizio</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u5q3',5)">La rotazione delle chiavi API</button>
+    </div><div class="quiz-feedback" id="u5q3-fb-correct ok">✅ Si re-indicizza su un indice parallelo, poi si fa swap. Zero downtime per gli utenti.</div>
+    <div class="quiz-feedback" id="u5q3-fb-wrong ko">❌ L'index rollover è la tecnica per aggiornare i documenti nel vector DB senza interruzione del servizio.</div></div>
+
+    <div id="u5-result" class="unlock-result"></div>
+    <button class="unlock-next-btn" id="u5-next" onclick="goPhaseUnlocked(5)">🏆 Sblocca Quiz Finale + Progetto →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ QUIZ FINALE ═══════════════════════════════════════ -->
+<div class="phase" id="phase-5">
+  <div class="final-quiz-wrap">
+    <h2>🏆 Quiz Finale — Tutto il piano</h2>
+    <p class="sub">15 domande su tutti i moduli. Testa quanto hai assorbito del piano completo.</p>
+    <div id="final-quiz-body">
+      <!-- Q1 -->
+      <div class="quiz-q"><p>1. Qual è la causa principale delle "allucinazioni" negli LLM?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq1')">Un bug nel codice del modello</button>
+        <button class="quiz-opt" onclick="fq(this,'correct','fq1')">Il modello predice testo plausibile anche senza conoscere la risposta corretta</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq1')">Una temperatura troppo alta</button>
+      </div><div class="quiz-feedback" id="fq1-fb-correct ok">✅ Esatto! È strutturale: i modelli generano testo probabile, non "vero".</div><div class="quiz-feedback" id="fq1-fb-wrong ko">❌ È strutturale, non un bug né dipende solo dalla temperatura.</div></div>
+      <!-- Q2 -->
+      <div class="quiz-q"><p>2. In una pipeline RAG, qual è il ruolo del "reranker"?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq2')">Genera la risposta finale</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq2')">Trasforma il testo in embedding</button>
+        <button class="quiz-opt" onclick="fq(this,'correct','fq2')">Riordina i chunk candidati per rilevanza dopo il retrieval iniziale</button>
+      </div><div class="quiz-feedback" id="fq2-fb-correct ok">✅ Il reranker è il "giudice finale" che affina i risultati del retrieval.</div><div class="quiz-feedback" id="fq2-fb-wrong ko">❌ Il reranker non genera né trasforma testo. Riordina i risultati già trovati.</div></div>
+      <!-- Q3 -->
+      <div class="quiz-q"><p>3. Cosa significa "temperatura = 0" in un LLM?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'correct','fq3')">Il modello è deterministico: stessa domanda = stessa risposta sempre</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq3')">Il modello è più lento</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq3')">Il modello rifiuta domande inappropriate</button>
+      </div><div class="quiz-feedback" id="fq3-fb-correct ok">✅ Temperatura 0 = deterministico. Ideale per sistemi aziendali dove vuoi risposte stabili.</div><div class="quiz-feedback" id="fq3-fb-wrong ko">❌ Temperatura 0 riguarda la casualità delle risposte, non la velocità o i filtri.</div></div>
+      <!-- Q4 -->
+      <div class="quiz-q"><p>4. Cos'è il "chunking" in una pipeline RAG?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq4')">La compressione delle immagini nei documenti</button>
+        <button class="quiz-opt" onclick="fq(this,'correct','fq4')">La suddivisione dei documenti in pezzi più piccoli da indicizzare</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq4')">Il processo di autenticazione degli utenti</button>
+      </div><div class="quiz-feedback" id="fq4-fb-correct ok">✅ Esatto! I documenti lunghi non entrano nel context window: vanno spezzati in chunk da indicizzare.</div><div class="quiz-feedback" id="fq4-fb-wrong ko">❌ Il chunking è la suddivisione dei testi in pezzi da indicizzare nel vector DB.</div></div>
+      <!-- Q5 -->
+      <div class="quiz-q"><p>5. Qual è il vantaggio dell'hybrid search (BM25 + vettoriale)?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq5')">È sempre più veloce della sola ricerca vettoriale</button>
+        <button class="quiz-opt" onclick="fq(this,'correct','fq5')">Trova sia corrispondenze esatte (codici, nomi) che semantiche (sinonimi, concetti)</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq5')">Riduce il costo degli embedding</button>
+      </div><div class="quiz-feedback" id="fq5-fb-correct ok">✅ BM25 trova "errore AB-2234" esatto. Il vettoriale trova "guasto al motore" anche detto diversamente. Insieme = copertura completa.</div><div class="quiz-feedback" id="fq5-fb-wrong ko">❌ L'hybrid search è più lenta. Il vantaggio è la completezza: copre sia parole esatte che significati.</div></div>
+      <!-- Q6 -->
+      <div class="quiz-q"><p>6. Cosa fa Ollama che OpenAI non può fare?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'correct','fq6')">Fa girare modelli LLM in locale, senza connessione internet e senza costi per token</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq6')">Genera immagini migliori</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq6')">Ha modelli più intelligenti di GPT-4</button>
+      </div><div class="quiz-feedback" id="fq6-fb-correct ok">✅ Ollama = LLM locale. Zero costi, zero latenza di rete, zero dati che escono. Ideale per sviluppo e fallback.</div><div class="quiz-feedback" id="fq6-fb-wrong ko">❌ Ollama non è migliore di OpenAI in qualità. Il vantaggio è locale: gratuito, offline, privato.</div></div>
+      <!-- Q7 -->
+      <div class="quiz-q"><p>7. Perché si usa la messaggistica asincrona (Kafka) con gli LLM?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq7')">Per rendere l'LLM più preciso</button>
+        <button class="quiz-opt" onclick="fq(this,'correct','fq7')">Le chiamate LLM sono lente: con la messaggistica asincrona l'utente non aspetta bloccato</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq7')">Per ridurre il numero di token inviati</button>
+      </div><div class="quiz-feedback" id="fq7-fb-correct ok">✅ Esatto! L'utente fa la richiesta, il sistema lavora in background, l'utente viene notificato quando è pronto.</div><div class="quiz-feedback" id="fq7-fb-wrong ko">❌ Kafka non migliora la precisione né i token. Serve a non bloccare l'utente mentre aspetta risposte lente.</div></div>
+      <!-- Q8 -->
+      <div class="quiz-q"><p>8. Cos'è il "faithfulness score" in un sistema RAG?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq8')">La velocità di risposta del sistema</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq8')">Il numero di documenti trovati dal retrieval</button>
+        <button class="quiz-opt" onclick="fq(this,'correct','fq8')">Quanto la risposta dell'LLM è basata sui documenti recuperati (e non inventata)</button>
+      </div><div class="quiz-feedback" id="fq8-fb-correct ok">✅ Faithfulness alta = il modello usa i documenti. Bassa = sta allucinando nonostante abbia i documenti davanti.</div><div class="quiz-feedback" id="fq8-fb-wrong ko">❌ Faithfulness misura la fedeltà della risposta ai documenti. È la metrica anti-allucinazione più importante.</div></div>
+      <!-- Q9 -->
+      <div class="quiz-q"><p>9. Cosa fa il "circuit breaker" in un microservizio RAG?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq9')">Limita il numero di richieste per utente</button>
+        <button class="quiz-opt" onclick="fq(this,'correct','fq9')">Rileva che un provider è down e switcha automaticamente al fallback</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq9')">Cripta i dati in transito</button>
+      </div><div class="quiz-feedback" id="fq9-fb-correct ok">✅ OpenAI down? Il circuit breaker "apre" e devia tutto su Ollama o Bedrock. Nessun downtime per l'utente.</div><div class="quiz-feedback" id="fq9-fb-wrong ko">❌ Il circuit breaker gestisce i fallback automatici, non il rate limiting né la crittografia.</div></div>
+      <!-- Q10 -->
+      <div class="quiz-q"><p>10. Perché le chiavi API non vanno messe nel codice sorgente?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'correct','fq10')">Chiunque legga il repository o l'immagine container le vedrebbe e potrebbe usarle</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq10')">Perché rallentano il tempo di build</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq10')">Perché i modelli non le accettano in quel formato</button>
+      </div><div class="quiz-feedback" id="fq10-fb-correct ok">✅ Una chiave nel codice = leak immediato se il repo è pubblico o se qualcuno ottiene accesso al container.</div><div class="quiz-feedback" id="fq10-fb-wrong ko">❌ È un rischio di sicurezza: le chiavi nel codice sono visibili a chiunque abbia accesso al repo o al container.</div></div>
+      <!-- Q11 -->
+      <div class="quiz-q"><p>11. Cosa misura la metrica "Recall@K" nel retrieval?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq11')">Quanti token usa il modello per rispondere</button>
+        <button class="quiz-opt" onclick="fq(this,'correct','fq11')">Quante volte la risposta giusta si trova tra i top K chunk recuperati</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq11')">La velocità di retrieval in millisecondi</button>
+      </div><div class="quiz-feedback" id="fq11-fb-correct ok">✅ Recall@5 = 0.9 significa che nel 90% dei casi la risposta giusta è tra i 5 chunk più rilevanti trovati.</div><div class="quiz-feedback" id="fq11-fb-wrong ko">❌ Recall@K misura la copertura del retrieval: quante volte trovi la risposta giusta nei top K risultati.</div></div>
+      <!-- Q12 -->
+      <div class="quiz-q"><p>12. Cos'è la "quantizzazione Q4" in Ollama?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq12')">Una versione del modello con 4 miliardi di parametri</button>
+        <button class="quiz-opt" onclick="fq(this,'correct','fq12')">Una versione compressa del modello che usa 4 bit per peso: più piccola e veloce ma leggermente meno precisa</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq12')">Il quarto aggiornamento del modello Llama</button>
+      </div><div class="quiz-feedback" id="fq12-fb-correct ok">✅ Q4 = 4 bit per peso. Il modello è molto più leggero (da 30GB a 4GB) ma perde un po' di qualità. Ottimo per sviluppo locale.</div><div class="quiz-feedback" id="fq12-fb-wrong ko">❌ La quantizzazione Q4 riguarda la precisione numerica del modello (4 bit per parametro), non il numero di parametri.</div></div>
+      <!-- Q13 -->
+      <div class="quiz-q"><p>13. Cosa fa il "PII Redaction" in un sistema RAG?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq13')">Comprime i documenti per risparmiare spazio</button>
+        <button class="quiz-opt" onclick="fq(this,'correct','fq13')">Rimuove automaticamente dati personali (nomi, email, CF) dalle risposte prima di mostrarle</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq13')">Autentica le richieste degli utenti</button>
+      </div><div class="quiz-feedback" id="fq13-fb-correct ok">✅ PII = Personally Identifiable Information. Il redaction è obbligatorio per GDPR e compliance aziendale.</div><div class="quiz-feedback" id="fq13-fb-wrong ko">❌ PII Redaction rimuove dati personali dalle risposte. È un guardrail per la compliance GDPR.</div></div>
+      <!-- Q14 -->
+      <div class="quiz-q"><p>14. Cos'è l'"embedding cache" e perché è utile?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'correct','fq14')">Salva i vettori già calcolati per non ricalcolarli: lo stesso testo produce sempre lo stesso vettore</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq14')">È una cache del database dei documenti</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq14')">Salva le risposte dell'LLM per riusarle</button>
+      </div><div class="quiz-feedback" id="fq14-fb-correct ok">✅ L'embedding è deterministico e costoso. Cacharlo significa non pagarlo due volte per lo stesso testo.</div><div class="quiz-feedback" id="fq14-fb-wrong ko">❌ L'embedding cache salva specificamente i vettori numerici dei testi, non i documenti né le risposte LLM.</div></div>
+      <!-- Q15 -->
+      <div class="quiz-q"><p>15. Qual è il progetto finale naturale di questo piano di studio?</p><div class="quiz-options">
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq15')">Un chatbot generico tipo ChatGPT</button>
+        <button class="quiz-opt" onclick="fq(this,'correct','fq15')">Un assistente AI aziendale che risponde basandosi sui documenti interni dell'azienda</button>
+        <button class="quiz-opt" onclick="fq(this,'wrong','fq15')">Un sistema di generazione di immagini</button>
+      </div><div class="quiz-feedback" id="fq15-fb-correct ok">✅ Esatto! Un RAG system aziendale con hybrid search, provider switching, guardrail, observability e deployment cloud. Tutto quello che hai studiato.</div><div class="quiz-feedback" id="fq15-fb-wrong ko">❌ Il piano è orientato a costruire un sistema RAG aziendale: AI che risponde basandosi sui tuoi documenti, non una chatbot generica.</div></div>
+
+      <div id="final-score" class="quiz-score" style="margin-top:24px">
+        <div class="score-num" id="score-num">0/15</div>
+        <p id="score-msg"></p>
+        <button onclick="resetFinalQuiz()" style="margin-top:12px;padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;font-family:var(--font)">Ricomincia il quiz</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ PROGETTO FINALE ═══════════════════════════════════════ -->
+<div class="phase" id="phase-6">
+  <div class="phase-card" style="border-color:rgba(155,127,232,0.3)">
+    <div class="phase-tag" style="background:var(--purple-dim);color:var(--purple)"><i class="ti ti-rocket"></i> Progetto Finale</div>
+    <h2>🚀 Costruisci il tuo Assistente AI Aziendale</h2>
+    <p class="sub">Applica tutto quello che hai imparato. Costruirai un sistema RAG completo step by step — dall'ingestion dei documenti al deploy in cloud.</p>
+    <div class="phase-meta">
+      <span><i class="ti ti-list-check"></i> 6 step progressivi</span>
+      <span><i class="ti ti-clock"></i> ~4–8 settimane</span>
+      <span><i class="ti ti-tools"></i> Hands-on reale</span>
+    </div>
+  </div>
+
+  <div class="project-step unlocked-step" id="ps1">
+    <div class="step-header">
+      <div class="step-num" id="psn1">1</div>
+      <div><div class="step-title">Setup ambiente locale</div><div class="step-phase">Fase 1–2 del piano · Python + Ollama</div></div>
+    </div>
+    <p class="step-body">Prima di tutto hai bisogno di un ambiente funzionante sul tuo PC. Installa Python, Ollama e le librerie base. Questo è il tuo "laboratorio" dove sviluppare e testare tutto gratuitamente.</p>
+    <div class="step-tasks">
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(1)"> Installa Python 3.10+ e crea un virtual environment</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(1)"> Installa Ollama e scarica un modello leggero (<code style="font-family:monospace;background:var(--bg);padding:1px 5px;border-radius:3px;color:var(--orange)">ollama pull llama3.2</code>)</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(1)"> Installa le librerie: <code style="font-family:monospace;background:var(--bg);padding:1px 5px;border-radius:3px;color:var(--orange)">pip install langchain chromadb openai fastapi</code></label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(1)"> Fai una prima chiamata ad Ollama via API HTTP e stampa la risposta</label>
+    </div>
+    <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Guidami step by step per configurare un ambiente Python per sviluppare un sistema RAG con Ollama e LangChain su Windows/Mac')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude:</span><span class="prompt-box-text">Guidami step by step per configurare un ambiente Python per sviluppare un sistema RAG con Ollama e LangChain su Windows/Mac</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+    <button class="step-complete-btn" id="psb1" onclick="completeStep(1)">✓ Step completato</button>
+  </div>
+
+  <div class="project-step locked-step" id="ps2">
+    <div class="step-header">
+      <div class="step-num" id="psn2">2</div>
+      <div><div class="step-title">Ingestion dei tuoi documenti</div><div class="step-phase">Fase 2–3 del piano · Chunking + Embedding + ChromaDB</div></div>
+    </div>
+    <p class="step-body">Prendi dei documenti reali (manuali PDF, documenti Word, pagine HTML) e costruisci la pipeline di ingestion: parsing → chunking → embedding → salvataggio in ChromaDB locale.</p>
+    <div class="step-tasks">
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(2)"> Scegli 3–5 documenti da indicizzare (PDF, Word o testo)</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(2)"> Scrivi lo script di parsing e chunking con LangChain (chunk_size=400, overlap=50)</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(2)"> Genera gli embedding con Ollama (modello bge-m3) e salvali in ChromaDB</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(2)"> Aggiungi i metadata a ogni chunk (fonte, data, capitolo)</label>
+    </div>
+    <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Scrivimi uno script Python completo per fare ingestion di PDF con LangChain, chunking con overlap e salvataggio degli embedding in ChromaDB usando Ollama come modello embedding')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude:</span><span class="prompt-box-text">Scrivimi uno script Python completo per fare ingestion di PDF con LangChain, chunking con overlap e salvataggio degli embedding in ChromaDB usando Ollama come modello embedding</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+    <button class="step-complete-btn" id="psb2" onclick="completeStep(2)">✓ Step completato</button>
+  </div>
+
+  <div class="project-step locked-step" id="ps3">
+    <div class="step-header">
+      <div class="step-num" id="psn3">3</div>
+      <div><div class="step-title">Retrieval ibrido + Reranker</div><div class="step-phase">Fase 2 del piano · BM25 + Vettoriale + Reranking</div></div>
+    </div>
+    <p class="step-body">Costruisci il sistema di ricerca ibrido: combina BM25 (ricerca per parola chiave) con la ricerca vettoriale di ChromaDB, poi applica un reranker per ordinare i risultati migliori.</p>
+    <div class="step-tasks">
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(3)"> Implementa la ricerca BM25 sui tuoi chunk con rank-bm25</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(3)"> Combina i risultati BM25 + ChromaDB con reciprocal rank fusion</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(3)"> Aggiungi un cross-encoder reranker (es. ms-marco-MiniLM) sui top 10 risultati</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(3)"> Testa con 10 domande e confronta: solo vettoriale vs ibrido. Chi vince?</label>
+    </div>
+    <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Scrivimi il codice Python per fare hybrid search combinando BM25 e ChromaDB con reciprocal rank fusion, più un cross-encoder reranker con sentence-transformers')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude:</span><span class="prompt-box-text">Scrivimi il codice Python per fare hybrid search combinando BM25 e ChromaDB con reciprocal rank fusion, più un cross-encoder reranker con sentence-transformers</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+    <button class="step-complete-btn" id="psb3" onclick="completeStep(3)">✓ Step completato</button>
+  </div>
+
+  <div class="project-step locked-step" id="ps4">
+    <div class="step-header">
+      <div class="step-num" id="psn4">4</div>
+      <div><div class="step-title">Orchestratore LLM con provider switching</div><div class="step-phase">Fase 3 del piano · FastAPI + Ollama + OpenAI fallback</div></div>
+    </div>
+    <p class="step-body">Costruisci l'orchestratore che riceve una domanda, recupera i chunk rilevanti e chiama l'LLM. Implementa il provider switching: prima Ollama locale, fallback su OpenAI se non disponibile. Esponi tutto come API FastAPI.</p>
+    <div class="step-tasks">
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(4)"> Scrivi l'orchestratore che prende domanda + chunk e costruisce il prompt RAG</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(4)"> Implementa il provider switching: Ollama → OpenAI con try/except</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(4)"> Esponi il tutto come endpoint FastAPI: POST /ask con body {"question": "..."}</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(4)"> Testa che il fallback funzioni spegnendo Ollama e rifacendo la chiamata</label>
+    </div>
+    <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Scrivimi un orchestratore LLM in Python con FastAPI che fa retrieval RAG, costruisce il prompt, chiama prima Ollama e se non disponibile fallback su OpenAI, con system prompt che impedisce allucinazioni')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude:</span><span class="prompt-box-text">Scrivimi un orchestratore LLM in Python con FastAPI che fa retrieval RAG, costruisce il prompt, chiama prima Ollama e se non disponibile fallback su OpenAI, con system prompt che impedisce allucinazioni</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+    <button class="step-complete-btn" id="psb4" onclick="completeStep(4)">✓ Step completato</button>
+  </div>
+
+  <div class="project-step locked-step" id="ps5">
+    <div class="step-header">
+      <div class="step-num" id="psn5">5</div>
+      <div><div class="step-title">Containerizza con Podman</div><div class="step-phase">Fase 3 del piano · Containerfile + Podman Compose</div></div>
+    </div>
+    <p class="step-body">Metti tutto dentro container con Podman. Scrivi un Containerfile per la tua API FastAPI e un Podman Compose che fa partire insieme API + ChromaDB + Ollama con un solo comando.</p>
+    <div class="step-tasks">
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(5)"> Scrivi il Containerfile per la tua API FastAPI (multi-stage, non-root user)</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(5)"> Scrivi il podman-compose.yml con i servizi: api, chromadb, ollama</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(5)"> Avvia tutto con <code style="font-family:monospace;background:var(--bg);padding:1px 5px;border-radius:3px;color:var(--orange)">podman-compose up</code> e verifica che l'API risponde</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(5)"> Aggiungi healthcheck ai container e verifica che si riavviano in caso di errore</label>
+    </div>
+    <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Scrivimi un Containerfile multi-stage per una API FastAPI Python e un podman-compose.yml che orchestra API + ChromaDB + Ollama con volumi, healthcheck e non-root user')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude:</span><span class="prompt-box-text">Scrivimi un Containerfile multi-stage per una API FastAPI Python e un podman-compose.yml che orchestra API + ChromaDB + Ollama con volumi, healthcheck e non-root user</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+    <button class="step-complete-btn" id="psb5" onclick="completeStep(5)">✓ Step completato</button>
+  </div>
+
+  <div class="project-step locked-step" id="ps6">
+    <div class="step-header">
+      <div class="step-num" id="psn6">6</div>
+      <div><div class="step-title">Guardrail, Evaluation e Deploy Cloud</div><div class="step-phase">Fase 4–5 del piano · Eval + PII + Cloud Run/Azure</div></div>
+    </div>
+    <p class="step-body">Il tocco finale: aggiungi la PII redaction alle risposte, costruisci un mini gold dataset per testare la faithfulness, e fai il primo deploy su un cloud a tua scelta (Cloud Run su GCP è il più semplice per iniziare).</p>
+    <div class="step-tasks">
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(6)"> Aggiungi la PII redaction con la libreria presidio sulle risposte dell'LLM</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(6)"> Crea un gold dataset di 10 domande con risposta attesa e misura la faithfulness</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(6)"> Fai il deploy dell'API su Cloud Run (GCP) o Azure Container Apps</label>
+      <label class="step-task"><input type="checkbox" onchange="checkProjectStep(6)"> Aggiungi il logging delle query con costo e latenza per ogni risposta</label>
+    </div>
+    <div class="prompt-row">
+          <button class="claude-btn" onclick="askClaude('Guidami per aggiungere PII redaction con Microsoft Presidio a un sistema RAG FastAPI, creare un gold dataset di evaluation e fare il deploy su Google Cloud Run')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
+          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
+            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude:</span><span class="prompt-box-text">Guidami per aggiungere PII redaction con Microsoft Presidio a un sistema RAG FastAPI, creare un gold dataset di evaluation e fare il deploy su Google Cloud Run</span></div>
+            <button class="copy-btn">Copia</button>
+          </div>
+        </div>
+    <div style="margin-top:16px;padding:14px;background:var(--green-dim);border:1px solid rgba(76,175,130,0.3);border-radius:8px;text-align:center" id="project-complete" style="display:none">
+      <div style="font-size:24px;margin-bottom:6px">🎉</div>
+      <div style="font-size:15px;font-weight:600;color:var(--green)">Hai completato il progetto!</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:4px">Hai costruito un sistema RAG aziendale completo. Questo vale su qualsiasi CV nel settore AI.</div>
+    </div>
+    <button class="step-complete-btn" id="psb6" onclick="completeStep(6)">✓ Step completato</button>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════ GLOSSARIO ═══════════════════════════════════════ -->
+<div class="phase" id="phase-7">
+  <div class="phase-card" style="border-color:rgba(62,196,196,0.3)">
+    <div class="phase-tag" style="background:var(--teal-dim);color:var(--teal)"><i class="ti ti-book-2"></i> Riferimento rapido</div>
+    <h2>📖 Glossario AI/LLM</h2>
+    <p class="sub">Tutti i termini tecnici del piano spiegati in modo semplice. Cercali quando incontri una parola che non conosci.</p>
+  </div>
+
+  <input class="gloss-search" type="text" placeholder="🔍 Cerca un termine..." oninput="filterGloss(this.value)">
+
+  <div class="gloss-filter">
+    <button class="gloss-filter-btn active" onclick="filterGlossTag('tutti',this)">Tutti</button>
+    <button class="gloss-filter-btn" onclick="filterGlossTag('llm',this)">LLM</button>
+    <button class="gloss-filter-btn" onclick="filterGlossTag('rag',this)">RAG</button>
+    <button class="gloss-filter-btn" onclick="filterGlossTag('infra',this)">Infrastruttura</button>
+    <button class="gloss-filter-btn" onclick="filterGlossTag('cloud',this)">Cloud</button>
+  </div>
+
+  <div class="gloss-grid" id="gloss-grid">
+
+    <div class="gloss-card" data-tag="llm" onclick="toggleGloss(this)">
+      <div class="gloss-term">Token <span class="gloss-tag" style="background:var(--accent-dim);color:var(--accent)">LLM</span></div>
+      <div class="gloss-def">Unità base di testo che un LLM elabora. Non è una parola intera: "straordinario" = 3 token, "gatto" = 1 token. I modelli costano a token e hanno un limite massimo di token che ricordano (context window).</div>
+    </div>
+
+    <div class="gloss-card" data-tag="llm" onclick="toggleGloss(this)">
+      <div class="gloss-term">Temperatura <span class="gloss-tag" style="background:var(--accent-dim);color:var(--accent)">LLM</span></div>
+      <div class="gloss-def">Parametro che controlla la creatività del modello. 0 = risposta sempre uguale (deterministico). 1 = più variabile e creativo. Per sistemi RAG aziendali si usa 0–0.2 per risposte stabili e prevedibili.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="llm" onclick="toggleGloss(this)">
+      <div class="gloss-term">Hallucination <span class="gloss-tag" style="background:var(--accent-dim);color:var(--accent)">LLM</span></div>
+      <div class="gloss-def">Quando un LLM inventa informazioni con assoluta sicurezza. Non è un bug: il modello predice testo plausibile anche quando non conosce la risposta. Il RAG riduce le allucinazioni fornendo documenti come contesto.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="llm" onclick="toggleGloss(this)">
+      <div class="gloss-term">Context Window <span class="gloss-tag" style="background:var(--accent-dim);color:var(--accent)">LLM</span></div>
+      <div class="gloss-def">Il limite massimo di token che un modello può "ricordare" in una conversazione. Oltre quel limite dimentica i messaggi più vecchi. GPT-4 ha ~128k token, Claude ha ~200k. Più è grande, più documenti puoi passare.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="llm" onclick="toggleGloss(this)">
+      <div class="gloss-term">Prompt Engineering <span class="gloss-tag" style="background:var(--accent-dim);color:var(--accent)">LLM</span></div>
+      <div class="gloss-def">L'arte di scrivere istruzioni efficaci per un LLM. Include tecniche come Chain of Thought (ragionare step by step), system prompt (definire il ruolo del modello), RAG-prompting (passare documenti come contesto).</div>
+    </div>
+
+    <div class="gloss-card" data-tag="llm" onclick="toggleGloss(this)">
+      <div class="gloss-term">System Prompt <span class="gloss-tag" style="background:var(--accent-dim);color:var(--accent)">LLM</span></div>
+      <div class="gloss-def">Il messaggio iniziale invisibile all'utente che definisce chi è il modello e come deve comportarsi. Es: "Sei un assistente tecnico. Rispondi solo in italiano basandoti sui documenti forniti. Se non sai, dillo."</div>
+    </div>
+
+    <div class="gloss-card" data-tag="rag" onclick="toggleGloss(this)">
+      <div class="gloss-term">RAG <span class="gloss-tag" style="background:var(--green-dim);color:var(--green)">RAG</span></div>
+      <div class="gloss-def">Retrieval Augmented Generation. Tecnica che fa rispondere un LLM basandosi su documenti specifici invece di usare solo la sua memoria. Riduce le allucinazioni perché il modello ha la risposta "davanti agli occhi".</div>
+    </div>
+
+    <div class="gloss-card" data-tag="rag" onclick="toggleGloss(this)">
+      <div class="gloss-term">Embedding <span class="gloss-tag" style="background:var(--green-dim);color:var(--green)">RAG</span></div>
+      <div class="gloss-def">Trasformazione di un testo in una lista di numeri (vettore) che rappresenta il suo significato semantico. Testi simili producono vettori simili: "auto" e "macchina" avranno vettori vicini nello spazio matematico.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="rag" onclick="toggleGloss(this)">
+      <div class="gloss-term">Chunking <span class="gloss-tag" style="background:var(--green-dim);color:var(--green)">RAG</span></div>
+      <div class="gloss-def">Suddivisione di documenti lunghi in pezzi più piccoli (chunk) da indicizzare. La dimensione tipica è 200–500 token. Con overlap (sovrapposizione) tra chunk si evita di perdere informazioni a cavallo del taglio.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="rag" onclick="toggleGloss(this)">
+      <div class="gloss-term">Vector DB <span class="gloss-tag" style="background:var(--green-dim);color:var(--green)">RAG</span></div>
+      <div class="gloss-def">Database ottimizzato per cercare vettori simili molto velocemente. Invece di cercare per parola esatta, cerca per "significato simile". Esempi: ChromaDB (locale), pgvector (PostgreSQL), Pinecone (cloud).</div>
+    </div>
+
+    <div class="gloss-card" data-tag="rag" onclick="toggleGloss(this)">
+      <div class="gloss-term">BM25 <span class="gloss-tag" style="background:var(--green-dim);color:var(--green)">RAG</span></div>
+      <div class="gloss-def">Algoritmo di ricerca per parola chiave esatta, usato prima dell'AI. Trova documenti che contengono esattamente le parole cercate. Combinato con la ricerca vettoriale dà l'hybrid search: trova sia parole esatte che sinonimi.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="rag" onclick="toggleGloss(this)">
+      <div class="gloss-term">Reranker <span class="gloss-tag" style="background:var(--green-dim);color:var(--green)">RAG</span></div>
+      <div class="gloss-def">Modello secondario che riordina i chunk trovati dal retrieval per rilevanza. Il cross-encoder è più preciso ma più lento: si applica solo ai top 10–20 candidati già trovati, non all'intero database.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="rag" onclick="toggleGloss(this)">
+      <div class="gloss-term">Faithfulness <span class="gloss-tag" style="background:var(--green-dim);color:var(--green)">RAG</span></div>
+      <div class="gloss-def">Metrica che misura quanto la risposta dell'LLM è basata sui documenti recuperati e non inventata. È la metrica anti-allucinazione più importante in un sistema RAG aziendale. Alta = modello usa i documenti. Bassa = sta inventando.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="rag" onclick="toggleGloss(this)">
+      <div class="gloss-term">Recall@K <span class="gloss-tag" style="background:var(--green-dim);color:var(--green)">RAG</span></div>
+      <div class="gloss-def">Metrica del retrieval: quante volte la risposta giusta si trova tra i top K chunk recuperati. Recall@5 = 0.9 significa che nel 90% dei casi la risposta è tra i 5 chunk più rilevanti trovati.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="infra" onclick="toggleGloss(this)">
+      <div class="gloss-term">Container <span class="gloss-tag" style="background:var(--orange-dim);color:var(--orange)">Infra</span></div>
+      <div class="gloss-def">Pacchetto che contiene un'applicazione con tutto il necessario per farla girare (codice, dipendenze, configurazione). Funziona identicamente su qualsiasi server. Podman e Docker sono i tool per crearli e gestirli.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="infra" onclick="toggleGloss(this)">
+      <div class="gloss-term">Podman <span class="gloss-tag" style="background:var(--orange-dim);color:var(--orange)">Infra</span></div>
+      <div class="gloss-def">Tool per creare e gestire container, alternativa a Docker. Non richiede un processo root sempre attivo (rootless), quindi è più sicuro in ambienti aziendali. La CLI è identica a Docker: stesso Dockerfile, stessi comandi.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="infra" onclick="toggleGloss(this)">
+      <div class="gloss-term">Kafka <span class="gloss-tag" style="background:var(--orange-dim);color:var(--orange)">Infra</span></div>
+      <div class="gloss-def">Sistema di messaggistica asincrona. I servizi pubblicano messaggi su "topic" e altri servizi li consumano quando sono pronti. Essenziale con LLM perché le chiamate sono lente (10–30s): l'utente non aspetta bloccato.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="infra" onclick="toggleGloss(this)">
+      <div class="gloss-term">Circuit Breaker <span class="gloss-tag" style="background:var(--orange-dim);color:var(--orange)">Infra</span></div>
+      <div class="gloss-def">Pattern che rileva quando un servizio esterno (es. OpenAI) non risponde e smette di chiamarlo, passando automaticamente a un fallback (es. Ollama locale). Evita di sprecare tempo su richieste destinate a fallire.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="infra" onclick="toggleGloss(this)">
+      <div class="gloss-term">Ollama <span class="gloss-tag" style="background:var(--orange-dim);color:var(--orange)">Infra</span></div>
+      <div class="gloss-def">Tool per far girare modelli LLM open-source (Llama, Mistral, Qwen) sul proprio computer. Zero costi, zero connessione internet, dati privati. Espone un'API HTTP compatibile con OpenAI su localhost:11434.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="infra" onclick="toggleGloss(this)">
+      <div class="gloss-term">Quantizzazione (Q4/Q8) <span class="gloss-tag" style="background:var(--orange-dim);color:var(--orange)">Infra</span></div>
+      <div class="gloss-def">Tecnica per comprimere un modello LLM riducendo la precisione dei pesi da 32 bit a 4 o 8 bit. Q4 = modello 8x più piccolo ma meno preciso. Q8 = buon compromesso. Permette di far girare modelli grandi su PC normali.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="cloud" onclick="toggleGloss(this)">
+      <div class="gloss-term">Vertex AI <span class="gloss-tag" style="background:var(--purple-dim);color:var(--purple)">Cloud</span></div>
+      <div class="gloss-def">Servizio Google Cloud per LLM managed. Include Model Garden (catalogo modelli), Cloud Run (serverless per API), e supporto a Gemini. Ideale se l'azienda usa già GCP.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="cloud" onclick="toggleGloss(this)">
+      <div class="gloss-term">Azure OpenAI <span class="gloss-tag" style="background:var(--purple-dim);color:var(--purple)">Cloud</span></div>
+      <div class="gloss-def">Versione Microsoft di GPT-4 e dei modelli OpenAI, disponibile dentro Azure. Ideale per ambienti enterprise già su Microsoft: si integra con Active Directory, Teams, e tutti i servizi Azure.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="cloud" onclick="toggleGloss(this)">
+      <div class="gloss-term">AWS Bedrock <span class="gloss-tag" style="background:var(--purple-dim);color:var(--purple)">Cloud</span></div>
+      <div class="gloss-def">Servizio Amazon per accedere a più modelli LLM (Claude, Llama, Mistral, Cohere) con un'unica API. Include Knowledge Bases per RAG nativo. Ideale se l'infrastruttura è già su AWS.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="cloud" onclick="toggleGloss(this)">
+      <div class="gloss-term">IAM <span class="gloss-tag" style="background:var(--purple-dim);color:var(--purple)">Cloud</span></div>
+      <div class="gloss-def">Identity and Access Management. Sistema che definisce chi può fare cosa in cloud. Ogni microservizio ha la sua identità (Service Account) con solo i permessi necessari. Principio del minimo privilegio: se non serve, non si ha.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="cloud" onclick="toggleGloss(this)">
+      <div class="gloss-term">Secret Manager <span class="gloss-tag" style="background:var(--purple-dim);color:var(--purple)">Cloud</span></div>
+      <div class="gloss-def">Servizio cloud per conservare chiavi API, password e credenziali in modo sicuro. Le chiavi non vanno mai nel codice sorgente o nei container: si leggono dal Secret Manager a runtime. Disponibile su tutti e tre i cloud (GCP, Azure, AWS).</div>
+    </div>
+
+    <div class="gloss-card" data-tag="cloud" onclick="toggleGloss(this)">
+      <div class="gloss-term">OpenTelemetry <span class="gloss-tag" style="background:var(--purple-dim);color:var(--purple)">Cloud</span></div>
+      <div class="gloss-def">Standard aperto per raccogliere log, metriche e trace da tutti i microservizi con un sistema unificato. Permette di seguire una richiesta dall'utente fino alla risposta LLM attraverso tutti i servizi e vedere dove si perde tempo.</div>
+    </div>
+
+    <div class="gloss-card" data-tag="cloud" onclick="toggleGloss(this)">
+      <div class="gloss-term">PII Redaction <span class="gloss-tag" style="background:var(--purple-dim);color:var(--purple)">Cloud</span></div>
+      <div class="gloss-def">Rimozione automatica di dati personali (nomi, email, codice fiscale, numeri di telefono) dalle risposte prima di mostrarle. Obbligatorio per compliance GDPR in Europa. Si implementa con librerie come Microsoft Presidio.</div>
+    </div>
+
+  </div><!-- fine gloss-grid -->
+</div>
+
+</main>
+</div>
+
+<!-- CLAUDE MODAL -->
+<div id="claude-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:24px;position:relative">
+    <button onclick="document.getElementById('claude-modal').style.display='none'" style="position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;line-height:1">✕</button>
+    <div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px">Claude risponde</div>
+    <div id="claude-modal-body" style="font-size:14px;color:var(--text);line-height:1.7;white-space:pre-wrap"></div>
+  </div>
+</div>
+
+<script>
+// ── FIREBASE CONFIG ──────────────────────────────────────────────
+var firebaseConfig = {
+  apiKey: "AIzaSyCxO1BXDcliLzURNgBrAWYLPGfKroHdTas",
+  authDomain: "piano-studio-llm.firebaseapp.com",
+  projectId: "piano-studio-llm",
+  storageBucket: "piano-studio-llm.firebasestorage.app",
+  messagingSenderId: "361629892564",
+  appId: "1:361629892564:web:b632c7d73c63ba2e236041"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+var DOC_REF = db.collection('users').doc('andrea');
+
+var SYSTEM_PROMPT = "Sei un tutor AI per un developer RPA di Accenture che studia per diventare full stack LLM developer. L'utente si chiama Andrea. Rispondi sempre in italiano. Sei conciso ma preciso. Non menzionare progetti specifici dei clienti.";
+
+// ── INIT / LOAD ───────────────────────────────────────────────────
+function initDB() {
+  DOC_REF.get().then(function(doc) {
+    if (doc.exists) {
+      applyProgress(doc.data());
+    }
+  }).catch(function(err) {
+    console.warn('Firestore load error:', err);
+  });
+}
+
+function applyProgress(data) {
+  if (!data) return;
+  // restore phase unlocks
+  if (data.unlockedPhases) {
+    data.unlockedPhases.forEach(function(p) {
+      unlockedPhases[p] = true;
+    });
+  }
+  updateNavLocks();
+  // restore done modules
+  if (data.doneModules) {
+    data.doneModules.forEach(function(id) {
+      var btn = document.getElementById('done-' + id);
+      if (btn) {
+        btn.classList.add('marked');
+        btn.innerHTML = '<i class="ti ti-check"></i> Studiato ✓';
+        doneModules[id] = true;
+      }
+    });
+  }
+  // restore done count
+  var c = 0;
+  for (var k in doneModules) { if (doneModules[k]) c++; }
+  var el = document.getElementById('done-count');
+  if (el) el.textContent = c;
+  // restore project steps
+  if (data.projectSteps) {
+    data.projectSteps.forEach(function(s) {
+      projectStepsDone[s] = true;
+      var btn = document.getElementById('step-btn-' + s);
+      var num = document.getElementById('step-num-' + s);
+      if (btn) { btn.textContent = '✓ Completato'; btn.classList.add('done'); }
+      if (num) { num.classList.add('done'); num.textContent = '✓'; }
+    });
+  }
+  // restore current phase
+  if (data.currentPhase !== undefined) {
+    var phaseEl = document.getElementById('phase-' + data.currentPhase);
+    if (phaseEl && unlockedPhases[data.currentPhase]) {
+      document.querySelectorAll('.phase').forEach(function(p) { p.classList.remove('active'); });
+      phaseEl.classList.add('active');
+    }
+  }
+}
+
+var _lastSavedPhase = 0;
+
+function saveProgress() {
+  var unlockedArr = [];
+  for (var k in unlockedPhases) { if (unlockedPhases[k]) unlockedArr.push(parseInt(k)); }
+  var doneArr = [];
+  for (var k in doneModules) { if (doneModules[k]) doneArr.push(k); }
+  var stepsArr = [];
+  for (var k in projectStepsDone) { if (projectStepsDone[k]) stepsArr.push(parseInt(k)); }
+  DOC_REF.set({
+    unlockedPhases: unlockedArr,
+    doneModules: doneArr,
+    projectSteps: stepsArr,
+    currentPhase: _lastSavedPhase,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(err) {
+    console.warn('Firestore save error:', err);
+  });
+}
+
+// ── STATE ─────────────────────────────────────────────────────────
+var unlockedPhases = {0:true,5:false,6:false,1:false,2:false,3:false,4:false};
+var doneModules = {};
+var projectStepsDone = {};
+
+// ── QUIZ UNLOCK (API-based) ───────────────────────────────────────
+var phaseTopics = {
+  1: "LLM (token, temperatura, allucinazioni, context window), prompt engineering (system prompt, chain of thought), embedding e cosine similarity, vector database (pgvector, Chroma, hybrid search BM25)",
+  2: "RAG pipeline completa (chunking, embedding, retrieval, generazione), tecniche di chunking (sliding window, metadata), LangChain, valutazione RAG (RAGAS, faithfulness, relevancy)",
+  3: "FastAPI, Docker, containerizzazione, API REST, CI/CD con GitHub Actions, Terraform, infrastruttura come codice",
+  4: "AWS Bedrock, Azure OpenAI, Google Vertex AI, deployment cloud, MLOps, monitoring LLM in produzione, costi API",
+  5: "AI security (prompt injection, jailbreaking, PII), GDPR e AI Act, LLM Observability (LangSmith, Phoenix), ottimizzazione costi, caching semantico"
+};
+
+var activeQuizzes = {};
+
+function renderUnlockQuiz(phase) {
+  var container = document.getElementById('uq' + phase);
+  if (!container) return;
+  // already rendered with static HTML for phase 1 (it's in the source)
+  // for phases 2-5, render dynamically
+  if (phase === 1) return; // phase 1 quiz is hardcoded in HTML
+  
+  container.innerHTML = '<h3>🔓 Quiz di Sblocco — Fase ' + phase + '</h3>' +
+    '<p class="sub">Caricamento domande in corso...</p>' +
+    '<div id="uq' + phase + '-loading" style="color:var(--text2);font-size:13px;padding:20px 0">⏳ Generando 3 domande con AI...</div>';
+
+  var prompt = 'Genera esattamente 3 domande a risposta multipla (3 opzioni ciascuna) su questi argomenti: ' + phaseTopics[phase] + '. ' +
+    'Rispondi SOLO con un array JSON valido, nessun testo prima o dopo, nel formato: ' +
+    '[{"q":"domanda","opts":["opzione1","opzione2","opzione3"],"correct":0}] ' +
+    'dove correct è l\'indice (0,1,2) della risposta corretta.';
+
+  fetch('/.netlify/functions/claude', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      system: SYSTEM_PROMPT,
+      messages: [{role:'user', content: prompt}]
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    var text = data.content && data.content[0] && data.content[0].text ? data.content[0].text : '';
+    var match = text.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('No JSON array found');
+    var questions = JSON.parse(match[0]);
+    activeQuizzes[phase] = {questions: questions, answers: {}, score: 0};
+    renderQuizQuestions(phase, questions, container);
+  })
+  .catch(function(err) {
+    container.innerHTML = '<h3>🔓 Quiz di Sblocco — Fase ' + phase + '</h3>' +
+      '<p style="color:var(--red);font-size:13px">Errore nel caricamento del quiz. Ricarica la pagina.</p>';
+    console.error('Quiz load error:', err);
+  });
+}
+
+function renderQuizQuestions(phase, questions, container) {
+  var html = '<h3>🔓 Quiz di Sblocco — Fase ' + phase + '</h3>' +
+    '<p class="sub">Rispondi a 3 domande per sbloccare la fase successiva. Devi prendere almeno 2/3.</p>';
+  questions.forEach(function(q, i) {
+    html += '<div class="quiz-q"><p>' + (i+1) + '. ' + q.q + '</p><div class="quiz-options">';
+    q.opts.forEach(function(opt, j) {
+      var isCorrect = j === q.correct ? 'correct' : 'wrong';
+      html += '<button class="quiz-opt" onclick="uq(this,\'' + isCorrect + '\',\'u' + phase + 'q' + (i+1) + '\',' + phase + ')">' + opt + '</button>';
+    });
+    html += '</div>' +
+      '<div class="quiz-feedback" id="u' + phase + 'q' + (i+1) + '-fb-correct ok">✅ Esatto!</div>' +
+      '<div class="quiz-feedback" id="u' + phase + 'q' + (i+1) + '-fb-wrong ko">❌ Risposta sbagliata.</div>' +
+      '</div>';
+  });
+  html += '<div id="u' + phase + '-result" class="unlock-result"></div>' +
+    '<button class="unlock-next-btn" id="u' + phase + '-next" onclick="goPhaseUnlocked(' + phase + ')">Sblocca Fase ' + (phase+1) + ' →</button>';
+  container.innerHTML = html;
+}
+
+function uq(btn, result, qId, phase, optIdx) {
+  if(uqAnswers[qId]) return;
+  uqAnswers[qId] = result;
+  var opts = btn.closest('.quiz-options').querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.classList.add('disabled'));
+  btn.classList.add(result);
+  // feedback
+  var qi = parseInt(qId.replace('u'+phase+'q','')) - 1;
+  var q = activeQuizzes[phase] ? activeQuizzes[phase][qi] : null;
+  var fbEl = document.getElementById(qId+'-fb');
+  if(fbEl && q) {
+    var fbText = q.fb[optIdx] || (result==='correct' ? '✅ Esatto!' : '❌ Riprova.');
+    fbEl.textContent = fbText;
+    fbEl.className = 'quiz-feedback show ' + (result==='correct'?'ok':'ko');
+    fbEl.style.display = 'block';
+  }
+  if(result === 'correct') {
+    uqScores[phase]++;
+  } else {
+    // evidenzia la risposta corretta
+    opts.forEach(o => { if(o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) o.classList.add('correct'); });
+  }
+  var phaseQs = Object.keys(uqAnswers).filter(k => k.startsWith('u'+phase+'q'));
+  if(phaseQs.length >= uqTotal[phase]) evaluateUnlock(phase);
+}
+
+function evaluateUnlock(phase) {
+  var score = uqScores[phase];
+  var resultEl = document.getElementById('u'+phase+'-result');
+  var nextBtn = document.getElementById('u'+phase+'-next');
+  if(score >= 2) {
+    resultEl.textContent = '✅ '+score+'/3 — Ottimo! Fase successiva sbloccata.';
+    resultEl.className = 'unlock-result pass';
+    nextBtn.style.display = 'block';
+  } else {
+    resultEl.textContent = '❌ '+score+'/3 — Non ancora. Rileggi i moduli, tra 5 secondi ricarico nuove domande.';
+    resultEl.className = 'unlock-result fail';
+    setTimeout(function(){ renderUnlockQuiz(phase); }, 5000);
+  }
+}
+
+function goPhaseUnlocked(phaseIdx) {
+  if(phaseIdx === 5) {
+    if(!unlockedPhases.includes(5)) unlockedPhases.push(5);
+    if(!unlockedPhases.includes(6)) unlockedPhases.push(6);
+  } else {
+    if(!unlockedPhases.includes(phaseIdx)) unlockedPhases.push(phaseIdx);
+  }
+  updateNavLocks();
+  saveProgress();
+  var navBtns = document.querySelectorAll('.nav-item');
+  goPhase(phaseIdx, navBtns[phaseIdx]);
+}
+
+function updateNavLocks() {
+  for(var i=1;i<=6;i++){
+    var lockEl = document.getElementById('lock-'+i);
+    if(lockEl) lockEl.style.display = unlockedPhases.includes(i)?'none':'inline';
+    var tb = document.getElementById('tb'+i);
+    if(tb) tb.classList.toggle('locked-tab', !unlockedPhases.includes(i));
+  }
+}
+
+// PROJECT STEPS
+function completeStep(n) {
+  if(!completedSteps.includes(n)) completedSteps.push(n);
+  var btn = document.getElementById('psb'+n);
+  btn.textContent = '✓ Completato!';
+  btn.classList.add('done');
+  var numEl = document.getElementById('psn'+n);
+  if(numEl) numEl.classList.add('done');
+  if(n < 6){
+    var next = document.getElementById('ps'+(n+1));
+    if(next){ next.classList.remove('locked-step'); next.classList.add('unlocked-step'); }
+  }
+  if(n === 6){
+    var pc = document.getElementById('project-complete');
+    if(pc) pc.style.display='block';
+  }
+  saveProgress();
+  showToast('✅ Step '+n+' salvato!');
+}
+
+function checkProjectStep(n) { /* visuale */ }
+
+// CHIEDI A CLAUDE - prova sendPrompt nativo, altrimenti copia
+function askClaude(text) {
+  if(typeof window.sendPrompt === 'function') {
+    window.sendPrompt(text);
+    showToast('✉️ Messaggio inviato a Claude!');
+  } else {
+    // fallback: copia negli appunti
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('📋 Copiato! Incolla nella chat Claude qui sotto.');
+    }).catch(function() {
+      showToast('💬 ' + text.substring(0,50) + '...');
+    });
+  }
+}
+
+// COPY PROMPT
+function copyPrompt(box) {
+  var text = box.querySelector('.prompt-box-text').textContent;
+  var btn = box.querySelector('.copy-btn');
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = '✓ Copiato!';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent='Copia'; btn.classList.remove('copied'); }, 2000);
+  }).catch(function() {
+    btn.textContent = '✓ Copia manuale';
+  });
+}
+
+// NAVIGATION
+function goPhase(idx, btn) {
+  // fase 7 = glossario, sempre accessibile
+  if(idx !== 7 && idx > 0 && !unlockedPhases.includes(idx)) {
+    showToast('🔒 Completa il quiz di sblocco della fase precedente!');
+    return;
+  }
+  document.querySelectorAll('.phase').forEach((p,i) => p.classList.toggle('active', i===idx));
+  // sidebar
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  // topbar
+  document.querySelectorAll('.topbar-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  // salva ultima fase visitata
+  saveProgress(idx);
+}
+
+async function askClaude(text) {
+  var modal = document.getElementById('claude-modal');
+  var body = document.getElementById('claude-modal-body');
+  body.textContent = '⏳ Sto elaborando la risposta...';
+  modal.style.display = 'flex';
+  try {
+    var r = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        system: SYSTEM_PROMPT,
+        messages: [{role: 'user', content: text}]
+      })
+    });
+    var data = await r.json();
+    var reply = data.content && data.content[0] && data.content[0].text
+      ? data.content[0].text
+      : JSON.stringify(data);
+    body.textContent = reply;
+  } catch(err) {
+    body.textContent = 'Errore: ' + err.message;
+  }
+}
+
+// GLOSSARIO
+function toggleGloss(card) {
+  card.classList.toggle('open');
+}
+
+var glossCurrentTag = 'tutti';
+function filterGlossTag(tag, btn) {
+  glossCurrentTag = tag;
+  document.querySelectorAll('.gloss-filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyGlossFilter(document.querySelector('.gloss-search').value);
+}
+
+function filterGloss(q) {
+  applyGlossFilter(q);
+}
+
+function applyGlossFilter(q) {
+  var query = (q||'').toLowerCase().trim();
+  document.querySelectorAll('.gloss-card').forEach(function(card) {
+    var term = card.querySelector('.gloss-term').textContent.toLowerCase();
+    var def = card.querySelector('.gloss-def').textContent.toLowerCase();
+    var tag = card.dataset.tag;
+    var matchTag = glossCurrentTag === 'tutti' || tag === glossCurrentTag;
+    var matchQ = !query || term.includes(query) || def.includes(query);
+    card.style.display = (matchTag && matchQ) ? '' : 'none';
+  });
+}
+
+// MODULE TOGGLE
+function toggleMod(id) {
+  var el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// TAB SWITCH
+function switchTab(btn, contentId) {
+  var body = btn.closest('.mod-body');
+  body.querySelectorAll('.mod-tab').forEach(b => b.classList.remove('active'));
+  body.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(contentId).classList.add('active');
+}
+
+// MARK DONE
+function markDone(modId) {
+  var btn = document.getElementById('done-'+modId);
+  if(doneSet.has(modId)){
+    doneSet.delete(modId);
+    btn.innerHTML='<i class="ti ti-check"></i> Segna come studiato';
+    btn.classList.remove('marked');
+  } else {
+    doneSet.add(modId);
+    btn.innerHTML='<i class="ti ti-check"></i> Completato ✓';
+    btn.classList.add('marked');
+    showToast('✅ Salvato!');
+  }
+  document.getElementById('done-count').textContent = doneSet.size;
+  saveProgress();
+}
+
+// MODULE QUIZ
+function answerQ(btn, result, qId) {
+  var opts = btn.closest('.quiz-options').querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.classList.add('disabled'));
+  btn.classList.add(result);
+  var fbOk = document.getElementById(qId+'-fb-correct');
+  var fbKo = document.getElementById(qId+'-fb-wrong');
+  if(result === 'correct') {
+    fbOk.classList.add('show','ok');
+  } else {
+    fbKo.classList.add('show','ko');
+    // highlight correct
+    opts.forEach(o => {
+      if(o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) {
+        o.classList.add('correct');
+      }
+    });
+  }
+}
+
+// FINAL QUIZ
+var fqAnswers = {};
+var fqTotal = 15;
+function fq(btn, result, qId) {
+  if(fqAnswers[qId]) return;
+  fqAnswers[qId] = result;
+  var opts = btn.closest('.quiz-options').querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.classList.add('disabled'));
+  btn.classList.add(result);
+  var fbOk = document.getElementById(qId+'-fb-correct');
+  var fbKo = document.getElementById(qId+'-fb-wrong');
+  if(result === 'correct') {
+    fbOk.classList.add('show','ok');
+  } else {
+    fbKo.classList.add('show','ko');
+    opts.forEach(o => {
+      if(o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) {
+        o.classList.add('correct');
+      }
+    });
+  }
+  // check if all answered
+  if(Object.keys(fqAnswers).length === fqTotal) showFinalScore();
+}
+function showFinalScore() {
+  var correct = Object.values(fqAnswers).filter(v=>v==='correct').length;
+  var scoreEl = document.getElementById('final-score');
+  var numEl = document.getElementById('score-num');
+  var msgEl = document.getElementById('score-msg');
+  numEl.textContent = correct+'/'+fqTotal;
+  var pct = correct/fqTotal;
+  if(pct >= 0.9) msgEl.textContent = '🏆 Eccellente! Hai assorbito molto bene il piano.';
+  else if(pct >= 0.7) msgEl.textContent = '👍 Buon risultato! Ripassare i moduli dove hai sbagliato.';
+  else if(pct >= 0.5) msgEl.textContent = '📖 Discreto. Ti consiglio di rileggere le spiegazioni dei moduli.';
+  else msgEl.textContent = '💪 Riparti dalle spiegazioni — è normale, il piano è denso!';
+  scoreEl.classList.add('show');
+}
+function resetFinalQuiz() {
+  fqAnswers = {};
+  document.querySelectorAll('.quiz-opt').forEach(o => {
+    o.classList.remove('disabled','correct','wrong');
+  });
+  document.querySelectorAll('.quiz-feedback').forEach(f => {
+    f.classList.remove('show','ok','ko');
+  });
+  document.getElementById('final-score').classList.remove('show');
+}
+
+// SEND PROMPT — manda direttamente in chat
+function sendPrompt(text) {
+  if(typeof window.sendPrompt === 'function') {
+    window.sendPrompt(text);
+  } else {
+    // fallback: copia negli appunti e avvisa
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('📋 Testo copiato! Incollalo nella chat qui sotto.');
+    }).catch(function() {
+      showToast('💬 Chiedi a Claude: "' + text.substring(0,60) + '..."');
+    });
+  }
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if(!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1E2333;border:1px solid rgba(91,141,239,0.4);color:#E8EAF0;padding:10px 18px;border-radius:8px;font-size:13px;z-index:9999;max-width:340px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.4);transition:opacity 0.3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.style.opacity='0'; }, 3500);
+}
+window.addEventListener('DOMContentLoaded', function() {
+  updateNavLocks();
+  for (var p = 2; p <= 5; p++) renderUnlockQuiz(p);
+  initDB();
+});
+</script>
+</body>
+</html>
