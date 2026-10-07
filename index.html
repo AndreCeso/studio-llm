@@ -230,6 +230,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .unlock-result.fail{background:var(--red-dim);color:var(--red);display:block}
 .unlock-next-btn{width:100%;margin-top:12px;padding:12px;background:var(--green-dim);border:1px solid rgba(76,175,130,0.3);border-radius:8px;color:var(--green);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);display:none}
 .unlock-next-btn:hover{background:rgba(76,175,130,0.25)}
+.btn-primary{padding:9px 18px;background:var(--accent-dim);border:1px solid rgba(91,141,239,0.3);border-radius:8px;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all 0.15s}
+.btn-primary:hover{background:rgba(91,141,239,0.25)}
+.btn-esercita{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;border:1px solid rgba(155,127,232,0.3);color:var(--purple);background:var(--purple-dim);margin-top:8px;font-family:var(--font);transition:all 0.15s}
+.btn-esercita:hover{border-color:var(--purple);background:rgba(155,127,232,0.2)}
+.claude-loading{color:var(--text2);font-style:italic;padding:8px 0}
+.claude-reply{color:var(--text);line-height:1.75;white-space:pre-wrap}
 
 /* PROGETTO FINALE */
 .project-step{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;position:relative}
@@ -389,37 +395,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         </div>
         </div>
         <div class="tab-content" id="m0-quiz">
-          <div id="quiz-m0">
-            <div class="quiz-q">
-              <p>1. Un LLM con temperatura = 0 produce risposte…</p>
-              <div class="quiz-options">
-                <button class="quiz-opt" onclick="answerQ(this,'wrong','m0q1')">Sempre diverse e creative</button>
-                <button class="quiz-opt" onclick="answerQ(this,'correct','m0q1')">Sempre uguali e deterministiche</button>
-                <button class="quiz-opt" onclick="answerQ(this,'wrong','m0q1')">Più lente ma più accurate</button>
-              </div>
-              <div class="quiz-feedback" id="m0q1-fb-correct ok">✅ Esatto! Temperatura 0 = determinismo. Ogni volta che fai la stessa domanda ottieni la stessa risposta.</div>
-              <div class="quiz-feedback" id="m0q1-fb-wrong ko">❌ No. Temperatura 0 azzera la casualità: il modello sceglie sempre il token più probabile → risposta sempre uguale.</div>
-            </div>
-            <div class="quiz-q">
-              <p>2. Cos'è un "token" in un LLM?</p>
-              <div class="quiz-options">
-                <button class="quiz-opt" onclick="answerQ(this,'wrong','m0q2')">Una parola intera</button>
-                <button class="quiz-opt" onclick="answerQ(this,'wrong','m0q2')">Un carattere singolo</button>
-                <button class="quiz-opt" onclick="answerQ(this,'correct','m0q2')">Un pezzo di parola — l'unità base di elaborazione del modello</button>
-              </div>
-              <div class="quiz-feedback" id="m0q2-fb-correct ok">✅ Giusto! I token sono pezzi di parola. Parole comuni = 1 token, parole rare o lunghe = più token.</div>
-              <div class="quiz-feedback" id="m0q2-fb-wrong ko">❌ I token non sono né parole intere né caratteri singoli. Sono sottopezzi: "straordinario" potrebbe essere 3 token.</div>
-            </div>
-            <div class="quiz-q">
-              <p>3. Perché gli LLM allucinano?</p>
-              <div class="quiz-options">
-                <button class="quiz-opt" onclick="answerQ(this,'wrong','m0q3')">Per un bug nel codice che va corretto</button>
-                <button class="quiz-opt" onclick="answerQ(this,'correct','m0q3')">Perché predicono testo plausibile anche senza conoscere la risposta</button>
-                <button class="quiz-opt" onclick="answerQ(this,'wrong','m0q3')">Solo con temperatura alta</button>
-              </div>
-              <div class="quiz-feedback" id="m0q3-fb-correct ok">✅ Esatto! L'allucinazione è strutturale: il modello genera testo plausibile per costruzione, non perché "sa" la risposta.</div>
-              <div class="quiz-feedback" id="m0q3-fb-wrong ko">❌ L'allucinazione non è un bug e non dipende solo dalla temperatura. È insita nel modo in cui i modelli generano testo.</div>
-            </div>
+          <div id="m0-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m0', 'Come funziona un LLM: token, probabilità, temperatura, allucinazioni, context window')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -474,25 +451,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m1-quiz">
-          <div class="quiz-q">
-            <p>1. Cos'è il "system prompt"?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m1q1')">La prima domanda che fa l'utente</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m1q1')">Il messaggio iniziale che definisce il comportamento e il ruolo del modello</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m1q1')">Il prompt che genera il codice Python</button>
-            </div>
-            <div class="quiz-feedback" id="m1q1-fb-correct ok">✅ Esatto! Il system prompt è invisibile all'utente ma guida ogni risposta del modello.</div>
-            <div class="quiz-feedback" id="m1q1-fb-wrong ko">❌ Il system prompt è la configurazione iniziale del modello, non la domanda dell'utente.</div>
-          </div>
-          <div class="quiz-q">
-            <p>2. Chain of Thought serve a…</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m1q2')">Ridurre il numero di token usati</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m1q2')">Rendere il modello più veloce</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m1q2')">Far ragionare il modello passo per passo migliorando la qualità su problemi complessi</button>
-            </div>
-            <div class="quiz-feedback" id="m1q2-fb-correct ok">✅ Giusto! CoT rallenta un po' ma migliora molto la qualità su problemi che richiedono ragionamento.</div>
-            <div class="quiz-feedback" id="m1q2-fb-wrong ko">❌ CoT non riduce i token né accelera — fa l'opposto. Ma migliora la qualità del ragionamento.</div>
+          <div id="m1-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m1', 'Prompt Engineering: system prompt, chain of thought, RAG-prompting, ReAct pattern, few-shot examples')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
         <div class="tab-content" id="m1-lab">
@@ -549,25 +509,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m2-quiz">
-          <div class="quiz-q">
-            <p>1. Due frasi con cosine similarity = 0.95 sono…</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m2q1')">Molto simili nel significato</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m2q1')">Completamente opposte</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m2q1')">Identiche parola per parola</button>
-            </div>
-            <div class="quiz-feedback" id="m2q1-fb-correct ok">✅ Giusto! Similarity vicina a 1 = significato quasi identico, anche se le parole usate sono diverse.</div>
-            <div class="quiz-feedback" id="m2q1-fb-wrong ko">❌ Similarity 0.95 (vicina a 1) significa semanticamente molto simili, non opposte né identiche letteralmente.</div>
-          </div>
-          <div class="quiz-q">
-            <p>2. Perché la ricerca per embedding è utile rispetto alla ricerca per parola chiave?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m2q2')">È più veloce</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m2q2')">Trova risultati anche quando si usano parole diverse ma con lo stesso significato</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m2q2')">Consuma meno risorse computazionali</button>
-            </div>
-            <div class="quiz-feedback" id="m2q2-fb-correct ok">✅ Esatto! "Propulsore" e "motore" sono parole diverse ma embedding vicini. La ricerca semantica le collega.</div>
-            <div class="quiz-feedback" id="m2q2-fb-wrong ko">❌ La ricerca per embedding è più lenta e costosa, ma trova risultati semanticamente correlati anche con sinonimi.</div>
+          <div id="m2-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m2', 'Embedding e similarità semantica: vettori, cosine similarity, modelli embedding, ricerca semantica vs keyword')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -607,25 +550,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m3-quiz">
-          <div class="quiz-q">
-            <p>1. Qual è il vantaggio dell'hybrid search rispetto alla sola ricerca vettoriale?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m3q1')">È molto più veloce</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m3q1')">Trova sia corrispondenze esatte (codici, nomi) sia corrispondenze semantiche (sinonimi)</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m3q1')">Usa meno memoria</button>
-            </div>
-            <div class="quiz-feedback" id="m3q1-fb-correct ok">✅ Giusto! BM25 trova "errore AB-2234" esatto. Il vettoriale trova "guasto al motore" anche scritto diversamente. Insieme coprono entrambi i casi.</div>
-            <div class="quiz-feedback" id="m3q1-fb-wrong ko">❌ L'hybrid search è più lenta, non più veloce. Il vantaggio è la completezza: trova sia corrispondenze esatte che semantiche.</div>
-          </div>
-          <div class="quiz-q">
-            <p>2. Quale vector DB è più adatto per iniziare in locale senza configurazioni complesse?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m3q2')">Chroma o pgvector</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m3q2')">Pinecone</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m3q2')">Elasticsearch</button>
-            </div>
-            <div class="quiz-feedback" id="m3q2-fb-correct ok">✅ Esatto! Chroma si installa con pip in 2 minuti. pgvector è un'estensione di Postgres che potresti già avere. Ottimi per iniziare.</div>
-            <div class="quiz-feedback" id="m3q2-fb-wrong ko">❌ Pinecone ed Elasticsearch sono ottimi in produzione ma richiedono più configurazione. Meglio Chroma o pgvector per iniziare.</div>
+          <div id="m3-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m3', 'Vector Database: pgvector, Chroma, Pinecone, Weaviate, hybrid search BM25 più vettoriale, ANN indexing')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -636,31 +562,6 @@ Non inventare mai dati, versioni o procedure.<br>
 
   <!-- QUIZ SBLOCCO FASE 1 -->
   <div class="unlock-quiz" id="uq1">
-    <h3>🔓 Quiz di Sblocco — Fase 1</h3>
-    <p class="sub">Rispondi a 3 domande per sbloccare la Fase 2: RAG & Ricerca. Devi prendere almeno 2/3.</p>
-    <div class="quiz-q"><p>1. Cos'è un embedding?</p><div class="quiz-options">
-      <button class="quiz-opt" onclick="uq(this,'wrong','u1q1',1)">Una versione compressa di un documento</button>
-      <button class="quiz-opt" onclick="uq(this,'correct','u1q1',1)">Una rappresentazione numerica (vettore) del significato di un testo</button>
-      <button class="quiz-opt" onclick="uq(this,'wrong','u1q1',1)">Il processo di chunking dei documenti</button>
-    </div><div class="quiz-feedback" id="u1q1-fb-correct ok">✅ Esatto! Il testo diventa un vettore di numeri che ne rappresenta il significato.</div>
-    <div class="quiz-feedback" id="u1q1-fb-wrong ko">❌ Un embedding è un vettore numerico che rappresenta il significato semantico di un testo.</div></div>
-
-    <div class="quiz-q"><p>2. Perché la temperatura bassa è preferita nei sistemi RAG aziendali?</p><div class="quiz-options">
-      <button class="quiz-opt" onclick="uq(this,'wrong','u1q2',1)">Perché è più veloce</button>
-      <button class="quiz-opt" onclick="uq(this,'correct','u1q2',1)">Perché produce risposte stabili e deterministiche, senza creatività incontrollata</button>
-      <button class="quiz-opt" onclick="uq(this,'wrong','u1q2',1)">Perché costa meno token</button>
-    </div><div class="quiz-feedback" id="u1q2-fb-correct ok">✅ Giusto! In ambito aziendale vuoi risposte prevedibili, non creative.</div>
-    <div class="quiz-feedback" id="u1q2-fb-wrong ko">❌ La temperatura bassa garantisce risposte stabili e ripetibili — fondamentale in contesti aziendali.</div></div>
-
-    <div class="quiz-q"><p>3. Cosa fa il "system prompt" in un LLM?</p><div class="quiz-options">
-      <button class="quiz-opt" onclick="uq(this,'correct','u1q3',1)">Definisce il comportamento e il ruolo del modello per tutta la conversazione</button>
-      <button class="quiz-opt" onclick="uq(this,'wrong','u1q3',1)">Genera la risposta finale</button>
-      <button class="quiz-opt" onclick="uq(this,'wrong','u1q3',1)">Comprime i token per risparmiare costi</button>
-    </div><div class="quiz-feedback" id="u1q3-fb-correct ok">✅ Esatto! Il system prompt è la configurazione iniziale invisibile all'utente che guida ogni risposta.</div>
-    <div class="quiz-feedback" id="u1q3-fb-wrong ko">❌ Il system prompt non genera risposte né comprime token: definisce chi è e come si comporta il modello.</div></div>
-
-    <div id="u1-result" class="unlock-result"></div>
-    <button class="unlock-next-btn" id="u1-next" onclick="goPhaseUnlocked(1)">Sblocca Fase 2: RAG & Ricerca →</button>
   </div>
 </div>
 
@@ -715,6 +616,7 @@ Non inventare mai dati, versioni o procedure.<br>
           </div>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">La procedura "Apertura Conto Corrente" è 12 pagine. Con chunk_size=400 e overlap=50 diventa circa 35 chunk. Ogni chunk porta i metadata: <em>procedura="apertura_conto", versione="2.3", data="2024-01"</em>. Quando esce la versione 2.4, i vecchi chunk vengono marcati obsoleti automaticamente.</div></div>
           <button class="done-btn" id="done-m4" onclick="markDone('m4')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <button class="btn-esercita" onclick="esercitati('Chunking','chunking dei documenti per RAG: dimensione chunk, overlap, sliding window, chunk semantico')">🏋️ Esercitati con Claude</button>
           <div class="prompt-row">
           <button class="claude-btn" onclick="askClaude('Spiegami il chunking dei documenti per RAG con esempi pratici e concreti')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
           <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
@@ -724,15 +626,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m4-quiz">
-          <div class="quiz-q">
-            <p>1. Perché si usa l'overlap (sliding window) nel chunking?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m4q1')">Per ridurre il numero di chunk totali</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m4q1')">Per non perdere informazioni che si trovano a cavallo tra due chunk consecutivi</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m4q1')">Per velocizzare l'embedding</button>
-            </div>
-            <div class="quiz-feedback" id="m4q1-fb-correct ok">✅ Esatto! Se taglia esattamente dove c'è una frase importante, senza overlap la perdi. Con overlap quella frase appare in entrambi i chunk vicini.</div>
-            <div class="quiz-feedback" id="m4q1-fb-wrong ko">❌ L'overlap aumenta il numero di chunk (non lo riduce) ma garantisce che nessuna informazione venga tagliata via.</div>
+          <div id="m4-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m4', 'Chunking dei documenti per RAG: chunk size, sliding window overlap, metadata per chunk, chunking semantico vs ricorsivo')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
         <div class="tab-content" id="m4-lab">
@@ -788,6 +683,7 @@ Non inventare mai dati, versioni o procedure.<br>
           </div>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Operatore scrive: <em>"Come blocco una carta per smarrimento?"</em> → la domanda diventa vettore → il sistema trova i 5 chunk più rilevanti della procedura "Blocco Carta" → li passa all'LLM → risposta precisa con i passi da seguire. Faithfulness alta = l'AI cita la procedura, non inventa.</div></div>
           <button class="done-btn" id="done-m5" onclick="markDone('m5')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <button class="btn-esercita" onclick="esercitati('Pipeline RAG','pipeline RAG completa: embedding query, retrieval vettoriale, context injection nel prompt, generazione risposta')">🏋️ Esercitati con Claude</button>
           <div class="prompt-row">
           <button class="claude-btn" onclick="askClaude('Disegnami e spiegami la pipeline RAG end-to-end con un esempio concreto aziendale')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
           <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
@@ -797,25 +693,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m5-quiz">
-          <div class="quiz-q">
-            <p>1. In quale ordine avviene la pipeline RAG per rispondere a una domanda?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m5q1')">LLM → Retrieval → Embedding → Risposta</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m5q1')">Embedding domanda → Retrieval → Reranking → LLM → Risposta</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m5q1')">Chunking → Embedding → LLM → Risposta</button>
-            </div>
-            <div class="quiz-feedback" id="m5q1-fb-correct ok">✅ Perfetto! Prima trasformi la domanda in vettore, poi cerchi, poi riordini i risultati, poi mandi tutto all'LLM.</div>
-            <div class="quiz-feedback" id="m5q1-fb-wrong ko">❌ L'ordine corretto è: trasformi la domanda in embedding → cerchi chunk simili → reranking → mandi a LLM → risposta.</div>
-          </div>
-          <div class="quiz-q">
-            <p>2. Cos'è la "faithfulness" in un sistema RAG?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m5q2')">La velocità di risposta del sistema</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m5q2')">Il numero di documenti indicizzati</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m5q2')">Quanto la risposta dell'LLM è effettivamente basata sui documenti recuperati</button>
-            </div>
-            <div class="quiz-feedback" id="m5q2-fb-correct ok">✅ Esatto! Faithfulness alta = il modello cita e usa i documenti. Bassa = sta inventando nonostante abbia i documenti davanti.</div>
-            <div class="quiz-feedback" id="m5q2-fb-wrong ko">❌ Faithfulness misura la fedeltà della risposta ai documenti. È la metrica anti-allucinazione più importante.</div>
+          <div id="m5-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m5', 'Pipeline RAG completa: Recall@K, reranking cross-encoder, faithfulness, groundedness, RAGAS evaluation framework')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
         <div class="tab-content" id="m5-lab">
@@ -861,6 +740,7 @@ Non inventare mai dati, versioni o procedure.<br>
           </div>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">In sviluppo usi Ollama con llama3.2 sul tuo PC: testi l'assistente gratuitamente senza mandare dati bancari fuori dall'azienda. In produzione switchi su Azure OpenAI. Se Azure è giù, il circuit breaker torna automaticamente su Ollama locale — zero downtime per gli operatori.</div></div>
           <button class="done-btn" id="done-m6" onclick="markDone('m6')"><i class="ti ti-check"></i> Segna come studiato</button>
+          <button class="btn-esercita" onclick="esercitati('Prompt Engineering','prompt engineering avanzato: system prompt, chain of thought, few-shot examples, output format control')">🏋️ Esercitati con Claude</button>
           <div class="prompt-row">
           <button class="claude-btn" onclick="askClaude('Guidami passo passo per installare Ollama e far girare il mio primo modello LLM in locale')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
           <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
@@ -870,15 +750,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m6-quiz">
-          <div class="quiz-q">
-            <p>1. Qual è il vantaggio principale di Ollama rispetto a OpenAI per lo sviluppo?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m6q1')">Ha modelli più intelligenti</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m6q1')">Gira in locale: zero costi per token, zero dati inviati fuori, funziona offline</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m6q1')">È più veloce di OpenAI</button>
-            </div>
-            <div class="quiz-feedback" id="m6q1-fb-correct ok">✅ Esatto! Sviluppo locale = test infiniti senza costi. E i dati aziendali restano in casa.</div>
-            <div class="quiz-feedback" id="m6q1-fb-wrong ko">❌ Ollama non è più intelligente né più veloce di OpenAI. Il vantaggio è locale, gratuito e privato.</div>
+          <div id="m6-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m6', 'Ollama: modelli LLM in locale, ollama pull e run, API HTTP compatibile OpenAI, quantizzazione Q4 e Q8, modelli open source Llama Mistral Qwen')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
         <div class="tab-content" id="m6-lab">
@@ -972,15 +845,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m7-quiz">
-          <div class="quiz-q">
-            <p>1. Qual è il vantaggio principale di usare un container?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m7q1')">L'applicazione diventa più veloce</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m7q1')">Funziona identicamente su qualsiasi server senza dipendenze da installare</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m7q1')">Occupa meno spazio su disco</button>
-            </div>
-            <div class="quiz-feedback" id="m7q1-fb-correct ok">✅ Esatto! "Works on my machine" addio. Il container porta tutto con sé: stesso comportamento ovunque.</div>
-            <div class="quiz-feedback" id="m7q1-fb-wrong ko">❌ I container non aumentano la velocità né riducono lo spazio. Il vantaggio è la portabilità: stesso comportamento su qualsiasi server.</div>
+          <div id="m7-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m7', 'Container con Podman: Containerfile, Podman vs Docker, Podman Compose, rootless container, immagini multi-stage')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -1016,15 +882,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m8-quiz">
-          <div class="quiz-q">
-            <p>1. Perché si usa la messaggistica asincrona con le chiamate LLM?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m8q1')">Per rendere l'LLM più veloce</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m8q1')">Per non bloccare l'utente mentre aspetta una risposta che può richiedere 10–30 secondi</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m8q1')">Per risparmiare token</button>
-            </div>
-            <div class="quiz-feedback" id="m8q1-fb-correct ok">✅ Esatto! L'utente non resta bloccato ad aspettare. Il sistema lavora in background e notifica quando ha finito.</div>
-            <div class="quiz-feedback" id="m8q1-fb-wrong ko">❌ Kafka non velocizza l'LLM né risparmia token. Serve a non bloccare l'utente in attesa di risposte lente.</div>
+          <div id="m8-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m8', 'Kafka e messaggistica asincrona: topic, consumer group, Dead Letter Queue, pub/sub pattern, uso con LLM lenti')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -1061,15 +920,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m9-quiz">
-          <div class="quiz-q">
-            <p>1. Cosa fa il "circuit breaker" in un sistema RAG?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m9q1')">Spegne il sistema in caso di sovraccarico</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m9q1')">Smette di chiamare un provider che non risponde e passa automaticamente a un altro</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m9q1')">Limita il numero di richieste per utente</button>
-            </div>
-            <div class="quiz-feedback" id="m9q1-fb-correct ok">✅ Esatto! Se OpenAI è down, il circuit breaker "apre" e devia tutto su Ollama o Bedrock. Nessun downtime per l'utente.</div>
-            <div class="quiz-feedback" id="m9q1-fb-wrong ko">❌ Il circuit breaker non spegne nulla. Rileva che un servizio non risponde e switcha automaticamente al fallback (es. Ollama locale).</div>
+          <div id="m9-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m9', 'Microservizi per RAG: ingestion service, retrieval service, LLM orchestrator, circuit breaker pattern, provider switching')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -1105,15 +957,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m10-quiz">
-          <div class="quiz-q">
-            <p>1. Perché la deduplication è importante nell'ingestion?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m10q1')">Per velocizzare il retrieval</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m10q1')">Per evitare che lo stesso documento caricato due volte duplichi i chunk nel vector DB</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m10q1')">Per ridurre la dimensione del modello</button>
-            </div>
-            <div class="quiz-feedback" id="m10q1-fb-correct ok">✅ Esatto! Chunk duplicati = risposte che ripetono la stessa fonte più volte e indice gonfio senza motivo.</div>
-            <div class="quiz-feedback" id="m10q1-fb-wrong ko">❌ La deduplication serve a non avere chunk identici nel DB. Se il doc è caricato due volte, senza dedup avresti ogni chunk duplicato.</div>
+          <div id="m10-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m10', 'Ingestion e parsing documenti: PDF parsing, OCR, normalizzazione, deduplication con hash, versioning documenti')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -1196,15 +1041,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m11-quiz">
-          <div class="quiz-q">
-            <p>1. Se sei già in un ambiente Microsoft con Active Directory, quale cloud è più naturale usare?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m11q1')">AWS Bedrock</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m11q1')">Azure (con Azure OpenAI e Entra ID)</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m11q1')">GCP Vertex AI</button>
-            </div>
-            <div class="quiz-feedback" id="m11q1-fb-correct ok">✅ Esatto! Azure si integra nativamente con Active Directory (ora Entra ID), SSO aziendale e tutti i tool Microsoft già in uso.</div>
-            <div class="quiz-feedback" id="m11q1-fb-wrong ko">❌ In un ambiente Microsoft, Azure è la scelta più naturale perché si integra con Active Directory, Teams, e il resto dello stack Microsoft.</div>
+          <div id="m11-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m11', 'Cloud per LLM: GCP Vertex AI, Azure OpenAI, AWS Bedrock, API Gateway, Cloud Run, serverless deployment')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -1240,15 +1078,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m12-quiz">
-          <div class="quiz-q">
-            <p>1. Perché le chiavi API non vanno messe nel codice sorgente?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m12q1')">Perché rallentano il codice</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m12q1')">Perché chiunque abbia accesso al repository o all'immagine container le vedrebbe in chiaro</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m12q1')">Perché i modelli non le accettano in quel formato</button>
-            </div>
-            <div class="quiz-feedback" id="m12q1-fb-correct ok">✅ Esatto! Una chiave nel codice = chiunque legga il repo (anche su GitHub) può usarla. Secret Manager le cripta e le rende disponibili solo ai servizi autorizzati.</div>
-            <div class="quiz-feedback" id="m12q1-fb-wrong ko">❌ Le chiavi nel codice sono un rischio di sicurezza enorme: chiunque legga il repo, il container o i log le vede e può usarle a tue spese.</div>
+          <div id="m12-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m12', 'IAM e sicurezza cloud: Service Account, Managed Identity, Secret Manager, zero trust, mTLS, principio del minimo privilegio')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -1283,15 +1114,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m13-quiz">
-          <div class="quiz-q">
-            <p>1. Cosa ti permette di fare il "trace distribuito"?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m13q1')">Seguire una singola richiesta attraverso tutti i microservizi e vedere dove si perde tempo</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m13q1')">Velocizzare le chiamate LLM</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m13q1')">Ridurre il costo per token</button>
-            </div>
-            <div class="quiz-feedback" id="m13q1-fb-correct ok">✅ Giusto! Con il trace distribuito vedi esattamente dove va ogni millisecondo. Retrieval lento? LLM lento? Lo sai subito.</div>
-            <div class="quiz-feedback" id="m13q1-fb-wrong ko">❌ Il trace distribuito è uno strumento di debug e monitoring, non di ottimizzazione diretta. Ti dice dove guardare per ottimizzare.</div>
+          <div id="m13-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m13', 'Observability per sistemi AI: OpenTelemetry, trace distribuito, metriche RAG latency p95, costo per query, groundedness score')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -1374,15 +1198,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m14-quiz">
-          <div class="quiz-q">
-            <p>1. Cos'è un "gold dataset" nel contesto dell'evaluation RAG?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m14q1')">Il dataset di training del modello LLM</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m14q1')">Un set di domande con risposta corretta nota, usato per testare regressioni</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m14q1')">I documenti più importanti dell'azienda</button>
-            </div>
-            <div class="quiz-feedback" id="m14q1-fb-correct ok">✅ Esatto! Con 100 domande "gold", puoi misurare automaticamente se un aggiornamento ha migliorato o peggiorato le risposte.</div>
-            <div class="quiz-feedback" id="m14q1-fb-wrong ko">❌ Il gold dataset non è usato per training. Serve per testing: hai le domande e le risposte giuste, e misuri se il sistema le trova.</div>
+          <div id="m14-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m14', 'Evaluation e guardrail RAG: gold dataset, groundedness score, PII redaction, content filter, regression testing')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -1417,15 +1234,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m15-quiz">
-          <div class="quiz-q">
-            <p>1. Perché ha senso cachare i risultati dell'embedding?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m15q1')">Perché lo stesso testo produce sempre lo stesso vettore: ricalcolarlo ogni volta è uno spreco di tempo e denaro</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m15q1')">Perché i vettori cambiano nel tempo</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m15q1')">Per migliorare la qualità delle risposte</button>
-            </div>
-            <div class="quiz-feedback" id="m15q1-fb-correct ok">✅ Esatto! L'embedding è deterministico. "Motore guasto" produce sempre gli stessi 1536 numeri. Calcolarlo due volte è uno spreco.</div>
-            <div class="quiz-feedback" id="m15q1-fb-wrong ko">❌ I vettori non cambiano nel tempo per lo stesso testo. Sono deterministici: calcolarlo più volte è uno spreco puro.</div>
+          <div id="m15-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m15', 'Cost management LLM: model routing, embedding cache, caching semantico, tracciamento costi per feature, ottimizzazione token')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -1461,15 +1271,8 @@ Non inventare mai dati, versioni o procedure.<br>
         </div>
         </div>
         <div class="tab-content" id="m16-quiz">
-          <div class="quiz-q">
-            <p>1. Cos'è l'"index rollover" e perché è importante?</p>
-            <div class="quiz-options">
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m16q1')">È un backup automatico del vector DB</button>
-              <button class="quiz-opt" onclick="answerQ(this,'correct','m16q1')">È la tecnica per aggiornare l'indice dei documenti senza fermare il servizio per gli utenti</button>
-              <button class="quiz-opt" onclick="answerQ(this,'wrong','m16q1')">È la rotazione automatica delle chiavi API</button>
-            </div>
-            <div class="quiz-feedback" id="m16q1-fb-correct ok">✅ Esatto! Si re-indicizza su un indice parallelo "cold", poi si fa swap. Gli utenti continuano ad usare il vecchio finché il nuovo è pronto.</div>
-            <div class="quiz-feedback" id="m16q1-fb-wrong ko">❌ L'index rollover riguarda l'aggiornamento dei documenti nel vector DB senza downtime, non i backup né le chiavi.</div>
+          <div id="m16-quiz-container">
+            <button class="btn-primary" onclick="generateModuleQuiz('m16', 'Playbook operativo RAG: provider failover, key rotation, index rollover, backup vector DB, incident response')">🎲 Genera quiz con Claude</button>
           </div>
         </div>
       </div>
@@ -1928,11 +1731,14 @@ Non inventare mai dati, versioni o procedure.<br>
 </div>
 
 <!-- CLAUDE MODAL -->
-<div id="claude-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:24px;position:relative">
-    <button onclick="document.getElementById('claude-modal').style.display='none'" style="position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;line-height:1">✕</button>
-    <div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px">Claude risponde</div>
-    <div id="claude-modal-body" style="font-size:14px;color:var(--text);line-height:1.7;white-space:pre-wrap"></div>
+<div id="claude-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:1000;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);max-width:640px;width:100%;max-height:85vh;display:flex;flex-direction:column;position:relative">
+    <div style="padding:18px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div id="claude-modal-title" style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase">Claude risponde</div>
+      <button onclick="document.getElementById('claude-modal').style.display='none'" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1;padding:0">✕</button>
+    </div>
+    <div id="claude-modal-body" style="flex:1;overflow-y:auto;padding:18px 20px;font-size:14px;color:var(--text);line-height:1.7"></div>
+    <div id="claude-modal-footer" style="padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0"></div>
   </div>
 </div>
 
@@ -2029,72 +1835,67 @@ var projectStepsDone = {};
 
 // ── QUIZ UNLOCK (API-based) ───────────────────────────────────────
 var phaseTopics = {
-  1: "LLM (token, temperatura, allucinazioni, context window), prompt engineering (system prompt, chain of thought), embedding e cosine similarity, vector database (pgvector, Chroma, hybrid search BM25)",
-  2: "RAG pipeline completa (chunking, embedding, retrieval, generazione), tecniche di chunking (sliding window, metadata), LangChain, valutazione RAG (RAGAS, faithfulness, relevancy)",
-  3: "FastAPI, Docker, containerizzazione, API REST, CI/CD con GitHub Actions, Terraform, infrastruttura come codice",
-  4: "AWS Bedrock, Azure OpenAI, Google Vertex AI, deployment cloud, MLOps, monitoring LLM in produzione, costi API",
-  5: "AI security (prompt injection, jailbreaking, PII), GDPR e AI Act, LLM Observability (LangSmith, Phoenix), ottimizzazione costi, caching semantico"
+  1: "LLM fondamenti: token, temperatura, context window, allucinazioni, prompt engineering base, system prompt, chain of thought, embedding, cosine similarity, vector database",
+  2: "RAG pipeline: chunking, sliding window, embedding, retrieval, LangChain, RAGAS, faithfulness, relevancy",
+  3: "FastAPI, Docker, containerizzazione, REST API, CI/CD GitHub Actions, Terraform",
+  4: "AWS Bedrock, Azure OpenAI, Google Vertex AI, MLOps, monitoring LLM, costi API",
+  5: "AI security, prompt injection, jailbreaking, PII, GDPR, AI Act, LangSmith, Phoenix, caching semantico"
 };
 
 var activeQuizzes = {};
 
-function renderUnlockQuiz(phase) {
+async function renderUnlockQuiz(phase) {
   var container = document.getElementById('uq' + phase);
   if (!container) return;
-  // already rendered with static HTML for phase 1 (it's in the source)
-  // for phases 2-5, render dynamically
-  if (phase === 1) return; // phase 1 quiz is hardcoded in HTML
-  
-  container.innerHTML = '<h3>🔓 Quiz di Sblocco — Fase ' + phase + '</h3>' +
-    '<p class="sub">Caricamento domande in corso...</p>' +
-    '<div id="uq' + phase + '-loading" style="color:var(--text2);font-size:13px;padding:20px 0">⏳ Generando 3 domande con AI...</div>';
-
-  var prompt = 'Genera esattamente 3 domande a risposta multipla (3 opzioni ciascuna) su questi argomenti: ' + phaseTopics[phase] + '. ' +
-    'Rispondi SOLO con un array JSON valido, nessun testo prima o dopo, nel formato: ' +
-    '[{"q":"domanda","opts":["opzione1","opzione2","opzione3"],"correct":0}] ' +
-    'dove correct è l\'indice (0,1,2) della risposta corretta.';
-
-  fetch('/.netlify/functions/claude', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      system: SYSTEM_PROMPT,
-      messages: [{role:'user', content: prompt}]
-    })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    var text = data.content && data.content[0] && data.content[0].text ? data.content[0].text : '';
-    var match = text.match(/\[[\s\S]*\]/);
-    if (!match) throw new Error('No JSON array found');
-    var questions = JSON.parse(match[0]);
-    activeQuizzes[phase] = {questions: questions, answers: {}, score: 0};
-    renderQuizQuestions(phase, questions, container);
-  })
-  .catch(function(err) {
-    container.innerHTML = '<h3>🔓 Quiz di Sblocco — Fase ' + phase + '</h3>' +
-      '<p style="color:var(--red);font-size:13px">Errore nel caricamento del quiz. Ricarica la pagina.</p>';
-    console.error('Quiz load error:', err);
-  });
-}
-
-function renderQuizQuestions(phase, questions, container) {
-  var html = '<h3>🔓 Quiz di Sblocco — Fase ' + phase + '</h3>' +
-    '<p class="sub">Rispondi a 3 domande per sbloccare la fase successiva. Devi prendere almeno 2/3.</p>';
-  questions.forEach(function(q, i) {
-    html += '<div class="quiz-q"><p>' + (i+1) + '. ' + q.q + '</p><div class="quiz-options">';
-    q.opts.forEach(function(opt, j) {
-      var isCorrect = j === q.correct ? 'correct' : 'wrong';
-      html += '<button class="quiz-opt" onclick="uq(this,\'' + isCorrect + '\',\'u' + phase + 'q' + (i+1) + '\',' + phase + ')">' + opt + '</button>';
+  container.innerHTML = '<div class="claude-loading">⏳ Claude genera le domande...</div>';
+  var topic = phaseTopics[phase];
+  try {
+    var prompt = 'Genera esattamente 3 domande a risposta multipla (A/B/C/D) per testare la comprensione di: ' + topic + '. '
+      + 'Rispondi SOLO con JSON valido, nessun testo prima o dopo, in questo formato esatto: '
+      + '{"questions":[{"q":"testo domanda","options":["A) testo","B) testo","C) testo","D) testo"],"correct":0,"explanation":"perché la risposta A è corretta"}]}. '
+      + 'correct è l\'indice 0-3 della risposta corretta. Le domande devono essere pratiche e concrete, non banali.';
+    var r = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        system: 'Sei un generatore di quiz tecnici. Rispondi SOLO con JSON valido, mai testo aggiuntivo.',
+        messages: [{role:'user', content: prompt}]
+      })
     });
-    html += '</div>' +
-      '<div class="quiz-feedback" id="u' + phase + 'q' + (i+1) + '-fb-correct ok">✅ Esatto!</div>' +
-      '<div class="quiz-feedback" id="u' + phase + 'q' + (i+1) + '-fb-wrong ko">❌ Risposta sbagliata.</div>' +
-      '</div>';
-  });
-  html += '<div id="u' + phase + '-result" class="unlock-result"></div>' +
-    '<button class="unlock-next-btn" id="u' + phase + '-next" onclick="goPhaseUnlocked(' + phase + ')">Sblocca Fase ' + (phase+1) + ' →</button>';
-  container.innerHTML = html;
+    var data = await r.json();
+    var text = data.content && data.content[0] && data.content[0].text ? data.content[0].text : '';
+    // extract JSON even if wrapped in markdown code blocks
+    var jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('JSON non trovato');
+    var parsed = JSON.parse(jsonMatch[0]);
+    activeQuizzes[phase] = parsed.questions;
+    uqScores[phase] = 0;
+    uqTotal[phase] = parsed.questions.length;
+    // reset answers for this phase
+    Object.keys(uqAnswers).forEach(function(k){ if(k.startsWith('u'+phase+'q')) delete uqAnswers[k]; });
+    var html = '<h3 style="font-size:15px;font-weight:600;margin-bottom:16px">🔓 Quiz di Sblocco — Fase ' + phase + '</h3>';
+    parsed.questions.forEach(function(q, qi) {
+      var qId = 'u'+phase+'q'+(qi+1);
+      html += '<div class="quiz-q" style="margin-bottom:20px">';
+      html += '<div style="font-size:13px;font-weight:500;margin-bottom:10px;color:var(--text)">'+(qi+1)+'. '+q.q+'</div>';
+      html += '<div class="quiz-options">';
+      q.options.forEach(function(opt, oi) {
+        var isCorrect = oi === q.correct ? "'correct'" : "'wrong'";
+        html += '<button class="quiz-opt" onclick="uq(this,'+isCorrect+',\''+qId+'\','+phase+','+oi+')">' + opt + '</button>';
+      });
+      html += '</div>';
+      html += '<div class="quiz-feedback" id="'+qId+'-fb" style="display:none"></div>';
+      html += '<div style="font-size:11px;color:var(--text3);margin-top:6px;display:none" id="'+qId+'-exp">💡 '+q.explanation+'</div>';
+      html += '</div>';
+    });
+    html += '<div id="u'+phase+'-result" class="unlock-result"></div>';
+    html += '<button class="unlock-next-btn" id="u'+phase+'-next" onclick="goPhaseUnlocked('+phase+')">Sblocca Fase '+(phase+1)+' →</button>';
+    html += '<button class="btn-primary" style="margin-top:8px;width:100%" onclick="renderUnlockQuiz('+phase+')">🔄 Nuove domande</button>';
+    container.innerHTML = html;
+  } catch(err) {
+    container.innerHTML = '<div style="color:var(--red);font-size:13px">Errore generazione quiz: '+err.message+'</div>'
+      + '<button class="btn-primary" onclick="renderUnlockQuiz('+phase+')" style="margin-top:8px">Riprova</button>';
+  }
 }
 
 function uq(btn, result, qId, phase, optIdx) {
@@ -2107,12 +1908,14 @@ function uq(btn, result, qId, phase, optIdx) {
   var qi = parseInt(qId.replace('u'+phase+'q','')) - 1;
   var q = activeQuizzes[phase] ? activeQuizzes[phase][qi] : null;
   var fbEl = document.getElementById(qId+'-fb');
-  if(fbEl && q) {
-    var fbText = q.fb[optIdx] || (result==='correct' ? '✅ Esatto!' : '❌ Riprova.');
+  if(fbEl) {
+    var fbText = result==='correct' ? '✅ Esatto!' : '❌ Risposta errata.';
     fbEl.textContent = fbText;
     fbEl.className = 'quiz-feedback show ' + (result==='correct'?'ok':'ko');
     fbEl.style.display = 'block';
   }
+  var expEl = document.getElementById(qId+'-exp');
+  if(expEl) expEl.style.display = 'block';
   if(result === 'correct') {
     uqScores[phase]++;
   } else {
@@ -2121,6 +1924,60 @@ function uq(btn, result, qId, phase, optIdx) {
   }
   var phaseQs = Object.keys(uqAnswers).filter(k => k.startsWith('u'+phase+'q'));
   if(phaseQs.length >= uqTotal[phase]) evaluateUnlock(phase);
+}
+
+async function generateModuleQuiz(modId, topic) {
+  var container = document.getElementById(modId + '-quiz-container');
+  if (!container) return;
+  container.innerHTML = '<div class="claude-loading">⏳ Claude genera il quiz...</div>';
+  try {
+    var prompt = 'Genera 3 domande a risposta multipla (A/B/C/D) su: ' + topic + '. '
+      + 'Rispondi SOLO con JSON: {"questions":[{"q":"domanda","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"spiegazione breve"}]}';
+    var r = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        system: 'Sei un generatore di quiz tecnici. Rispondi SOLO con JSON valido.',
+        messages: [{role:'user', content: prompt}]
+      })
+    });
+    var data = await r.json();
+    var text = data.content[0].text;
+    var jsonMatch = text.match(/\{[\s\S]*\}/);
+    var parsed = JSON.parse(jsonMatch[0]);
+    var html = '';
+    parsed.questions.forEach(function(q, qi) {
+      var qId = modId+'_q'+(qi+1);
+      html += '<div class="quiz-q" style="margin-bottom:18px">';
+      html += '<div style="font-size:13px;font-weight:500;margin-bottom:9px">'+(qi+1)+'. '+q.q+'</div>';
+      html += '<div class="quiz-options">';
+      q.options.forEach(function(opt, oi) {
+        var isCorrect = oi === q.correct;
+        html += '<button class="quiz-opt" onclick="answerModQ(this,'+isCorrect+',\''+qId+'\')">'+opt+'</button>';
+      });
+      html += '</div>';
+      html += '<div class="quiz-feedback" id="'+qId+'-fb" style="display:none;margin-top:6px"></div>';
+      html += '<div style="font-size:11px;color:var(--text3);margin-top:4px;display:none" id="'+qId+'-exp">💡 '+q.explanation+'</div>';
+      html += '</div>';
+    });
+    html += '<button class="btn-primary" style="margin-top:8px" onclick="generateModuleQuiz(\''+modId+'\',\''+topic.replace(/'/g,"\\'")+'\')" >🔄 Nuovo quiz</button>';
+    container.innerHTML = html;
+  } catch(err) {
+    container.innerHTML = '<div style="color:var(--red);font-size:13px">Errore: '+err.message+'</div>'
+      + '<button class="btn-primary" onclick="generateModuleQuiz(\''+modId+'\',\''+topic.replace(/'/g,"\\'")+'\')">Riprova</button>';
+  }
+}
+
+function answerModQ(btn, isCorrect, qId) {
+  var opts = btn.closest('.quiz-options').querySelectorAll('.quiz-opt');
+  if (opts[0].classList.contains('disabled')) return;
+  opts.forEach(o => o.classList.add('disabled'));
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) opts.forEach(o => { if(o.getAttribute('onclick') && o.getAttribute('onclick').includes('true,')) o.classList.add('correct'); });
+  var fbEl = document.getElementById(qId+'-fb');
+  var expEl = document.getElementById(qId+'-exp');
+  if (fbEl) { fbEl.textContent = isCorrect ? '✅ Esatto!' : '❌ Risposta errata.'; fbEl.className = 'quiz-feedback show '+(isCorrect?'ok':'ko'); fbEl.style.display='block'; }
+  if (expEl) expEl.style.display = 'block';
 }
 
 function evaluateUnlock(phase) {
@@ -2228,28 +2085,82 @@ function goPhase(idx, btn) {
   saveProgress(idx);
 }
 
+async function callClaude(messages) {
+  var r = await fetch('/.netlify/functions/claude', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ system: SYSTEM_PROMPT, messages: messages })
+  });
+  var data = await r.json();
+  return data.content && data.content[0] && data.content[0].text
+    ? data.content[0].text : JSON.stringify(data);
+}
+
 async function askClaude(text) {
   var modal = document.getElementById('claude-modal');
+  var title = document.getElementById('claude-modal-title');
   var body = document.getElementById('claude-modal-body');
-  body.textContent = '⏳ Sto elaborando la risposta...';
+  var footer = document.getElementById('claude-modal-footer');
+  title.textContent = 'Claude risponde';
+  body.innerHTML = '<div class="claude-loading">⏳ Sto elaborando...</div>';
+  footer.innerHTML = '';
   modal.style.display = 'flex';
   try {
-    var r = await fetch('/.netlify/functions/claude', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        system: SYSTEM_PROMPT,
-        messages: [{role: 'user', content: text}]
-      })
-    });
-    var data = await r.json();
-    var reply = data.content && data.content[0] && data.content[0].text
-      ? data.content[0].text
-      : JSON.stringify(data);
-    body.textContent = reply;
+    var reply = await callClaude([{role:'user', content: text}]);
+    body.innerHTML = '<div class="claude-reply">' + reply.replace(/\n/g,'<br>') + '</div>';
   } catch(err) {
-    body.textContent = 'Errore: ' + err.message;
+    body.innerHTML = '<div class="claude-reply" style="color:var(--red)">Errore: ' + err.message + '</div>';
   }
+}
+
+var _esercitaHistory = [];
+async function esercitati(modTitle, modTopic) {
+  var modal = document.getElementById('claude-modal');
+  var title = document.getElementById('claude-modal-title');
+  var body = document.getElementById('claude-modal-body');
+  var footer = document.getElementById('claude-modal-footer');
+  _esercitaHistory = [];
+  title.textContent = '🏋️ Esercitati — ' + modTitle;
+  body.innerHTML = '<div class="claude-loading">⏳ Genero un esercizio pratico...</div>';
+  footer.innerHTML = '';
+  modal.style.display = 'flex';
+  try {
+    var prompt = 'Crea un breve esercizio pratico su: ' + modTopic + '. '
+      + 'Fornisci: 1) una situazione concreta (max 3 righe), 2) cosa deve fare/rispondere lo studente. '
+      + 'Sii conciso. Termina con "---\\nLa tua risposta:"';
+    _esercitaHistory = [{role:'user', content: prompt}];
+    var reply = await callClaude(_esercitaHistory);
+    _esercitaHistory.push({role:'assistant', content: reply});
+    body.innerHTML = '<div class="claude-reply">' + reply.replace(/\n/g,'<br>') + '</div>';
+    footer.innerHTML = '<textarea id="esercita-input" placeholder="Scrivi la tua risposta..." rows="3" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-family:var(--font);font-size:13px;resize:vertical;margin-bottom:8px"></textarea>'
+      + '<button class="btn-primary" onclick="inviaRisposta()">Invia risposta →</button>';
+  } catch(err) {
+    body.innerHTML = '<div style="color:var(--red)">Errore: ' + err.message + '</div>';
+  }
+}
+
+async function inviaRisposta() {
+  var input = document.getElementById('esercita-input');
+  var risposta = input ? input.value.trim() : '';
+  if (!risposta) return;
+  var body = document.getElementById('claude-modal-body');
+  var footer = document.getElementById('claude-modal-footer');
+  footer.innerHTML = '<div class="claude-loading">⏳ Claude valuta la tua risposta...</div>';
+  _esercitaHistory.push({role:'user', content: risposta});
+  try {
+    var feedback = await callClaude(_esercitaHistory);
+    _esercitaHistory.push({role:'assistant', content: feedback});
+    body.innerHTML += '<div class="claude-reply" style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px"><strong style="color:var(--accent)">La tua risposta:</strong><br>' + risposta.replace(/\n/g,'<br>') + '</div>'
+      + '<div class="claude-reply" style="margin-top:8px"><strong style="color:var(--green)">Feedback Claude:</strong><br>' + feedback.replace(/\n/g,'<br>') + '</div>';
+    footer.innerHTML = '<button class="btn-primary" onclick="nuovoEsercizio()">Nuovo esercizio 🔄</button>';
+  } catch(err) {
+    footer.innerHTML = '<div style="color:var(--red)">Errore: ' + err.message + '</div>';
+  }
+}
+
+function nuovoEsercizio() {
+  var title = document.getElementById('claude-modal-title').textContent.replace('🏋️ Esercitati — ','');
+  esercitati(title, title);
 }
 
 // GLOSSARIO
@@ -2410,7 +2321,7 @@ function showToast(msg) {
 }
 window.addEventListener('DOMContentLoaded', function() {
   updateNavLocks();
-  for (var p = 2; p <= 5; p++) renderUnlockQuiz(p);
+  for (var p = 1; p <= 5; p++) renderUnlockQuiz(p);
   initDB();
 });
 </script>
