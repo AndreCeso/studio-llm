@@ -1966,61 +1966,50 @@ function initDB() {
 function applyProgress(data) {
   if (!data) return;
   // restore phase unlocks
-  if (data.unlockedPhases) {
+  if (data.unlockedPhases && Array.isArray(data.unlockedPhases)) {
     data.unlockedPhases.forEach(function(p) {
-      unlockedPhases[p] = true;
+      if (!unlockedPhases.includes(p)) unlockedPhases.push(p);
     });
   }
   updateNavLocks();
   // restore done modules
   if (data.doneModules) {
     data.doneModules.forEach(function(id) {
+      doneSet.add(id);
       var btn = document.getElementById('done-' + id);
       if (btn) {
         btn.classList.add('marked');
-        btn.innerHTML = '<i class="ti ti-check"></i> Studiato ✓';
-        doneModules[id] = true;
+        btn.innerHTML = '<i class="ti ti-check"></i> Completato ✓';
       }
     });
   }
-  // restore done count
-  var c = 0;
-  for (var k in doneModules) { if (doneModules[k]) c++; }
   var el = document.getElementById('done-count');
-  if (el) el.textContent = c;
+  if (el) el.textContent = doneSet.size;
   // restore project steps
   if (data.projectSteps) {
     data.projectSteps.forEach(function(s) {
-      projectStepsDone[s] = true;
-      var btn = document.getElementById('step-btn-' + s);
-      var num = document.getElementById('step-num-' + s);
-      if (btn) { btn.textContent = '✓ Completato'; btn.classList.add('done'); }
-      if (num) { num.classList.add('done'); num.textContent = '✓'; }
+      if (!completedSteps.includes(s)) completedSteps.push(s);
+      var btn = document.getElementById('psb' + s);
+      var num = document.getElementById('psn' + s);
+      if (btn) { btn.textContent = '✓ Completato!'; btn.classList.add('done'); }
+      if (num) { num.classList.add('done'); }
     });
   }
   // restore current phase
-  if (data.currentPhase !== undefined) {
-    var phaseEl = document.getElementById('phase-' + data.currentPhase);
-    if (phaseEl && unlockedPhases[data.currentPhase]) {
-      document.querySelectorAll('.phase').forEach(function(p) { p.classList.remove('active'); });
-      phaseEl.classList.add('active');
-    }
+  if (data.currentPhase !== undefined && unlockedPhases.includes(data.currentPhase)) {
+    var navBtns = document.querySelectorAll('.nav-item');
+    goPhase(data.currentPhase, navBtns[data.currentPhase]);
   }
 }
 
 var _lastSavedPhase = 0;
 
 function saveProgress() {
-  var unlockedArr = [];
-  for (var k in unlockedPhases) { if (unlockedPhases[k]) unlockedArr.push(parseInt(k)); }
-  var doneArr = [];
-  for (var k in doneModules) { if (doneModules[k]) doneArr.push(k); }
-  var stepsArr = [];
-  for (var k in projectStepsDone) { if (projectStepsDone[k]) stepsArr.push(parseInt(k)); }
+  if (typeof DOC_REF === 'undefined') return;
   DOC_REF.set({
-    unlockedPhases: unlockedArr,
-    doneModules: doneArr,
-    projectSteps: stepsArr,
+    unlockedPhases: unlockedPhases.slice(),
+    doneModules: Array.from(doneSet),
+    projectSteps: completedSteps.slice(),
     currentPhase: _lastSavedPhase,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   }).catch(function(err) {
@@ -2029,7 +2018,12 @@ function saveProgress() {
 }
 
 // ── STATE ─────────────────────────────────────────────────────────
-var unlockedPhases = {0:true,5:false,6:false,1:false,2:false,3:false,4:false};
+var unlockedPhases = [0];
+var doneSet = new Set();
+var completedSteps = [];
+var uqAnswers = {};
+var uqScores = {};
+var uqTotal = {1:3,2:3,3:3,4:3,5:3};
 var doneModules = {};
 var projectStepsDone = {};
 
