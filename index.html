@@ -179,6 +179,49 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 /* ASK BTN */
 .ask-btn{display:none}
 
+/* APPROFONDISCI BTN */
+.approfondisci-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;border:1px solid rgba(91,141,239,0.35);background:var(--accent-dim);color:var(--accent);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all 0.15s}
+.approfondisci-btn:hover{background:rgba(91,141,239,0.25)}
+.approfondisci-btn i{font-size:14px}
+
+/* MODAL CHAT INPUT */
+.modal-chat-input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-family:var(--font);font-size:13px;resize:vertical;margin-bottom:8px;outline:none;transition:border-color 0.15s;min-height:70px}
+.modal-chat-input:focus{border-color:var(--accent)}
+.modal-chat-suggestion{font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.6}
+.modal-chat-suggestion strong{color:var(--text2)}
+
+/* ESERCIZIO STEP-GUIDATO */
+.ex-scenario{background:var(--bg3);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--text);line-height:1.7}
+.ex-step-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.ex-step{display:flex;gap:10px;align-items:flex-start}
+.ex-step-n{width:22px;height:22px;border-radius:50%;background:var(--purple-dim);color:var(--purple);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ex-step-text{font-size:13px;color:var(--text2);line-height:1.6;flex:1}
+.ex-prompt-box{margin-top:10px;background:var(--bg);border:1px solid rgba(155,127,232,0.3);border-radius:8px;padding:10px 14px;display:flex;align-items:flex-start;gap:10px}
+.ex-prompt-box-text{font-size:12px;color:var(--purple);flex:1;font-family:var(--mono);line-height:1.6;word-break:break-word}
+.ex-copy-btn{flex-shrink:0;background:var(--purple-dim);border:none;color:var(--purple);padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:var(--font);white-space:nowrap;display:flex;align-items:center;gap:4px;flex-direction:column}
+.ex-copy-btn:hover{background:rgba(155,127,232,0.3)}
+
+/* INTERACTIVE DEMOS */
+.demo-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+.demo-box h4{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.demo-slider-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.demo-slider{flex:1;accent-color:var(--accent)}
+.demo-val{font-size:20px;font-weight:700;color:var(--accent);min-width:36px;text-align:center}
+.demo-output{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13px;color:var(--text2);line-height:1.7;min-height:60px}
+.chunk-visual{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.chunk-item{padding:4px 8px;border-radius:4px;font-size:11px;font-family:var(--mono);cursor:default;transition:all 0.2s}
+.sim-row{display:flex;flex-direction:column;gap:8px}
+.sim-pair{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:border-color 0.15s}
+.sim-pair:hover{border-color:var(--border2)}
+.sim-label{font-size:12px;color:var(--text2);flex:1}
+.sim-score{font-size:14px;font-weight:700;min-width:42px;text-align:right}
+
+/* RIPASSO FLASH */
+.ripasso-box{background:linear-gradient(135deg,rgba(91,141,239,0.08),rgba(155,127,232,0.08));border:1px solid rgba(91,141,239,0.25);border-radius:8px;padding:14px 16px;margin-bottom:16px}
+.ripasso-title{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+.ripasso-item{font-size:12px;color:var(--text2);display:flex;gap:8px;line-height:1.6;margin-bottom:4px}
+.ripasso-item strong{color:var(--text)}
+
 /* CASO PRATICO BOX */
 .case-box{background:linear-gradient(135deg,rgba(62,196,196,0.08),rgba(91,141,239,0.08));border:1px solid rgba(62,196,196,0.3);border-radius:8px;padding:12px 14px;margin-top:14px}
 .case-box-label{font-size:10px;font-weight:700;color:var(--teal);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px}
@@ -369,34 +412,71 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         <div class="mod-tabs">
           <button class="mod-tab active" onclick="switchTab(this,'m0-spieg')">📖 Spiegazione</button>
           <button class="mod-tab" onclick="switchTab(this,'m0-quiz')">🧠 Quiz</button>
+          <button class="mod-tab" onclick="switchTab(this,'m0-demo')">🎛️ Demo</button>
         </div>
         <div class="tab-content active" id="m0-spieg">
-          <p class="spieg-intro">Un LLM non "capisce" davvero — predice la parola più probabile dopo le precedenti. Sapere questo cambia tutto su come lo usi.</p>
-          <div class="analogy-box">🎲 <strong>Analogia:</strong> Immagina un gioco dove completi la frase <em>"Il gatto è sul..."</em>. Il modello ha letto miliardi di testi e sa che "tetto" viene dopo quella frase molto spesso. Fa questo miliardi di volte al secondo, producendo testo fluido.
-          </div>
-          <div class="topics">
-            <div class="topic"><div class="topic-dot" style="background:var(--accent)"></div><div class="topic-text"><strong>Token</strong> <span>— non sono parole intere, sono pezzi di parola. "Gatto" = 1 token, "straordinario" = 3 token. Importante perché i modelli costano a token e hanno un limite massimo di token che "ricordano".</span></div></div>
-            <div class="topic"><div class="topic-dot" style="background:var(--accent)"></div><div class="topic-text"><strong>Temperatura</strong> <span>— controlla quanto il modello è "creativo". Con 0 risponde sempre uguale. Con 1 è più variabile e imprevedibile. Per sistemi aziendali si usa bassa (0–0.2) per avere risposte stabili.</span></div></div>
-            <div class="topic"><div class="topic-dot" style="background:var(--accent)"></div><div class="topic-text"><strong>Hallucination</strong> <span>— il modello inventa cose con assoluta sicurezza. Non è un bug, è come funziona: predice testo plausibile anche quando non conosce la risposta. Ecco perché serve il RAG.</span></div></div>
-            <div class="topic"><div class="topic-dot" style="background:var(--accent)"></div><div class="topic-text"><strong>Context window</strong> <span>— quanto il modello "ricorda" in una conversazione. Oltre quel limite (es. 128k token) dimentica le cose più vecchie. Come la memoria a breve termine.</span></div></div>
+          <div class="explain-block">
+            <h4><i class="ti ti-brain" style="color:var(--accent)"></i> Concetto chiave</h4>
+            <p>Un Large Language Model non è un database di risposte e non "capisce" davvero il linguaggio nel senso umano. È un sistema statistico che, dopo aver analizzato miliardi di testi, ha imparato a <strong>predire il token più probabile</strong> dato un certo contesto. Ogni parola che genera è il risultato di una distribuzione di probabilità su decine di migliaia di possibili token: il modello sceglie quello con la probabilità più alta (o quasi, a seconda della temperatura).</p>
+            <p>Questo meccanismo ha implicazioni profonde. Il modello non sa cosa è vero — sa cosa è <em>plausibile</em> in base ai testi visti in training. Ecco perché può "allucinare" con grande sicurezza: genera testo statisticamente coerente anche quando non ha la risposta. I <strong>token</strong> sono l'unità base: non parole intere, ma pezzi di parola. "Straordinario" = 3 token, "gatto" = 1 token. La <strong>context window</strong> è la quantità massima di token che il modello può considerare in una volta: oltre quel limite (es. 128k token per GPT-4) dimentica i messaggi più vecchi. La <strong>temperatura</strong> controlla la casualità: 0 = deterministico (sempre la stessa risposta), 1 = creativo e variabile.</p>
           </div>
           <div class="explain-block">
-            <h4><i class="ti ti-bulb" style="color:var(--orange)"></i> Perché la temperatura è importante per te</h4>
-            <p>Nel sistema RAG aziendale che costruirai, userai temperatura <code>0.1</code> — vuoi risposte precise e ripetibili, non creative. Un modello "creativo" potrebbe inventare dettagli tecnici che non esistono nei tuoi documenti.</p>
+            <h4><i class="ti ti-building-bank" style="color:var(--teal)"></i> Perché ti serve</h4>
+            <p>Nel tuo assistente bancario, capire questo meccanismo è critico. Un LLM senza contesto esterno potrebbe rispondere a "come si blocca una carta?" con informazioni plausibili ma inventate — procedure che non corrispondono ai manuali della tua banca specifica. Userai temperatura <strong>0.1</strong> per garantire risposte stabili e ripetibili, e sfrutterai la context window per iniettare i chunk delle procedure come contesto, guidando il modello a rispondere solo da quei dati.</p>
           </div>
-          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">La banca ha 80 procedure operative in PDF. Prima di costruire qualsiasi sistema, devi capire cosa può e non può fare un LLM su quei documenti. Se la temperatura è alta, l'AI potrebbe inventare passaggi di procedura che non esistono — potenzialmente disastroso per un operatore che gestisce un conto.</div></div>
+          <div class="explain-block">
+            <h4><i class="ti ti-flask" style="color:var(--orange)"></i> Esempio concreto</h4>
+            <p>Un operatore chiede: <em>"Quanti giorni ci vogliono per l'apertura conto?"</em>. Senza RAG, il modello potrebbe rispondere "5-7 giorni lavorativi" — plausibile in generale ma sbagliato per la tua banca (che magari ha procedura da 3 giorni). Con temperatura alta potrebbe addirittura variare la risposta da sessione a sessione. Con temperatura 0.1 e il manuale come contesto, la risposta sarà sempre quella corretta, citando la procedura interna.</p>
+          </div>
+          <div class="explain-block">
+            <h4><i class="ti ti-list-check" style="color:var(--green)"></i> Da ricordare</h4>
+            <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px">
+              <li style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--accent);flex-shrink:0">•</span><span>Un LLM predice il token più probabile, non recupera fatti certi: le allucinazioni non sono un bug ma una conseguenza del funzionamento.</span></li>
+              <li style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--accent);flex-shrink:0">•</span><span>Temperatura 0 = deterministico e stabile (ideale per sistemi aziendali); temperatura 1 = creativo e variabile (ideale per scrittura creativa).</span></li>
+              <li style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--accent);flex-shrink:0">•</span><span>La context window è la "memoria di lavoro" del modello: tutto ciò che serve al modello per rispondere deve starci dentro — documenti inclusi.</span></li>
+            </ul>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">La banca ha 80 procedure operative in PDF. Prima di costruire qualsiasi sistema, devi capire cosa può e non può fare un LLM su quei documenti. Se la temperatura è alta, l'AI potrebbe inventare passaggi di procedura che non esistono — potenzialmente disastroso per un operatore che gestisce un conto. Con temperatura 0.1 e il manuale come contesto, le risposte saranno sempre ancorate alla documentazione reale.</div></div>
           <button class="done-btn" id="done-m0" onclick="markDone('m0')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Spiegami i token e la temperatura degli LLM come se avessi 10 anni, con esempi pratici')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami i token e la temperatura degli LLM come se avessi 10 anni, con esempi pratici</span></div>
-            <button class="copy-btn">Copia</button>
-          </div>
+          <button class="approfondisci-btn" onclick="approfondisci('Come funziona un LLM','token, probabilità, temperatura, context window, allucinazioni, predizione del prossimo token')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Come funziona un LLM','token, temperatura, context window, allucinazioni in un assistente bancario')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
         </div>
         </div>
         <div class="tab-content" id="m0-quiz">
           <div id="m0-quiz-container">
             <button class="btn-primary" onclick="generateModuleQuiz('m0', 'Come funziona un LLM: token, probabilità, temperatura, allucinazioni, context window')">🎲 Genera quiz con Claude</button>
+          </div>
+        </div>
+        <div class="tab-content" id="m0-demo">
+          <div class="demo-box">
+            <h4><i class="ti ti-thermometer" style="color:var(--orange)"></i> Demo Temperatura</h4>
+            <p style="font-size:12px;color:var(--text3);margin-bottom:10px">Sposta il cursore per vedere come cambia il comportamento del modello a diverse temperature.</p>
+            <div class="demo-slider-row">
+              <span style="font-size:12px;color:var(--text3)">0</span>
+              <input type="range" class="demo-slider" min="0" max="20" value="7" id="temp-slider" oninput="updateTempDemo(this.value)">
+              <span style="font-size:12px;color:var(--text3)">2</span>
+              <div class="demo-val" id="temp-val">0.7</div>
+            </div>
+            <div class="demo-output" id="temp-output">
+              <strong>Modalità:</strong> Bilanciata — buona qualità con una certa varietà. Usata di default da molti chatbot.
+            </div>
+          </div>
+          <div class="demo-box">
+            <h4><i class="ti ti-cut" style="color:var(--purple)"></i> Demo Tokenizzazione</h4>
+            <p style="font-size:12px;color:var(--text3);margin-bottom:10px">Vedi come diverse parole vengono suddivise in token (colori alternati).</p>
+            <div id="token-demo" class="chunk-visual">
+              <span class="chunk-item" style="background:var(--accent-dim);color:var(--accent)">stra</span>
+              <span class="chunk-item" style="background:var(--orange-dim);color:var(--orange)">ordin</span>
+              <span class="chunk-item" style="background:var(--accent-dim);color:var(--accent)">ario</span>
+              <span class="chunk-item" style="background:var(--green-dim);color:var(--green)"> </span>
+              <span class="chunk-item" style="background:var(--accent-dim);color:var(--accent)">ga</span>
+              <span class="chunk-item" style="background:var(--orange-dim);color:var(--orange)">tto</span>
+              <span class="chunk-item" style="background:var(--green-dim);color:var(--green)"> </span>
+              <span class="chunk-item" style="background:var(--accent-dim);color:var(--accent)">man</span>
+              <span class="chunk-item" style="background:var(--orange-dim);color:var(--orange)">gia</span>
+            </div>
+            <p style="font-size:11px;color:var(--text3);margin-top:8px">← "Straordinario gatto mangia" = 8 token. In media 1 token ≈ 0.75 parole in inglese, meno in italiano.</p>
           </div>
         </div>
       </div>
@@ -419,35 +499,44 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
           <button class="mod-tab" onclick="switchTab(this,'m1-lab')">🔬 Esercizio</button>
         </div>
         <div class="tab-content active" id="m1-spieg">
-          <p class="spieg-intro">Il modo in cui scrivi il messaggio al modello cambia radicalmente la qualità della risposta. Più contesto e struttura dai, meglio risponde.</p>
-          <div class="analogy-box">👨‍🍳 <strong>Analogia:</strong> Dire a un cuoco <em>"fai qualcosa di buono"</em> vs <em>"fai una pasta al pomodoro, 4 persone, senza aglio, pronta in 20 minuti"</em>. Più contesto = risultato migliore e più prevedibile.</div>
-          <div class="topics">
-            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>Chain of Thought (CoT)</strong> <span>— chiedi al modello di ragionare passo per passo. Aggiungere <em>"pensa prima di rispondere"</em> o <em>"ragiona step by step"</em> migliora la qualità su problemi complessi.</span></div></div>
-            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>System prompt</strong> <span>— il messaggio iniziale che definisce chi è il modello e come si deve comportare. Es: "Sei un assistente tecnico aziendale. Rispondi solo basandoti sui documenti forniti. Se non sai, di' che non sai."</span></div></div>
-            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>RAG-prompting</strong> <span>— tecnica per passare documenti al modello e dirgli di rispondere solo su quelli. Previene le allucinazioni perché il modello ha la risposta davanti.</span></div></div>
-            <div class="topic"><div class="topic-dot" style="background:var(--green)"></div><div class="topic-text"><strong>ReAct</strong> <span>— pattern in cui il modello ragiona, poi agisce (chiama un tool), poi osserva il risultato, e ripete. Base degli AI agent che eseguono compiti autonomi.</span></div></div>
+          <div class="explain-block">
+            <h4><i class="ti ti-message-circle" style="color:var(--green)"></i> Concetto chiave</h4>
+            <p>Il <strong>Prompt Engineering</strong> è l'arte di scrivere istruzioni efficaci per un LLM. Lo stesso modello, con prompt diversi, può dare risposte completamente differenti in qualità, formato e accuratezza. Le tecniche principali sono: il <strong>System Prompt</strong> (il messaggio nascosto che definisce il ruolo e il comportamento del modello, visibile al sistema ma non all'utente), il <strong>User Prompt</strong> (il messaggio dell'utente), e i <strong>Few-shot Examples</strong> (esempi di input/output inseriti nel prompt per mostrare al modello esattamente cosa ci aspettiamo).</p>
+            <p>La tecnica <strong>Chain of Thought (CoT)</strong> chiede al modello di ragionare passo per passo prima di rispondere: aggiungere "pensa step by step" o "ragiona prima di rispondere" migliora drasticamente la qualità su problemi complessi. Il <strong>controllo del formato output</strong> (es. "rispondi in JSON", "usa elenchi puntati", "massimo 3 frasi") è fondamentale per integrare le risposte in sistemi software. Il pattern <strong>ReAct</strong> (Reason + Act) è la base degli AI agent: il modello ragiona, esegue un'azione (chiama un tool), osserva il risultato, e ripete il ciclo fino alla soluzione.</p>
           </div>
           <div class="explain-block">
-            <h4><i class="ti ti-code" style="color:var(--green)"></i> Esempio: system prompt RAG aziendale</h4>
+            <h4><i class="ti ti-building-bank" style="color:var(--teal)"></i> Perché ti serve</h4>
+            <p>Il system prompt è la prima difesa contro le allucinazioni nel tuo assistente bancario. Scrivere un system prompt preciso — che specifica il ruolo, i limiti, la lingua, il formato e la politica per i casi non coperti — è spesso più impattante che cambiare il modello stesso. Per l'assistente operativo, il prompt deve esplicitamente vietare risposte non basate sui documenti, definire come rispondere a domande ambigue, e forzare il formato delle risposte per renderle facili da leggere su schermo piccolo.</p>
+          </div>
+          <div class="explain-block">
+            <h4><i class="ti ti-flask" style="color:var(--orange)"></i> Esempio concreto</h4>
             <div class="code-block">
-              <span class="cm"># System prompt per il tuo assistente AI</span><br>
+              <span class="cm"># System prompt ottimizzato per l'assistente bancario</span><br>
               system = <span class="str">"""<br>
-Sei un assistente tecnico aziendale.<br>
-Rispondi SOLO basandoti sui documenti forniti nel contesto.<br>
-Se la risposta non è nei documenti, rispondi:<br>
-"Non ho informazioni sufficienti su questo argomento."<br>
-Non inventare mai dati, versioni o procedure.<br>
+Sei un assistente operativo interno della banca.<br>
+REGOLE ASSOLUTE:<br>
+1. Rispondi SOLO in base ai documenti forniti nel contesto.<br>
+2. Se la risposta non è nei documenti, scrivi esattamente:<br>
+   "Non ho informazioni su questo nelle procedure disponibili."<br>
+3. Non inventare mai numeri, date, importi o passi procedurali.<br>
+4. Rispondi in italiano, in modo conciso e operativo.<br>
+5. Se citi una procedura, indica sempre il nome del documento.<br>
 """</span>
             </div>
           </div>
-          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Il tuo system prompt per l'assistente bancario sarà tipo: <em>"Sei un assistente operativo. Rispondi SOLO basandoti sulle procedure fornite. Se la procedura non copre il caso, di' esplicitamente che non hai informazioni sufficienti."</em> Questo evita che l'AI inventi passaggi per il reset password.</div></div>
+          <div class="explain-block">
+            <h4><i class="ti ti-list-check" style="color:var(--green)"></i> Da ricordare</h4>
+            <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px">
+              <li style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">•</span><span>Il system prompt è il tuo contratto con il modello: più è specifico, più il comportamento è prevedibile e sicuro in produzione.</span></li>
+              <li style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">•</span><span>I few-shot examples sono spesso più efficaci di lunghe descrizioni: mostra al modello un esempio di risposta ideale invece di spiegarla.</span></li>
+              <li style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--green);flex-shrink:0">•</span><span>Chain of Thought ("ragiona step by step") migliora la qualità su problemi complessi ma aumenta i token usati — usalo dove conta davvero.</span></li>
+            </ul>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Il tuo system prompt per l'assistente bancario deve coprire: ruolo ("sei un assistente operativo"), vincoli ("rispondi SOLO dai documenti forniti"), lingua ("rispondi in italiano"), gestione fallback ("se non sai, dì esplicitamente che non hai informazioni sufficienti"), e formato ("cita sempre il nome della procedura"). Questo evita che l'AI inventi passaggi per il reset password o per il blocco carta.</div></div>
           <button class="done-btn" id="done-m1" onclick="markDone('m1')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Fammi esercitare sul prompt engineering con esempi pratici e concreti, partendo da zero')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Fammi esercitare sul prompt engineering con esempi pratici e concreti, partendo da zero</span></div>
-            <button class="copy-btn">Copia</button>
-          </div>
+          <button class="approfondisci-btn" onclick="approfondisci('Prompt Engineering','system prompt, chain of thought, ReAct, few-shot examples, output formatting')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Prompt Engineering','scrivere system prompt efficaci, chain of thought, few-shot per un assistente bancario')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
         </div>
         </div>
         <div class="tab-content" id="m1-quiz">
@@ -485,32 +574,79 @@ Non inventare mai dati, versioni o procedure.<br>
         <div class="mod-tabs">
           <button class="mod-tab active" onclick="switchTab(this,'m2-spieg')">📖 Spiegazione</button>
           <button class="mod-tab" onclick="switchTab(this,'m2-quiz')">🧠 Quiz</button>
+          <button class="mod-tab" onclick="switchTab(this,'m2-demo')">🎛️ Demo</button>
         </div>
         <div class="tab-content active" id="m2-spieg">
-          <p class="spieg-intro">Gli embedding trasformano testi in numeri in modo che testi con significato simile abbiano numeri simili. È la magia che permette la ricerca semantica.</p>
-          <div class="analogy-box">🗺️ <strong>Analogia:</strong> Immagina una mappa dove città con clima simile sono fisicamente vicine. Gli embedding fanno lo stesso con i testi: "gatto" e "felino" finiscono vicini sulla mappa, "gatto" e "automobile" lontani — anche se non condividono lettere.</div>
-          <div class="topics">
-            <div class="topic"><div class="topic-dot" style="background:var(--orange)"></div><div class="topic-text"><strong>Vettore</strong> <span>— lista di numeri che rappresenta il "significato" di un testo. Es: "motore guasto" → [0.23, -0.87, 0.12, 0.54, ...] (centinaia di numeri).</span></div></div>
-            <div class="topic"><div class="topic-dot" style="background:var(--orange)"></div><div class="topic-text"><strong>Cosine similarity</strong> <span>— come si misura quanto due vettori sono vicini. Valore 1 = identici come significato. Valore 0 = nessuna relazione. Valore -1 = opposti.</span></div></div>
-            <div class="topic"><div class="topic-dot" style="background:var(--orange)"></div><div class="topic-text"><strong>Modelli embedding</strong> <span>— servizi che generano i vettori: OpenAI (text-embedding-3), BGE (open source), Cohere. Non sono gli stessi LLM che rispondono alle domande — sono specializzati.</span></div></div>
+          <div class="explain-block">
+            <h4><i class="ti ti-vector" style="color:var(--orange)"></i> Concetto chiave</h4>
+            <p>Un <strong>embedding</strong> è la trasformazione di un testo in un vettore numerico — una lista di centinaia o migliaia di numeri — che rappresenta il <em>significato semantico</em> di quel testo in uno spazio matematico multidimensionale. La proprietà fondamentale è che testi con significato simile producono vettori simili, indipendentemente dalle parole usate: "reset password", "reimpostazione credenziali" e "non riesco ad accedere all'account" saranno tutti vicini nello spazio vettoriale, anche se non condividono nemmeno una parola.</p>
+            <p>La <strong>cosine similarity</strong> misura l'angolo tra due vettori: valore 1 = stesso significato, valore 0 = nessuna relazione, valore -1 = significati opposti. I <strong>modelli di embedding</strong> (OpenAI text-embedding-3, BGE, Cohere, Nomic) sono reti neurali specializzate nel produrre questi vettori — diversi dai modelli che generano testo. La <strong>ricerca semantica</strong> vs keyword search è la differenza tra trovare documenti per significato e per parola esatta: la ricerca semantica capisce sinonimi, parafrasi e concetti correlati che la ricerca testuale perde completamente.</p>
           </div>
           <div class="explain-block">
-            <h4><i class="ti ti-bulb" style="color:var(--orange)"></i> Perché ti serve capire questo</h4>
-            <p>Quando un utente scrive <em>"problema con il propulsore"</em> e nel manuale c'è scritto <em>"guasto al motore"</em>, la ricerca per parola chiave fallisce. L'embedding le capisce come sinonime e trova il risultato giusto. Questo è il cuore della ricerca semantica nel tuo sistema RAG.</p>
+            <h4><i class="ti ti-building-bank" style="color:var(--teal)"></i> Perché ti serve</h4>
+            <p>Nel tuo assistente bancario, gli operatori fanno domande in linguaggio naturale e colloquiale. Non useranno mai le parole esatte dei manuali — diranno "carta bloccata" invece di "sospensione operatività strumento di pagamento", o "non si apre il conto" invece di "iter di apertura rapporto corrente". Senza embedding, il retrieval fallisce su queste varianti linguistiche. Con gli embedding, la domanda dell'operatore viene convertita in vettore e confrontata con i vettori di tutti i chunk delle procedure: la similitudine semantica trova i documenti giusti anche con terminologia completamente diversa.</p>
           </div>
-          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">"Reset password" e "reimpostazione credenziali" sono la stessa cosa ma scritte diversamente. Senza embedding, una ricerca per parola chiave non le collega. Con gli embedding, l'operatore che scrive "non riesco ad accedere" trova automaticamente la procedura di reset — anche senza usare le parole esatte.</div></div>
+          <div class="explain-block">
+            <h4><i class="ti ti-flask" style="color:var(--orange)"></i> Esempio concreto</h4>
+            <p>Operatore scrive: <em>"Ho un cliente che non riesce a fare il login dopo aver cambiato telefono"</em>. Il manuale contiene: <em>"Procedura di reset autenticazione a due fattori — sezione 4.2"</em>. Le due frasi non condividono quasi nessuna parola. Ma i loro embedding avranno cosine similarity ~0.82 — abbastanza alta da far emergere la procedura giusta tra i top risultati. Una ricerca keyword classica restituirebbe zero risultati o risultati irrilevanti.</p>
+          </div>
+          <div class="explain-block">
+            <h4><i class="ti ti-list-check" style="color:var(--green)"></i> Da ricordare</h4>
+            <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px">
+              <li style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--orange);flex-shrink:0">•</span><span>Gli embedding catturano il <em>significato</em>, non la forma: sinonimi, parafrasi e concetti correlati diventano vettori vicini anche senza parole in comune.</span></li>
+              <li style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--orange);flex-shrink:0">•</span><span>La cosine similarity è la metrica standard per confrontare vettori di embedding: sopra 0.7 i testi sono semanticamente simili, sopra 0.9 quasi identici.</span></li>
+              <li style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--orange);flex-shrink:0">•</span><span>Il modello di embedding deve essere lo stesso in fase di indicizzazione e in fase di query — vettori prodotti da modelli diversi non sono comparabili.</span></li>
+            </ul>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">"Reset password" e "reimpostazione credenziali" sono la stessa cosa ma scritte diversamente. Senza embedding, una ricerca per parola chiave non le collega. Con gli embedding, l'operatore che scrive "non riesco ad accedere" trova automaticamente la procedura di reset — anche senza usare le parole esatte del manuale. Userai un modello embedding open-source come BGE-m3 (multilingua, gratuito) o text-embedding-3-small di OpenAI per generare i vettori di tutti i chunk delle 80 procedure.</div></div>
           <button class="done-btn" id="done-m2" onclick="markDone('m2')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Spiegami gli embedding vettoriali con un esempio visivo e pratico, parto da zero')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami gli embedding vettoriali con un esempio visivo e pratico, parto da zero</span></div>
-            <button class="copy-btn">Copia</button>
-          </div>
+          <button class="approfondisci-btn" onclick="approfondisci('Embedding & Similarità','embedding vettoriali, cosine similarity, modelli di embedding, ricerca semantica vs keyword')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Embedding & Similarità','embedding, cosine similarity, ricerca semantica per documenti bancari')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
         </div>
         </div>
         <div class="tab-content" id="m2-quiz">
           <div id="m2-quiz-container">
             <button class="btn-primary" onclick="generateModuleQuiz('m2', 'Embedding e similarità semantica: vettori, cosine similarity, modelli embedding, ricerca semantica vs keyword')">🎲 Genera quiz con Claude</button>
+          </div>
+        </div>
+        <div class="tab-content" id="m2-demo">
+          <div class="demo-box">
+            <h4><i class="ti ti-circles-relation" style="color:var(--orange)"></i> Demo Cosine Similarity</h4>
+            <p style="font-size:12px;color:var(--text3);margin-bottom:12px">Clicca su una coppia per vedere la similarità semantica simulata. Testo query: <strong style="color:var(--text)">"reset password"</strong></p>
+            <div class="sim-row" id="sim-demo">
+              <div class="sim-pair" onclick="showSim(this,0.94,'Alta similarità — stesso concetto bancario, entrambi sul recupero accesso')">
+                <div class="sim-label"><span style="color:var(--text3);font-size:10px">vs</span> "reimpostazione credenziali di accesso"</div>
+                <div class="sim-score" style="color:var(--green)">?</div>
+              </div>
+              <div class="sim-pair" onclick="showSim(this,0.78,'Media-alta — concetto correlato, stessa area di problema (accesso account)')">
+                <div class="sim-label"><span style="color:var(--text3);font-size:10px">vs</span> "non riesco ad accedere all'account"</div>
+                <div class="sim-score" style="color:var(--green)">?</div>
+              </div>
+              <div class="sim-pair" onclick="showSim(this,0.51,'Media — cambia password è azione correlata ma diversa (sicurezza, non recupero accesso)')">
+                <div class="sim-label"><span style="color:var(--text3);font-size:10px">vs</span> "modifica password per sicurezza"</div>
+                <div class="sim-score" style="color:var(--orange)">?</div>
+              </div>
+              <div class="sim-pair" onclick="showSim(this,0.12,'Bassa — parla di blocco carta, area completamente diversa')">
+                <div class="sim-label"><span style="color:var(--text3);font-size:10px">vs</span> "procedura blocco carta di credito"</div>
+                <div class="sim-score" style="color:var(--red)">?</div>
+              </div>
+              <div class="sim-pair" onclick="showSim(this,0.03,'Quasi nulla — argomento completamente diverso')">
+                <div class="sim-label"><span style="color:var(--text3);font-size:10px">vs</span> "orari apertura sportello bancario"</div>
+                <div class="sim-score" style="color:var(--red)">?</div>
+              </div>
+            </div>
+            <div id="sim-explain" style="font-size:12px;color:var(--text2);margin-top:10px;min-height:30px;background:var(--bg);border-radius:6px;padding:8px 10px;display:none"></div>
+          </div>
+          <div class="demo-box">
+            <h4><i class="ti ti-scissors" style="color:var(--green)"></i> Demo Chunking Visuale</h4>
+            <p style="font-size:12px;color:var(--text3);margin-bottom:8px">Un documento bancario spezzato in chunk. Ogni colore = 1 chunk. I chunk si sovrappongono leggermente (overlap) per non perdere contesto.</p>
+            <div class="chunk-visual" id="chunk-vis" style="flex-direction:column;gap:3px">
+              <div style="padding:6px 10px;background:var(--accent-dim);color:var(--accent);border-radius:4px;font-size:12px;border-left:3px solid var(--accent)">📄 <strong>Chunk 1</strong> — "Procedura Apertura Conto. Il cliente deve fornire documento di identità valido e codice fiscale. La verifica dell'identità avviene tramite..." <span style="color:var(--text3)">[300 tok]</span></div>
+              <div style="padding:6px 10px;background:var(--orange-dim);color:var(--orange);border-radius:4px;font-size:12px;border-left:3px solid var(--orange)">📄 <strong>Chunk 2</strong> — "...tramite sistema AML interno. Il modulo di apertura (MOD-01) deve essere firmato in duplice copia. Tempi: 3 giorni lavorativi..." <span style="color:var(--text3)">[300 tok]</span></div>
+              <div style="padding:6px 10px;background:var(--green-dim);color:var(--green);border-radius:4px;font-size:12px;border-left:3px solid var(--green)">📄 <strong>Chunk 3</strong> — "...lavorativi dalla ricezione. In caso di minore, è richiesta firma del tutore (Art. 3 regolamento). Il IBAN viene comunicato..." <span style="color:var(--text3)">[300 tok]</span></div>
+            </div>
+            <p style="font-size:11px;color:var(--text3);margin-top:8px">↑ I chunk 1 e 2 si sovrappongono su "...tramite sistema AML" — questo overlap evita di perdere info a cavallo tra due chunk.</p>
           </div>
         </div>
       </div>
@@ -532,21 +668,32 @@ Non inventare mai dati, versioni o procedure.<br>
           <button class="mod-tab" onclick="switchTab(this,'m3-quiz')">🧠 Quiz</button>
         </div>
         <div class="tab-content active" id="m3-spieg">
-          <p class="spieg-intro">Un vector DB è un database ottimizzato per cercare vettori simili molto velocemente. È dove vengono salvati gli embedding dei tuoi documenti.</p>
-          <div class="analogy-box">📚 <strong>Analogia:</strong> Una biblioteca normale cerca per titolo esatto. Un vector DB cerca per <em>"libri con argomento simile a questo"</em> — anche se non condividono nemmeno una parola nel titolo. È come un bibliotecario che conosce il significato di ogni libro.</div>
-          <div class="topics">
-            <div class="topic"><div class="topic-dot" style="background:var(--purple)"></div><div class="topic-text"><strong>pgvector</strong> <span>— il più semplice da iniziare: è un'estensione di PostgreSQL (database che probabilmente esiste già in azienda). Aggiungi una colonna "vettore" a una tabella normale.</span></div></div>
-            <div class="topic"><div class="topic-dot" style="background:var(--purple)"></div><div class="topic-text"><strong>Pinecone / Chroma / Weaviate</strong> <span>— soluzioni dedicate, più potenti per grandi volumi. Chroma è ottima per iniziare in locale, Pinecone per produzione scalabile.</span></div></div>
-            <div class="topic"><div class="topic-dot" style="background:var(--purple)"></div><div class="topic-text"><strong>Hybrid search (BM25 + vettoriale)</strong> <span>— combina ricerca per parola chiave esatta (BM25) + ricerca semantica (embedding). Meglio di entrambe da sole: trova codici esatti E sinonimi.</span></div></div>
+          <div class="explain-block">
+            <h4><i class="ti ti-database" style="color:var(--purple)"></i> Concetto chiave</h4>
+            <p>Un <strong>Vector Database</strong> è un database specializzato per indicizzare e interrogare vettori numerici ad alta dimensionalità in modo efficiente. Mentre un database relazionale cerca per valore esatto (<code>WHERE nome = 'rossi'</code>), un vector DB cerca per <em>prossimità vettoriale</em>: "trova i 10 vettori più simili a questo". Questo è il problema del <strong>Approximate Nearest Neighbor (ANN)</strong> — trovare i vicini più prossimi in uno spazio con centinaia di dimensioni.</p>
+            <p>Le opzioni principali sono: <strong>pgvector</strong> (estensione PostgreSQL, ideale se la banca ha già Postgres — zero infrastruttura aggiuntiva), <strong>ChromaDB</strong> (open source, ottimo per sviluppo locale, si usa in RAM o su disco), <strong>FAISS</strong> (libreria Facebook, estremamente veloce, usata embedded in Python), <strong>Pinecone</strong> (cloud managed, scala automaticamente). La scelta dipende dal volume di documenti, dai requisiti di latenza e dall'infrastruttura esistente. L'<strong>hybrid search</strong> combina BM25 (keyword) + vettoriale: i risultati vengono fusi con Reciprocal Rank Fusion (RRF), poi opzionalmente riordinati da un reranker cross-encoder.</p>
           </div>
-          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Userai pgvector (estensione del database PostgreSQL che probabilmente la banca ha già) per salvare gli embedding delle 80 procedure. La hybrid search è cruciale: "blocco carta n. 4929..." richiede BM25 per il numero esatto, ma "carta bloccata per furto" richiede la ricerca semantica.</div></div>
+          <div class="explain-block">
+            <h4><i class="ti ti-building-bank" style="color:var(--teal)"></i> Perché ti serve</h4>
+            <p>Hai 80 procedure bancarie, spezzate in ~2.000-3.000 chunk. A ogni domanda dell'operatore devi trovare i 5-10 chunk più rilevanti in meno di 100ms. Senza un vector DB ottimizzato, dovresti confrontare ogni domanda con ogni chunk uno per uno — impossibile in tempi reali. Il vector DB costruisce un indice ANN che rende la ricerca O(log n) invece di O(n). Inoltre, la hybrid search è essenziale perché le procedure bancarie contengono sia testo narrativo (bene per il semantico) che codici, numeri e termini tecnici precisi (dove BM25 è superiore).</p>
+          </div>
+          <div class="explain-block">
+            <h4><i class="ti ti-flask" style="color:var(--orange)"></i> Esempio concreto</h4>
+            <p>La procedura "Blocco Carta" contiene: <em>"Il codice di blocco immediato è BC-001. Tempi: attivazione entro 30 secondi dalla chiamata."</em>. Se l'operatore chiede "codice BC-001", BM25 lo trova subito per corrispondenza esatta. Se chiede "come si blocca una carta rubata rapidamente", la ricerca vettoriale trova il chunk giusto per il significato. La hybrid search li combina, garantendo coverage completa sia per codici tecnici precisi che per domande in linguaggio naturale.</p>
+          </div>
+          <div class="explain-block">
+            <h4><i class="ti ti-list-check" style="color:var(--green)"></i> Da ricordare</h4>
+            <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px">
+              <li style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--purple);flex-shrink:0">•</span><span>pgvector è la scelta più pragmatica per iniziare in un contesto bancario: PostgreSQL è già presente, e aggiungere una colonna <code>vector(1536)</code> richiede zero infrastruttura aggiuntiva.</span></li>
+              <li style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--purple);flex-shrink:0">•</span><span>L'hybrid search (BM25 + vettoriale) supera sempre la ricerca solo vettoriale su testi tecnici che contengono codici, numeri e terminologia specializzata.</span></li>
+              <li style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--purple);flex-shrink:0">•</span><span>Il reranker cross-encoder è il "secondo giudizio" che affina i risultati del retrieval iniziale — applicarlo solo sui top 20 candidati per bilanciare precisione e velocità.</span></li>
+            </ul>
+          </div>
+          <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Userai pgvector (estensione del database PostgreSQL che probabilmente la banca ha già) per salvare gli embedding delle 80 procedure. La hybrid search è cruciale: "blocco carta n. 4929..." richiede BM25 per il numero esatto, ma "carta bloccata per furto" richiede la ricerca semantica. Per lo sviluppo locale puoi usare ChromaDB, poi migrare a pgvector per la produzione.</div></div>
           <button class="done-btn" id="done-m3" onclick="markDone('m3')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Spiegami i vector database e la hybrid search con esempi semplici')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami i vector database e la hybrid search con esempi semplici</span></div>
-            <button class="copy-btn">Copia</button>
-          </div>
+          <button class="approfondisci-btn" onclick="approfondisci('Vector Database','pgvector, Chroma, Pinecone, hybrid search BM25 + semantica, ANN indexing, reranker')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Vector Database','scegliere e usare un vector database per le procedure bancarie in PDF')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
         </div>
         </div>
         <div class="tab-content" id="m3-quiz">
@@ -616,14 +763,10 @@ Non inventare mai dati, versioni o procedure.<br>
           </div>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">La procedura "Apertura Conto Corrente" è 12 pagine. Con chunk_size=400 e overlap=50 diventa circa 35 chunk. Ogni chunk porta i metadata: <em>procedura="apertura_conto", versione="2.3", data="2024-01"</em>. Quando esce la versione 2.4, i vecchi chunk vengono marcati obsoleti automaticamente.</div></div>
           <button class="done-btn" id="done-m4" onclick="markDone('m4')"><i class="ti ti-check"></i> Segna come studiato</button>
-          <button class="btn-esercita" onclick="esercitati('Chunking','chunking dei documenti per RAG: dimensione chunk, overlap, sliding window, chunk semantico')">🏋️ Esercitati con Claude</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Spiegami il chunking dei documenti per RAG con esempi pratici e concreti')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami il chunking dei documenti per RAG con esempi pratici e concreti</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('Chunking','chunking dei documenti per RAG con esempi pratici e concreti')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Chunking','chunking dei documenti per RAG con esempi pratici e concreti')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m4-quiz">
           <div id="m4-quiz-container">
@@ -683,14 +826,10 @@ Non inventare mai dati, versioni o procedure.<br>
           </div>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Operatore scrive: <em>"Come blocco una carta per smarrimento?"</em> → la domanda diventa vettore → il sistema trova i 5 chunk più rilevanti della procedura "Blocco Carta" → li passa all'LLM → risposta precisa con i passi da seguire. Faithfulness alta = l'AI cita la procedura, non inventa.</div></div>
           <button class="done-btn" id="done-m5" onclick="markDone('m5')"><i class="ti ti-check"></i> Segna come studiato</button>
-          <button class="btn-esercita" onclick="esercitati('Pipeline RAG','pipeline RAG completa: embedding query, retrieval vettoriale, context injection nel prompt, generazione risposta')">🏋️ Esercitati con Claude</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Disegnami e spiegami la pipeline RAG end-to-end con un esempio concreto aziendale')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Disegnami e spiegami la pipeline RAG end-to-end con un esempio concreto aziendale</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('Pipeline RAG','pipeline RAG end-to-end con esempio concreto aziendale')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Pipeline RAG','pipeline RAG end-to-end con esempio concreto aziendale')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m5-quiz">
           <div id="m5-quiz-container">
@@ -740,14 +879,10 @@ Non inventare mai dati, versioni o procedure.<br>
           </div>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">In sviluppo usi Ollama con llama3.2 sul tuo PC: testi l'assistente gratuitamente senza mandare dati bancari fuori dall'azienda. In produzione switchi su Azure OpenAI. Se Azure è giù, il circuit breaker torna automaticamente su Ollama locale — zero downtime per gli operatori.</div></div>
           <button class="done-btn" id="done-m6" onclick="markDone('m6')"><i class="ti ti-check"></i> Segna come studiato</button>
-          <button class="btn-esercita" onclick="esercitati('Prompt Engineering','prompt engineering avanzato: system prompt, chain of thought, few-shot examples, output format control')">🏋️ Esercitati con Claude</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Guidami passo passo per installare Ollama e far girare il mio primo modello LLM in locale')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Guidami passo passo per installare Ollama e far girare il mio primo modello LLM in locale</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('Ollama','installazione Ollama e LLM locale passo passo')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Ollama','installazione Ollama e LLM locale passo passo')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m6-quiz">
           <div id="m6-quiz-container">
@@ -837,12 +972,9 @@ Non inventare mai dati, versioni o procedure.<br>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Il tuo Containerfile impacchetta l'assistente bancario con tutte le dipendenze. Il Podman Compose fa partire insieme: API + ChromaDB + Ollama. In ambienti bancari Podman è preferito a Docker perché non richiede privilegi root — requisito standard di sicurezza.</div></div>
           <button class="done-btn" id="done-m7" onclick="markDone('m7')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Spiegami i container e Podman partendo da zero con analogie semplici ed esempi pratici')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami i container e Podman partendo da zero con analogie semplici ed esempi pratici</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('Container e Podman','container e Podman da zero con analogie semplici ed esempi pratici')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Container e Podman','container e Podman da zero con analogie semplici ed esempi pratici')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m7-quiz">
           <div id="m7-quiz-container">
@@ -874,12 +1006,9 @@ Non inventare mai dati, versioni o procedure.<br>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Quando un operatore carica una nuova procedura PDF, il messaggio va su Kafka topic <em>"procedure-da-indicizzare"</em>. Il servizio di embedding lo processa in background. L'operatore non aspetta — continua a lavorare e la procedura è disponibile in pochi secondi.</div></div>
           <button class="done-btn" id="done-m8" onclick="markDone('m8')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Spiegami Kafka e la messaggistica asincrona con esempi pratici in un contesto RAG e LLM')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami Kafka e la messaggistica asincrona con esempi pratici in un contesto RAG e LLM</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('Kafka e Messaggistica','Kafka e messaggistica asincrona in contesto RAG e LLM')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Kafka e Messaggistica','Kafka e messaggistica asincrona in contesto RAG e LLM')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m8-quiz">
           <div id="m8-quiz-container">
@@ -912,12 +1041,9 @@ Non inventare mai dati, versioni o procedure.<br>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Il tuo sistema ha 4 microservizi: <em>ingestion</em> (riceve i PDF), <em>embedding</em> (li indicizza), <em>retrieval</em> (cerca le procedure rilevanti), <em>orchestrator</em> (chiama l'LLM e restituisce la risposta). Se il retrieval è lento, non blocca l'ingestion — lavorano in parallelo.</div></div>
           <button class="done-btn" id="done-m9" onclick="markDone('m9')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Disegnami l\'architettura a microservizi di un sistema RAG aziendale spiegata in modo semplice')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Disegnami l'architettura a microservizi di un sistema RAG aziendale spiegata in modo semplice</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('Microservizi e FastAPI','architettura microservizi di un sistema RAG aziendale con FastAPI')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Microservizi e FastAPI','architettura microservizi di un sistema RAG aziendale con FastAPI')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m9-quiz">
           <div id="m9-quiz-container">
@@ -949,12 +1075,9 @@ Non inventare mai dati, versioni o procedure.<br>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Le procedure bancarie hanno spesso tabelle (es. limiti di importo per tipo di operazione) e header ripetuti su ogni pagina ("USO INTERNO - RISERVATO"). Il parser deve estrarre le tabelle correttamente e rimuovere gli header, altrimenti ogni chunk conterrà testo inutile che confonde il retrieval.</div></div>
           <button class="done-btn" id="done-m10" onclick="markDone('m10')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Spiegami come funziona l\'ingestion e il parsing di documenti in una pipeline RAG')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami come funziona l'ingestion e il parsing di documenti in una pipeline RAG</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('Ingestion Pipeline','ingestion e parsing di documenti in una pipeline RAG')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Ingestion Pipeline','ingestion e parsing di documenti in una pipeline RAG')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m10-quiz">
           <div id="m10-quiz-container">
@@ -1033,12 +1156,9 @@ Non inventare mai dati, versioni o procedure.<br>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">La banca è già su Azure → usi Azure OpenAI per i modelli GPT e Azure AI Search per il retrieval ibrido managed. Le procedure stanno su Azure Blob Storage. L'API è esposta tramite Azure API Management con autenticazione Azure AD — gli operatori accedono con le stesse credenziali aziendali.</div></div>
           <button class="done-btn" id="done-m11" onclick="markDone('m11')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Spiegami le differenze tra GCP Vertex AI, Azure OpenAI e AWS Bedrock per un sistema RAG aziendale')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami le differenze tra GCP Vertex AI, Azure OpenAI e AWS Bedrock per un sistema RAG aziendale</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('Cloud Bedrock/Azure/Vertex','differenze tra GCP Vertex AI, Azure OpenAI e AWS Bedrock per RAG aziendale')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Cloud Bedrock/Azure/Vertex','differenze tra GCP Vertex AI, Azure OpenAI e AWS Bedrock per RAG aziendale')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m11-quiz">
           <div id="m11-quiz-container">
@@ -1070,12 +1190,9 @@ Non inventare mai dati, versioni o procedure.<br>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Il microservizio di retrieval ha un Service Account che può SOLO leggere il vector DB — non scrivere, non cancellare. Le chiavi API di Azure OpenAI stanno nel Key Vault, non nel codice. Se un container viene compromesso, l'attaccante non trova nessuna chiave.</div></div>
           <button class="done-btn" id="done-m12" onclick="markDone('m12')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Spiegami IAM, zero-trust e gestione segreti in cloud per sistemi AI con esempi pratici')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami IAM, zero-trust e gestione segreti in cloud per sistemi AI con esempi pratici</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('IAM e Security Cloud','IAM, zero-trust e gestione segreti in cloud per sistemi AI')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('IAM e Security Cloud','IAM, zero-trust e gestione segreti in cloud per sistemi AI')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m12-quiz">
           <div id="m12-quiz-container">
@@ -1106,12 +1223,9 @@ Non inventare mai dati, versioni o procedure.<br>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Con OpenTelemetry tracci ogni richiesta: operatore chiede → 45ms retrieval → 8.2s LLM → risposta. Se gli operatori si lamentano che "è lento", sai subito che il collo di bottiglia è l'LLM, non il retrieval. La latency p95 target è sotto 10 secondi.</div></div>
           <button class="done-btn" id="done-m13" onclick="markDone('m13')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Spiegami come si monitora un sistema RAG in produzione con OpenTelemetry e metriche pratiche')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami come si monitora un sistema RAG in produzione con OpenTelemetry e metriche pratiche</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('Monitoring e OpenTelemetry','monitoring sistema RAG in produzione con OpenTelemetry e metriche pratiche')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Monitoring e OpenTelemetry','monitoring sistema RAG in produzione con OpenTelemetry e metriche pratiche')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m13-quiz">
           <div id="m13-quiz-container">
@@ -1190,12 +1304,9 @@ Non inventare mai dati, versioni o procedure.<br>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Il gold dataset contiene 50 domande reali degli operatori con la risposta corretta. Il PII redaction è critico: se un operatore chiede di un cliente specifico, la risposta non deve contenere nome, IBAN o dati personali. Il content filter blocca domande fuori scope ("come faccio un bonifico personale?").</div></div>
           <button class="done-btn" id="done-m14" onclick="markDone('m14')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Spiegami come si valuta e si mette in sicurezza un sistema RAG con guardrail e evaluation framework')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Spiegami come si valuta e si mette in sicurezza un sistema RAG con guardrail e evaluation framework</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('Security e Guardrail','valutazione e sicurezza sistema RAG con guardrail e evaluation framework')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Security e Guardrail','valutazione e sicurezza sistema RAG con guardrail e evaluation framework')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m14-quiz">
           <div id="m14-quiz-container">
@@ -1226,12 +1337,9 @@ Non inventare mai dati, versioni o procedure.<br>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">"Come faccio il reset password?" è semplice → usi un modello economico (Claude Haiku). "Analizza questo caso di successione complesso" richiede più ragionamento → usi Claude Sonnet. Il routing automatico riduce i costi del 60-70% senza impatto sulla qualità percepita.</div></div>
           <button class="done-btn" id="done-m15" onclick="markDone('m15')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Come si ottimizzano e tracciano i costi di un sistema LLM in produzione? Esempi pratici.')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Come si ottimizzano e tracciano i costi di un sistema LLM in produzione? Esempi pratici.</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('Costi e Ottimizzazione','ottimizzazione e tracciamento costi sistema LLM in produzione')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Costi e Ottimizzazione','ottimizzazione e tracciamento costi sistema LLM in produzione')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m15-quiz">
           <div id="m15-quiz-container">
@@ -1263,12 +1371,9 @@ Non inventare mai dati, versioni o procedure.<br>
           <div class="case-box"><div class="case-box-label">🏦 Nel tuo caso pratico</div><div class="case-box-text">Azure OpenAI è giù alle 14:30. Il playbook dice: circuit breaker attivo → sistema switcha su Ollama locale → alert al team → in parallelo si verifica lo stato Azure. Gli operatori non si accorgono di niente. Il runbook di rollback delle procedure permette di tornare a una versione precedente in 5 minuti.</div></div>
           <button class="done-btn" id="done-m16" onclick="markDone('m16')"><i class="ti ti-check"></i> Segna come studiato</button>
           <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Crea un playbook operativo per un sistema RAG in produzione: incident response, failover, key rotation')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude in chat:</span><span class="prompt-box-text">Crea un playbook operativo per un sistema RAG in produzione: incident response, failover, key rotation</span></div>
-            <button class="copy-btn">Copia</button>
+          <button class="approfondisci-btn" onclick="approfondisci('Operazioni e Runbook','playbook operativo sistema RAG in produzione: incident response, failover, key rotation')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Operazioni e Runbook','playbook operativo sistema RAG in produzione: incident response, failover, key rotation')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
           </div>
-        </div>
         </div>
         <div class="tab-content" id="m16-quiz">
           <div id="m16-quiz-container">
@@ -1443,12 +1548,9 @@ Non inventare mai dati, versioni o procedure.<br>
       <label class="step-task"><input type="checkbox" onchange="checkProjectStep(1)"> Fai una prima chiamata ad Ollama via API HTTP e stampa la risposta</label>
     </div>
     <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Guidami step by step per configurare un ambiente Python per sviluppare un sistema RAG con Ollama e LangChain su Windows/Mac')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude:</span><span class="prompt-box-text">Guidami step by step per configurare un ambiente Python per sviluppare un sistema RAG con Ollama e LangChain su Windows/Mac</span></div>
-            <button class="copy-btn">Copia</button>
-          </div>
-        </div>
+          <button class="approfondisci-btn" onclick="approfondisci('Progetto Finale','configurazione ambiente Python per sistema RAG con Ollama e LangChain')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Progetto Finale','configurazione ambiente Python per sistema RAG con Ollama e LangChain')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
+    </div>
     <button class="step-complete-btn" id="psb1" onclick="completeStep(1)">✓ Step completato</button>
   </div>
 
@@ -1465,12 +1567,9 @@ Non inventare mai dati, versioni o procedure.<br>
       <label class="step-task"><input type="checkbox" onchange="checkProjectStep(2)"> Aggiungi i metadata a ogni chunk (fonte, data, capitolo)</label>
     </div>
     <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Scrivimi uno script Python completo per fare ingestion di PDF con LangChain, chunking con overlap e salvataggio degli embedding in ChromaDB usando Ollama come modello embedding')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude:</span><span class="prompt-box-text">Scrivimi uno script Python completo per fare ingestion di PDF con LangChain, chunking con overlap e salvataggio degli embedding in ChromaDB usando Ollama come modello embedding</span></div>
-            <button class="copy-btn">Copia</button>
-          </div>
-        </div>
+          <button class="approfondisci-btn" onclick="approfondisci('Progetto Finale','ingestion PDF con LangChain, chunking con overlap e embedding in ChromaDB')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Progetto Finale','ingestion PDF con LangChain, chunking con overlap e embedding in ChromaDB')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
+    </div>
     <button class="step-complete-btn" id="psb2" onclick="completeStep(2)">✓ Step completato</button>
   </div>
 
@@ -1487,12 +1586,9 @@ Non inventare mai dati, versioni o procedure.<br>
       <label class="step-task"><input type="checkbox" onchange="checkProjectStep(3)"> Testa con 10 domande e confronta: solo vettoriale vs ibrido. Chi vince?</label>
     </div>
     <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Scrivimi il codice Python per fare hybrid search combinando BM25 e ChromaDB con reciprocal rank fusion, più un cross-encoder reranker con sentence-transformers')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude:</span><span class="prompt-box-text">Scrivimi il codice Python per fare hybrid search combinando BM25 e ChromaDB con reciprocal rank fusion, più un cross-encoder reranker con sentence-transformers</span></div>
-            <button class="copy-btn">Copia</button>
-          </div>
-        </div>
+          <button class="approfondisci-btn" onclick="approfondisci('Progetto Finale','hybrid search BM25 + ChromaDB con reciprocal rank fusion e cross-encoder reranker')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Progetto Finale','hybrid search BM25 + ChromaDB con reciprocal rank fusion e cross-encoder reranker')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
+    </div>
     <button class="step-complete-btn" id="psb3" onclick="completeStep(3)">✓ Step completato</button>
   </div>
 
@@ -1509,12 +1605,9 @@ Non inventare mai dati, versioni o procedure.<br>
       <label class="step-task"><input type="checkbox" onchange="checkProjectStep(4)"> Testa che il fallback funzioni spegnendo Ollama e rifacendo la chiamata</label>
     </div>
     <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Scrivimi un orchestratore LLM in Python con FastAPI che fa retrieval RAG, costruisce il prompt, chiama prima Ollama e se non disponibile fallback su OpenAI, con system prompt che impedisce allucinazioni')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude:</span><span class="prompt-box-text">Scrivimi un orchestratore LLM in Python con FastAPI che fa retrieval RAG, costruisce il prompt, chiama prima Ollama e se non disponibile fallback su OpenAI, con system prompt che impedisce allucinazioni</span></div>
-            <button class="copy-btn">Copia</button>
-          </div>
-        </div>
+          <button class="approfondisci-btn" onclick="approfondisci('Progetto Finale','orchestratore LLM FastAPI con retrieval RAG, provider switching Ollama/OpenAI e guardrail')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Progetto Finale','orchestratore LLM FastAPI con retrieval RAG, provider switching Ollama/OpenAI e guardrail')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
+    </div>
     <button class="step-complete-btn" id="psb4" onclick="completeStep(4)">✓ Step completato</button>
   </div>
 
@@ -1531,12 +1624,9 @@ Non inventare mai dati, versioni o procedure.<br>
       <label class="step-task"><input type="checkbox" onchange="checkProjectStep(5)"> Aggiungi healthcheck ai container e verifica che si riavviano in caso di errore</label>
     </div>
     <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Scrivimi un Containerfile multi-stage per una API FastAPI Python e un podman-compose.yml che orchestra API + ChromaDB + Ollama con volumi, healthcheck e non-root user')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude:</span><span class="prompt-box-text">Scrivimi un Containerfile multi-stage per una API FastAPI Python e un podman-compose.yml che orchestra API + ChromaDB + Ollama con volumi, healthcheck e non-root user</span></div>
-            <button class="copy-btn">Copia</button>
-          </div>
-        </div>
+          <button class="approfondisci-btn" onclick="approfondisci('Progetto Finale','Containerfile multi-stage FastAPI e podman-compose.yml con API + ChromaDB + Ollama')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Progetto Finale','Containerfile multi-stage FastAPI e podman-compose.yml con API + ChromaDB + Ollama')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
+    </div>
     <button class="step-complete-btn" id="psb5" onclick="completeStep(5)">✓ Step completato</button>
   </div>
 
@@ -1553,12 +1643,9 @@ Non inventare mai dati, versioni o procedure.<br>
       <label class="step-task"><input type="checkbox" onchange="checkProjectStep(6)"> Aggiungi il logging delle query con costo e latenza per ogni risposta</label>
     </div>
     <div class="prompt-row">
-          <button class="claude-btn" onclick="askClaude('Guidami per aggiungere PII redaction con Microsoft Presidio a un sistema RAG FastAPI, creare un gold dataset di evaluation e fare il deploy su Google Cloud Run')"><i class="ti ti-brand-hipchat"></i> Chiedi a Claude</button>
-          <div class="prompt-box" onclick="copyPrompt(this)" style="flex:1;margin-top:0">
-            <div style="flex:1"><span class="prompt-box-label">💬 Chiedi a Claude:</span><span class="prompt-box-text">Guidami per aggiungere PII redaction con Microsoft Presidio a un sistema RAG FastAPI, creare un gold dataset di evaluation e fare il deploy su Google Cloud Run</span></div>
-            <button class="copy-btn">Copia</button>
-          </div>
-        </div>
+          <button class="approfondisci-btn" onclick="approfondisci('Progetto Finale','PII redaction con Presidio, gold dataset evaluation e deploy su Google Cloud Run')"><i class="ti ti-message-circle"></i> 💬 Approfondisci con Claude</button>
+          <button class="btn-esercita" onclick="esercitati('Progetto Finale','PII redaction con Presidio, gold dataset evaluation e deploy su Google Cloud Run')"><i class="ti ti-barbell"></i> 🏋️ Esercitati</button>
+    </div>
     <div style="margin-top:16px;padding:14px;background:var(--green-dim);border:1px solid rgba(76,175,130,0.3);border-radius:8px;text-align:center" id="project-complete" style="display:none">
       <div style="font-size:24px;margin-bottom:6px">🎉</div>
       <div style="font-size:15px;font-weight:600;color:var(--green)">Hai completato il progetto!</div>
@@ -1732,10 +1819,10 @@ Non inventare mai dati, versioni o procedure.<br>
 
 <!-- CLAUDE MODAL -->
 <div id="claude-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:1000;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.style.display='none'">
-  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);max-width:640px;width:100%;max-height:85vh;display:flex;flex-direction:column;position:relative">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);max-width:640px;width:100%;max-height:90vh;display:flex;flex-direction:column;position:relative">
     <div style="padding:18px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <div id="claude-modal-title" style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase">Claude risponde</div>
-      <button onclick="document.getElementById('claude-modal').style.display='none'" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1;padding:0">✕</button>
+      <div id="claude-modal-title" style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase">💬 Approfondisci con Claude</div>
+      <button onclick="closeModal()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1;padding:0">✕</button>
     </div>
     <div id="claude-modal-body" style="flex:1;overflow-y:auto;padding:18px 20px;font-size:14px;color:var(--text);line-height:1.7"></div>
     <div id="claude-modal-footer" style="padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0"></div>
@@ -1929,10 +2016,12 @@ function uq(btn, result, qId, phase, optIdx) {
 async function generateModuleQuiz(modId, topic) {
   var container = document.getElementById(modId + '-quiz-container');
   if (!container) return;
-  container.innerHTML = '<div class="claude-loading">⏳ Claude genera il quiz...</div>';
+  container.innerHTML = '<div class="claude-loading">⏳ Claude prepara ripasso e quiz...</div>';
   try {
-    var prompt = 'Genera 3 domande a risposta multipla (A/B/C/D) su: ' + topic + '. '
-      + 'Rispondi SOLO con JSON: {"questions":[{"q":"domanda","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"spiegazione breve"}]}';
+    var prompt = 'Argomento: ' + topic + '.\n\n'
+      + 'Crea un mini-ripasso flash (3 bullet) e 3 domande quiz. '
+      + 'Rispondi SOLO con JSON valido:\n'
+      + '{"ripasso":["bullet 1 — concetto chiave","bullet 2","bullet 3"],"questions":[{"q":"domanda","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"spiegazione breve"}]}';
     var r = await fetch('/.netlify/functions/claude', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -1945,7 +2034,17 @@ async function generateModuleQuiz(modId, topic) {
     var text = data.content[0].text;
     var jsonMatch = text.match(/\{[\s\S]*\}/);
     var parsed = JSON.parse(jsonMatch[0]);
+    // Build ripasso flash
     var html = '';
+    if (parsed.ripasso && parsed.ripasso.length) {
+      html += '<div class="ripasso-box"><div class="ripasso-title">⚡ Ripasso Flash</div>';
+      parsed.ripasso.forEach(function(b) {
+        var parts = b.split(' — ');
+        html += '<div class="ripasso-item"><span style="color:var(--accent);flex-shrink:0">→</span><span>' + (parts[0] ? '<strong>' + parts[0] + '</strong>' + (parts[1] ? ' — ' + parts[1] : '') : b) + '</span></div>';
+      });
+      html += '</div>';
+    }
+    // Build quiz questions
     parsed.questions.forEach(function(q, qi) {
       var qId = modId+'_q'+(qi+1);
       html += '<div class="quiz-q" style="margin-bottom:18px">';
@@ -2039,20 +2138,8 @@ function completeStep(n) {
 
 function checkProjectStep(n) { /* visuale */ }
 
-// CHIEDI A CLAUDE - prova sendPrompt nativo, altrimenti copia
-function askClaude(text) {
-  if(typeof window.sendPrompt === 'function') {
-    window.sendPrompt(text);
-    showToast('✉️ Messaggio inviato a Claude!');
-  } else {
-    // fallback: copia negli appunti
-    navigator.clipboard.writeText(text).then(function() {
-      showToast('📋 Copiato! Incolla nella chat Claude qui sotto.');
-    }).catch(function() {
-      showToast('💬 ' + text.substring(0,50) + '...');
-    });
-  }
-}
+// CHIEDI A CLAUDE (legacy, ora punta a approfondisci)
+// askClaude è ridefinito sopra
 
 // COPY PROMPT
 function copyPrompt(box) {
@@ -2085,58 +2172,153 @@ function goPhase(idx, btn) {
   saveProgress(idx);
 }
 
-async function callClaude(messages) {
+async function callClaude(messages, systemOverride) {
   var r = await fetch('/.netlify/functions/claude', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ system: SYSTEM_PROMPT, messages: messages })
+    body: JSON.stringify({ system: systemOverride || SYSTEM_PROMPT, messages: messages })
   });
   var data = await r.json();
   return data.content && data.content[0] && data.content[0].text
     ? data.content[0].text : JSON.stringify(data);
 }
 
-async function askClaude(text) {
+function closeModal() {
+  document.getElementById('claude-modal').style.display='none';
+}
+
+// ── APPROFONDISCI CON CLAUDE (input box contestuale) ─────────────
+var _currentModTopic = '';
+function approfondisci(modTitle, modTopic) {
   var modal = document.getElementById('claude-modal');
   var title = document.getElementById('claude-modal-title');
   var body = document.getElementById('claude-modal-body');
   var footer = document.getElementById('claude-modal-footer');
-  title.textContent = 'Claude risponde';
-  body.innerHTML = '<div class="claude-loading">⏳ Sto elaborando...</div>';
-  footer.innerHTML = '';
+  _currentModTopic = modTopic;
+  _currentModTitle = modTitle;
+  _chatHistory = [];
+  title.textContent = '💬 Approfondisci — ' + modTitle;
+  body.innerHTML = '<div class="modal-chat-suggestion"><strong>Argomento:</strong> ' + modTopic + '<br><span style="color:var(--text3);font-size:11px">Scrivi la tua domanda su questo modulo. Puoi chiedere spiegazioni, esempi concreti, confronti, applicazioni pratiche...</span></div><div id="chat-messages"></div>';
+  footer.innerHTML = '<textarea id="appro-input" class="modal-chat-input" placeholder="Es: Come faccio a scegliere la giusta temperatura per un assistente bancario? Fai un esempio..." rows="3" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();inviaApprofondimento()}"></textarea><div style="display:flex;gap:8px"><button class="btn-primary" onclick="inviaApprofondimento()" style="flex:1">Invia →</button><button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:9px 14px;cursor:pointer;font-family:var(--font);font-size:13px">Chiudi</button></div>';
   modal.style.display = 'flex';
+  setTimeout(function(){ var inp = document.getElementById('appro-input'); if(inp) inp.focus(); }, 100);
+}
+
+var _chatHistory = [];
+var _currentModTitle = '';
+
+async function inviaApprofondimento() {
+  var input = document.getElementById('appro-input');
+  var domanda = input ? input.value.trim() : '';
+  if (!domanda) return;
+  input.value = '';
+  var msgs = document.getElementById('chat-messages');
+  msgs.innerHTML += '<div style="background:var(--accent-dim);border-radius:8px;padding:9px 12px;margin-bottom:10px;font-size:13px;color:var(--text);text-align:right">' + domanda.replace(/</g,'&lt;') + '</div>';
+  msgs.innerHTML += '<div id="chat-loading-' + Date.now() + '" style="font-size:12px;color:var(--text3);font-style:italic;margin-bottom:10px">⏳ Claude sta elaborando...</div>';
+  var loadingId = msgs.lastElementChild.id;
+  _chatHistory.push({role:'user', content: domanda});
+  var sysAppro = 'Sei un tutor amichevole che aiuta chi sta imparando l\'AI e i modelli LLM da zero. L\'utente sta studiando il modulo "' + _currentModTitle + '" (argomento: ' + _currentModTopic + '). Rispondi in italiano con un tono semplice e incoraggiante, senza gergo accademico. Sii conciso (max 3-4 paragrafi), usa esempi concreti e pratici. Se l\'utente sbaglia o ha un\'idea imprecisa, correggilo gentilmente.';
   try {
-    var reply = await callClaude([{role:'user', content: text}]);
-    body.innerHTML = '<div class="claude-reply">' + reply.replace(/\n/g,'<br>') + '</div>';
+    var reply = await callClaude(_chatHistory, sysAppro);
+    _chatHistory.push({role:'assistant', content: reply});
+    var loadEl = document.getElementById(loadingId);
+    if (loadEl) loadEl.outerHTML = '<div style="background:var(--bg3);border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px;color:var(--text);line-height:1.7"><span style="font-size:10px;color:var(--accent);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;display:block;margin-bottom:4px">Claude</span>' + reply.replace(/\n/g,'<br>') + '</div>';
+    msgs.scrollTop = msgs.scrollHeight;
   } catch(err) {
-    body.innerHTML = '<div class="claude-reply" style="color:var(--red)">Errore: ' + err.message + '</div>';
+    var loadEl2 = document.getElementById(loadingId);
+    if (loadEl2) loadEl2.outerHTML = '<div style="color:var(--red);font-size:13px;margin-bottom:10px">Errore: ' + err.message + '</div>';
+  }
+  var f = document.getElementById('appro-input');
+  if (f) f.focus();
+}
+
+// ── LEGACY askClaude: retrocompatibile con chiamate a singolo argomento ──
+function askClaude(modTitleOrText, modTopic) {
+  if (modTopic === undefined) {
+    // chiamata legacy con un solo testo: usa il testo come topic
+    approfondisci('Claude', modTitleOrText);
+  } else {
+    approfondisci(modTitleOrText, modTopic);
   }
 }
 
+// ── ESERCITATI — step-guidato con prompt copiabile ────────────────
 var _esercitaHistory = [];
+var _lastEsercitaTopic = '';
+var _lastEsercitaTitle = '';
+
 async function esercitati(modTitle, modTopic) {
   var modal = document.getElementById('claude-modal');
   var title = document.getElementById('claude-modal-title');
   var body = document.getElementById('claude-modal-body');
   var footer = document.getElementById('claude-modal-footer');
   _esercitaHistory = [];
+  _lastEsercitaTopic = modTopic;
+  _lastEsercitaTitle = modTitle;
   title.textContent = '🏋️ Esercitati — ' + modTitle;
-  body.innerHTML = '<div class="claude-loading">⏳ Genero un esercizio pratico...</div>';
+  body.innerHTML = '<div class="claude-loading">⏳ Genero uno scenario pratico...</div>';
   footer.innerHTML = '';
   modal.style.display = 'flex';
   try {
-    var prompt = 'Crea un breve esercizio pratico su: ' + modTopic + '. '
-      + 'Fornisci: 1) una situazione concreta (max 3 righe), 2) cosa deve fare/rispondere lo studente. '
-      + 'Sii conciso. Termina con "---\\nLa tua risposta:"';
-    _esercitaHistory = [{role:'user', content: prompt}];
-    var reply = await callClaude(_esercitaHistory);
-    _esercitaHistory.push({role:'assistant', content: reply});
-    body.innerHTML = '<div class="claude-reply">' + reply.replace(/\n/g,'<br>') + '</div>';
-    footer.innerHTML = '<textarea id="esercita-input" placeholder="Scrivi la tua risposta..." rows="3" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-family:var(--font);font-size:13px;resize:vertical;margin-bottom:8px"></textarea>'
-      + '<button class="btn-primary" onclick="inviaRisposta()">Invia risposta →</button>';
+    var prompt = 'Crea un esercizio pratico su: ' + modTopic + '. Contesto: developer in banca che costruisce un assistente AI interno.\n\n'
+      + 'Rispondi SOLO con JSON valido in questo formato:\n'
+      + '{"scenario":"descrizione situazione concreta max 3 righe","steps":["step 1 cosa fare","step 2","step 3","step 4"],"prompt_da_copiare":"il prompt esatto da incollare su Claude per fare questo esercizio","suggerimento":"cosa osservare o imparare"}\n\n'
+      + 'I passi devono essere pratici e fattibili su claude.ai. Il prompt deve essere pronto da copiare-incollare.';
+    var r = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        system: 'Sei un trainer tecnico. Crei esercizi pratici. Rispondi SOLO con JSON valido.',
+        messages: [{role:'user', content: prompt}]
+      })
+    });
+    var data = await r.json();
+    var text = data.content && data.content[0] ? data.content[0].text : '';
+    var jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Formato non valido');
+    var ex = JSON.parse(jsonMatch[0]);
+    var stepsHtml = (ex.steps || []).map(function(s,i){
+      return '<div class="ex-step"><div class="ex-step-n">'+(i+1)+'</div><div class="ex-step-text">'+s+'</div></div>';
+    }).join('');
+    var promptText = ex.prompt_da_copiare || '';
+    var escapedPrompt = promptText.replace(/"/g,'&quot;');
+    var encodedPrompt = encodeURIComponent(promptText);
+    body.innerHTML =
+      '<div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">📋 Scenario</div>'
+      + '<div class="ex-scenario">' + (ex.scenario || '') + '</div>'
+      + '<div style="font-size:11px;font-weight:700;color:var(--purple);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">🔢 Step da seguire</div>'
+      + '<div class="ex-step-list">' + stepsHtml + '</div>'
+      + '<div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">📋 Prompt da copiare su Claude</div>'
+      + '<div class="ex-prompt-box">'
+        + '<div class="ex-prompt-box-text" id="ex-prompt-text">' + promptText.replace(/</g,'&lt;') + '</div>'
+        + '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
+          + '<button class="ex-copy-btn" onclick="copyExPrompt()"><i class="ti ti-clipboard" style="font-size:13px"></i><span id="ex-copy-label">Copia</span></button>'
+          + '<button class="ex-copy-btn" onclick="openClaudeWithPrompt()" style="background:var(--accent-dim);color:var(--accent)"><i class="ti ti-external-link" style="font-size:13px"></i><span>Apri</span></button>'
+        + '</div>'
+      + '</div>'
+      + (ex.suggerimento ? '<div style="font-size:12px;color:var(--text3);margin-top:10px;line-height:1.6">💡 <em>' + ex.suggerimento + '</em></div>' : '');
+    window._currentExPrompt = promptText;
+    footer.innerHTML = '<button class="btn-primary" style="width:100%" onclick="nuovoEsercizio()">🔄 Nuovo esercizio</button>';
   } catch(err) {
-    body.innerHTML = '<div style="color:var(--red)">Errore: ' + err.message + '</div>';
+    body.innerHTML = '<div style="color:var(--red);font-size:13px">Errore: ' + err.message + '</div>';
+    footer.innerHTML = '<button class="btn-primary" onclick="esercitati(\'' + modTitle + '\',\'' + modTopic.replace(/'/g,"\\'") + '\')">Riprova</button>';
   }
+}
+
+function copyExPrompt() {
+  var text = window._currentExPrompt || '';
+  navigator.clipboard.writeText(text).then(function() {
+    var label = document.getElementById('ex-copy-label');
+    if(label){ label.textContent = '✓'; setTimeout(function(){ label.textContent = 'Copia'; }, 2000); }
+  }).catch(function(){ showToast('Copia manuale: ' + text.substring(0,40) + '...'); });
+}
+
+function openClaudeWithPrompt() {
+  var text = window._currentExPrompt || '';
+  window.open('https://claude.ai', '_blank');
+  navigator.clipboard.writeText(text).then(function() {
+    showToast('📋 Prompt copiato — incollalo su Claude!');
+  });
 }
 
 async function inviaRisposta() {
@@ -2145,22 +2327,21 @@ async function inviaRisposta() {
   if (!risposta) return;
   var body = document.getElementById('claude-modal-body');
   var footer = document.getElementById('claude-modal-footer');
-  footer.innerHTML = '<div class="claude-loading">⏳ Claude valuta la tua risposta...</div>';
+  footer.innerHTML = '<div class="claude-loading">⏳ Claude valuta...</div>';
   _esercitaHistory.push({role:'user', content: risposta});
   try {
     var feedback = await callClaude(_esercitaHistory);
     _esercitaHistory.push({role:'assistant', content: feedback});
     body.innerHTML += '<div class="claude-reply" style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px"><strong style="color:var(--accent)">La tua risposta:</strong><br>' + risposta.replace(/\n/g,'<br>') + '</div>'
-      + '<div class="claude-reply" style="margin-top:8px"><strong style="color:var(--green)">Feedback Claude:</strong><br>' + feedback.replace(/\n/g,'<br>') + '</div>';
-    footer.innerHTML = '<button class="btn-primary" onclick="nuovoEsercizio()">Nuovo esercizio 🔄</button>';
+      + '<div class="claude-reply" style="margin-top:8px"><strong style="color:var(--green)">Feedback:</strong><br>' + feedback.replace(/\n/g,'<br>') + '</div>';
+    footer.innerHTML = '<button class="btn-primary" onclick="nuovoEsercizio()">🔄 Nuovo esercizio</button>';
   } catch(err) {
     footer.innerHTML = '<div style="color:var(--red)">Errore: ' + err.message + '</div>';
   }
 }
 
 function nuovoEsercizio() {
-  var title = document.getElementById('claude-modal-title').textContent.replace('🏋️ Esercitati — ','');
-  esercitati(title, title);
+  esercitati(_lastEsercitaTitle || 'Esercizio', _lastEsercitaTopic || _lastEsercitaTitle || 'AI');
 }
 
 // GLOSSARIO
@@ -2319,11 +2500,46 @@ function showToast(msg) {
   clearTimeout(t._timer);
   t._timer = setTimeout(function(){ t.style.opacity='0'; }, 3500);
 }
+// ── DEMO TEMPERATURA ──────────────────────────────────────────────
+function updateTempDemo(val) {
+  var temp = (val / 10).toFixed(1);
+  document.getElementById('temp-val').textContent = temp;
+  var out = document.getElementById('temp-output');
+  var f = parseFloat(temp);
+  var descriptions = {
+    low: { range: [0, 0.2], mode: 'Deterministica', desc: 'Risposta sempre identica. Ideale per sistemi aziendali dove la coerenza è critica — es. assistente bancario che cita procedure.', color: 'var(--accent)' },
+    med_low: { range: [0.3, 0.5], mode: 'Stabile', desc: 'Leggera variazione nella forma, non nel contenuto. Buon compromesso per chatbot tecnici che devono sembrare naturali ma precisi.', color: 'var(--green)' },
+    med: { range: [0.6, 0.9], mode: 'Bilanciata', desc: 'Buona qualità con varietà. Default di molti chatbot (ChatGPT usa ~0.7). Buona per conversazione generale e Q&A non critica.', color: 'var(--orange)' },
+    high: { range: [1.0, 1.4], mode: 'Creativa', desc: 'Alta varietà, risposte originali ma meno prevedibili. Ottima per brainstorming, scrittura creativa, generazione di idee.', color: 'var(--purple)' },
+    very_high: { range: [1.5, 2.0], mode: 'Caotica', desc: 'Molto variabile, spesso incoerente. Utile solo per usi molto specifici (generazione diversità, test). Sconsigliata in produzione.', color: 'var(--red)' }
+  };
+  var match = descriptions.med;
+  if (f <= 0.2) match = descriptions.low;
+  else if (f <= 0.5) match = descriptions.med_low;
+  else if (f <= 0.9) match = descriptions.med;
+  else if (f <= 1.4) match = descriptions.high;
+  else match = descriptions.very_high;
+  out.innerHTML = '<strong style="color:' + match.color + '">' + match.mode + '</strong> — ' + match.desc;
+}
+
+// ── DEMO COSINE SIMILARITY ────────────────────────────────────────
+function showSim(el, score, reason) {
+  var scoreEl = el.querySelector('.sim-score');
+  var color = score >= 0.8 ? 'var(--green)' : score >= 0.5 ? 'var(--orange)' : 'var(--red)';
+  scoreEl.textContent = score.toFixed(2);
+  scoreEl.style.color = color;
+  el.style.borderColor = color;
+  var exp = document.getElementById('sim-explain');
+  exp.style.display = 'block';
+  exp.innerHTML = '<strong style="color:' + color + '">Score: ' + score.toFixed(2) + '</strong> — ' + reason;
+}
+
 window.addEventListener('DOMContentLoaded', function() {
   updateNavLocks();
   for (var p = 1; p <= 5; p++) renderUnlockQuiz(p);
   initDB();
 });
 </script>
+<!-- v5 — Approfondisci con Claude (chat contestuale), Esercizi step-guidati con prompt copiabile, Demo interattive (temperatura, chunking, cosine similarity), Mini-ripasso flash pre-quiz. 2026-10 -->
 </body>
 </html>
