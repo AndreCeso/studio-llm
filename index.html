@@ -2050,17 +2050,20 @@ async function generateModuleQuiz(modId, topic) {
       });
       html += '</div>';
     }
+    // Store testi lampada per accesso dopo render
+    var _lampadaTesti = {};
+    var _lampadaExternal = {};
     // Build quiz questions
     parsed.questions.forEach(function(q, qi) {
       var qId = modId+'_q'+(qi+1);
+      _lampadaTesti[qId] = (q.external && q.concetto_base) ? q.concetto_base : (q.explanation || '');
+      _lampadaExternal[qId] = q.external ? true : false;
       html += '<div class="quiz-q" style="margin-bottom:18px">';
-      // Header domanda con eventuale badge 💡 se concetto esterno
-      var testoLampada = (q.external && q.concetto_base) ? q.concetto_base : ('💬 ' + q.explanation);
       html += '<div style="font-size:13px;font-weight:500;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px">';
       html += '<span>'+(qi+1)+'. '+q.q+'</span>';
       html += '<button class="lampada-btn" onclick="toggleConcetto(\''+qId+'-concetto\')" title="Clicca per spiegazione">💡</button>';
       html += '</div>';
-      html += '<div class="concetto-box" id="'+qId+'-concetto" style="display:none">'+(q.external ? '<strong style="color:var(--orange);font-size:11px;text-transform:uppercase;letter-spacing:0.05em">⚠️ Concetto non nel modulo</strong><br><br>' : '')+testoLampada+'</div>';
+      html += '<div class="concetto-box" id="'+qId+'-concetto" style="display:none"></div>';
       html += '<div class="quiz-options">';
       q.options.forEach(function(opt, oi) {
         var isCorrect = oi === q.correct;
@@ -2073,15 +2076,33 @@ async function generateModuleQuiz(modId, topic) {
     });
     html += '<button class="btn-primary" style="margin-top:8px" onclick="generateModuleQuiz(\''+modId+'\',\''+topic.replace(/'/g,"\\'")+'\')" >🔄 Nuovo quiz</button>';
     container.innerHTML = html;
+    // Rendi i testi disponibili globalmente dopo il render
+    window._lampadaTesti = _lampadaTesti;
+    window._lampadaExternal = _lampadaExternal;
   } catch(err) {
     container.innerHTML = '<div style="color:var(--red);font-size:13px">Errore: '+err.message+'</div>'
       + '<button class="btn-primary" onclick="generateModuleQuiz(\''+modId+'\',\''+topic.replace(/'/g,"\\'")+'\')">Riprova</button>';
   }
 }
 
+var _lampadaTesti = {};
+var _lampadaExternal = {};
 function toggleConcetto(id) {
   var el = document.getElementById(id);
-  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  if (!el) return;
+  if (el.style.display === 'none' || el.style.display === '') {
+    // Popola al primo click
+    if (!el.dataset.filled) {
+      var qId = id.replace('-concetto','');
+      var testo = _lampadaTesti[qId] || '';
+      var isExt = _lampadaExternal[qId];
+      el.innerHTML = (isExt ? '<strong style="color:var(--orange);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:8px">⚠️ Concetto non nel modulo</strong>' : '') + testo.replace(/\n/g,'<br>');
+      el.dataset.filled = '1';
+    }
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
 }
 
 function answerModQ(btn, isCorrect, qId) {
