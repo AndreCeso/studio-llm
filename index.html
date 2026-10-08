@@ -1963,10 +1963,16 @@ async function renderUnlockQuiz(phase) {
     // reset answers for this phase
     Object.keys(uqAnswers).forEach(function(k){ if(k.startsWith('u'+phase+'q')) delete uqAnswers[k]; });
     var html = '<h3 style="font-size:15px;font-weight:600;margin-bottom:16px">🔓 Quiz di Sblocco — Fase ' + phase + '</h3>';
+    if (!window._quizDomande) window._quizDomande = {};
     parsed.questions.forEach(function(q, qi) {
       var qId = 'u'+phase+'q'+(qi+1);
+      window._quizDomande[qId] = q.q;
       html += '<div class="quiz-q" style="margin-bottom:20px">';
-      html += '<div style="font-size:13px;font-weight:500;margin-bottom:10px;color:var(--text)">'+(qi+1)+'. '+q.q+'</div>';
+      html += '<div style="font-size:13px;font-weight:500;margin-bottom:10px;color:var(--text);display:flex;align-items:flex-start;gap:8px">';
+      html += '<span>'+(qi+1)+'. '+q.q+'</span>';
+      html += '<button class="lampada-btn" onclick="spiegaDomanda(\''+qId+'\')" title="Aiutami a capire questa domanda">💡</button>';
+      html += '</div>';
+      html += '<div class="concetto-box" id="'+qId+'-concetto" style="display:none"></div>';
       html += '<div class="quiz-options">';
       q.options.forEach(function(opt, oi) {
         var isCorrect = oi === q.correct ? "'correct'" : "'wrong'";
@@ -2596,7 +2602,7 @@ window.addEventListener('DOMContentLoaded', function() {
   initDB();
 });
 </script>
-<!-- v5 — Approfondisci con Claude (chat contestuale), Esercizi step-guidati con prompt copiabile, Demo interattive (temperatura, chunking, cosine similarity), Mini-ripasso flash pre-quiz, 💡 lampadina concetti esterni. 2026-10 -->
+<!-- v5.1.1 — Approfondisci con Claude (chat contestuale), Esercizi step-guidati con prompt copiabile, Demo interattive (temperatura, chunking, cosine similarity), Mini-ripasso flash pre-quiz, 💡 lampadina concetti esterni. 2026-10 -->
 <div style="text-align:center;padding:32px 16px 24px;font-size:11px;color:var(--text3);letter-spacing:0.04em">
   v5 · Studio LLM Dashboard · 2026-10 · <span style="opacity:0.6">Powered by Claude</span>
 </div>
