@@ -2050,14 +2050,14 @@ async function generateModuleQuiz(modId, topic) {
       });
       html += '</div>';
     }
-    // Store testi lampada per accesso dopo render
-    var _lampadaTesti = {};
-    var _lampadaExternal = {};
+    // Reset dizionari globali lampada
+    window._lampadaTesti = {};
+    window._lampadaExternal = {};
     // Build quiz questions
     parsed.questions.forEach(function(q, qi) {
       var qId = modId+'_q'+(qi+1);
-      _lampadaTesti[qId] = (q.external && q.concetto_base) ? q.concetto_base : (q.explanation || '');
-      _lampadaExternal[qId] = q.external ? true : false;
+      window._lampadaTesti[qId] = (q.external && q.concetto_base) ? q.concetto_base : (q.explanation || '');
+      window._lampadaExternal[qId] = q.external ? true : false;
       html += '<div class="quiz-q" style="margin-bottom:18px">';
       html += '<div style="font-size:13px;font-weight:500;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px">';
       html += '<span>'+(qi+1)+'. '+q.q+'</span>';
@@ -2076,9 +2076,6 @@ async function generateModuleQuiz(modId, topic) {
     });
     html += '<button class="btn-primary" style="margin-top:8px" onclick="generateModuleQuiz(\''+modId+'\',\''+topic.replace(/'/g,"\\'")+'\')" >🔄 Nuovo quiz</button>';
     container.innerHTML = html;
-    // Rendi i testi disponibili globalmente dopo il render
-    window._lampadaTesti = _lampadaTesti;
-    window._lampadaExternal = _lampadaExternal;
   } catch(err) {
     container.innerHTML = '<div style="color:var(--red);font-size:13px">Errore: '+err.message+'</div>'
       + '<button class="btn-primary" onclick="generateModuleQuiz(\''+modId+'\',\''+topic.replace(/'/g,"\\'")+'\')">Riprova</button>';
@@ -2094,8 +2091,8 @@ function toggleConcetto(id) {
     // Popola al primo click
     if (!el.dataset.filled) {
       var qId = id.replace('-concetto','');
-      var testo = _lampadaTesti[qId] || '';
-      var isExt = _lampadaExternal[qId];
+      var testo = (window._lampadaTesti && window._lampadaTesti[qId]) || '';
+      var isExt = window._lampadaExternal && window._lampadaExternal[qId];
       el.innerHTML = (isExt ? '<strong style="color:var(--orange);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:8px">⚠️ Concetto non nel modulo</strong>' : '') + testo.replace(/\n/g,'<br>');
       el.dataset.filled = '1';
     }
