@@ -2055,16 +2055,12 @@ async function generateModuleQuiz(modId, topic) {
       var qId = modId+'_q'+(qi+1);
       html += '<div class="quiz-q" style="margin-bottom:18px">';
       // Header domanda con eventuale badge 💡 se concetto esterno
+      var testoLampada = (q.external && q.concetto_base) ? q.concetto_base : ('💬 ' + q.explanation);
       html += '<div style="font-size:13px;font-weight:500;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px">';
       html += '<span>'+(qi+1)+'. '+q.q+'</span>';
-      if (q.external) {
-        html += '<button class="lampada-btn" onclick="toggleConcetto(\''+qId+'-concetto\')" title="Questo concetto non è nel modulo — clicca per una spiegazione semplice">💡</button>';
-      }
+      html += '<button class="lampada-btn" onclick="toggleConcetto(\''+qId+'-concetto\')" title="Clicca per spiegazione">💡</button>';
       html += '</div>';
-      // Box concetto base (visibile solo se external)
-      if (q.external && q.concetto_base) {
-        html += '<div class="concetto-box" id="'+qId+'-concetto" style="display:none">'+q.concetto_base+'</div>';
-      }
+      html += '<div class="concetto-box" id="'+qId+'-concetto" style="display:none">'+(q.external ? '<strong style="color:var(--orange);font-size:11px;text-transform:uppercase;letter-spacing:0.05em">⚠️ Concetto non nel modulo</strong><br><br>' : '')+testoLampada+'</div>';
       html += '<div class="quiz-options">';
       q.options.forEach(function(opt, oi) {
         var isCorrect = oi === q.correct;
@@ -2561,6 +2557,9 @@ window.addEventListener('DOMContentLoaded', function() {
   initDB();
 });
 </script>
-<!-- v5 — Approfondisci con Claude (chat contestuale), Esercizi step-guidati con prompt copiabile, Demo interattive (temperatura, chunking, cosine similarity), Mini-ripasso flash pre-quiz. 2026-10 -->
+<!-- v5 — Approfondisci con Claude (chat contestuale), Esercizi step-guidati con prompt copiabile, Demo interattive (temperatura, chunking, cosine similarity), Mini-ripasso flash pre-quiz, 💡 lampadina concetti esterni. 2026-10 -->
+<div style="text-align:center;padding:32px 16px 24px;font-size:11px;color:var(--text3);letter-spacing:0.04em">
+  v5 · Studio LLM Dashboard · 2026-10 · <span style="opacity:0.6">Powered by Claude</span>
+</div>
 </body>
 </html>
