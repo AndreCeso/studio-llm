@@ -306,6 +306,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .final-quiz-wrap h2{font-size:18px;font-weight:600;margin-bottom:6px}
 .final-quiz-wrap .sub{color:var(--text2);font-size:13px;margin-bottom:20px}
 
+/* ANALIZZA BTN */
+.analizza-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--font);transition:opacity 0.15s}
+.analizza-btn:hover{opacity:0.88}
+
 /* RESPONSIVE */
 @media(max-width:700px){
   .sidebar{display:none}
@@ -369,6 +373,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="prog-chip"><i class="ti ti-clock" style="color:var(--orange)"></i> ~<strong>6</strong> mesi</div>
     <div class="prog-chip"><i class="ti ti-check" style="color:var(--green)"></i> Completati: <strong id="done-count">0</strong>/17</div>
   </div>
+</div>
+
+<!-- ANALIZZA STUDIO BTN -->
+<div style="margin-bottom:20px">
+  <button class="analizza-btn" onclick="analizzaStudio()"><i class="ti ti-brain" style="font-size:15px"></i> 🧠 Analizza il mio studio</button>
 </div>
 
 <!-- CASO PRATICO BANNER -->
@@ -1847,11 +1856,48 @@ var DOC_REF = db.collection('users').doc('andrea');
 
 var SYSTEM_PROMPT = "Sei un tutor AI per un developer RPA di Accenture che studia per diventare full stack LLM developer. L'utente si chiama Andrea. Rispondi sempre in italiano. Sei conciso ma preciso. Non menzionare progetti specifici dei clienti.";
 
+// ── SESSION LOG ───────────────────────────────────────────────────
+window._sessionLog = [];
+window._lampadeUsate = {};
+
+// Mappa modId -> nome leggibile
+var _modNames = {
+  m0:'Come funziona un LLM', m1:'Prompt Engineering', m2:'Embedding & Similarità Semantica',
+  m3:'Vector Database', m4:'Chunking', m5:'Pipeline RAG completa', m6:'Ollama',
+  m7:'Container con Podman', m8:'Kafka & Pub/Sub', m9:'Microservizi per RAG',
+  m10:'Ingestion & Parsing Documenti', m11:'Cloud per LLM', m12:'IAM & Sicurezza Cloud',
+  m13:'Observability', m14:'Evaluation & Guardrail', m15:'Cost Management',
+  m16:'Playbook Operativo'
+};
+
+function _getModNameFromQId(qId) {
+  // qId formato: "m0_q1" oppure "u2q1"
+  var modMatch = qId.match(/^(m\d+)_q/);
+  if (modMatch) return _modNames[modMatch[1]] || modMatch[1];
+  var unlockMatch = qId.match(/^u(\d+)q/);
+  if (unlockMatch) return 'Quiz Sblocco Fase ' + unlockMatch[1];
+  return qId;
+}
+
+function _saveEventToFirebase(evento) {
+  if (typeof DOC_REF === 'undefined') return;
+  DOC_REF.update({
+    sessionLog: firebase.firestore.FieldValue.arrayUnion(evento)
+  }).catch(function() {
+    DOC_REF.set({ sessionLog: [evento] }, { merge: true });
+  });
+}
+
 // ── INIT / LOAD ───────────────────────────────────────────────────
 function initDB() {
   DOC_REF.get().then(function(doc) {
     if (doc.exists) {
-      applyProgress(doc.data());
+      var data = doc.data();
+      applyProgress(data);
+      // Carica sessionLog da Firebase
+      if (data.sessionLog && Array.isArray(data.sessionLog)) {
+        window._sessionLog = data.sessionLog;
+      }
     }
   }).catch(function(err) {
     console.warn('Firestore load error:', err);
@@ -2019,6 +2065,19 @@ function uq(btn, result, qId, phase, optIdx) {
   }
   var phaseQs = Object.keys(uqAnswers).filter(k => k.startsWith('u'+phase+'q'));
   if(phaseQs.length >= uqTotal[phase]) evaluateUnlock(phase);
+  // Traccia evento in _sessionLog
+  var domanda = (window._quizDomande && window._quizDomande[qId]) || '';
+  var eventoUq = {
+    ts: Date.now(),
+    tipo: 'quiz_risposta',
+    modulo: 'Quiz Sblocco Fase ' + phase,
+    domanda: domanda,
+    esito: result === 'correct' ? 'corretto' : 'sbagliato',
+    usato_lampada: !!(window._lampadeUsate && window._lampadeUsate[qId]),
+    esterna: false
+  };
+  window._sessionLog.push(eventoUq);
+  _saveEventToFirebase(eventoUq);
 }
 
 async function generateModuleQuiz(modId, topic) {
@@ -2119,6 +2178,20 @@ async function spiegaDomanda(qId) {
   el.style.display = 'block';
   el.innerHTML = '<span style="font-size:11px;color:var(--text3);font-style:italic">⏳ Claude sta leggendo la domanda...</span>';
   var domanda = (window._quizDomande && window._quizDomande[qId]) || '';
+  // Traccia evento lampada (solo al primo click, quando carica)
+  window._lampadeUsate = window._lampadeUsate || {};
+  window._lampadeUsate[qId] = true;
+  var lampadaEvento = {
+    ts: Date.now(),
+    tipo: 'lampada',
+    modulo: _getModNameFromQId(qId),
+    domanda: domanda,
+    esito: null,
+    usato_lampada: true,
+    esterna: false
+  };
+  window._sessionLog.push(lampadaEvento);
+  _saveEventToFirebase(lampadaEvento);
   try {
     var sys = 'Sei un tutor che aiuta chi impara AI/LLM da zero. Il tuo compito e aiutare lo studente a CAPIRE e RISPONDERE a una domanda di quiz, senza mai rivelare la risposta corretta. Rispondi in italiano, tono amichevole, max 4-5 righe. Struttura: 1) spiega cosa chiede la domanda in parole semplici, 2) dai un suggerimento per ragionare ("pensa a...", "ricorda che..."). Non dire mai quale opzione e corretta.';
     var reply = await callClaude([{role:'user', content: 'Domanda del quiz: ' + domanda + '\n\nAiutami a capire cosa chiede e come ragionare per rispondere, senza dirmi la risposta.'}], sys);
@@ -2139,6 +2212,19 @@ function answerModQ(btn, isCorrect, qId) {
   var expEl = document.getElementById(qId+'-exp');
   if (fbEl) { fbEl.textContent = isCorrect ? '✅ Esatto!' : '❌ Risposta errata.'; fbEl.className = 'quiz-feedback show '+(isCorrect?'ok':'ko'); fbEl.style.display='block'; }
   if (expEl) expEl.style.display = 'block';
+  // Traccia evento in _sessionLog
+  var domanda = (window._quizDomande && window._quizDomande[qId]) || '';
+  var evento = {
+    ts: Date.now(),
+    tipo: 'quiz_risposta',
+    modulo: _getModNameFromQId(qId),
+    domanda: domanda,
+    esito: isCorrect ? 'corretto' : 'sbagliato',
+    usato_lampada: !!(window._lampadeUsate && window._lampadeUsate[qId]),
+    esterna: false
+  };
+  window._sessionLog.push(evento);
+  _saveEventToFirebase(evento);
 }
 
 function evaluateUnlock(phase) {
@@ -2596,15 +2682,64 @@ function showSim(el, score, reason) {
   exp.innerHTML = '<strong style="color:' + color + '">Score: ' + score.toFixed(2) + '</strong> — ' + reason;
 }
 
+// ── ANALIZZA STUDIO ───────────────────────────────────────────────
+async function analizzaStudio() {
+  var modal = document.getElementById('claude-modal');
+  var title = document.getElementById('claude-modal-title');
+  var body = document.getElementById('claude-modal-body');
+  var footer = document.getElementById('claude-modal-footer');
+  title.textContent = '🧠 Il tuo percorso di studio';
+  body.innerHTML = '<div class="claude-loading">⏳ Claude sta analizzando il tuo percorso...</div>';
+  footer.innerHTML = '<button onclick="closeModal()" style="background:none;border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:9px 18px;cursor:pointer;font-family:var(--font);font-size:13px">Chiudi</button>';
+  modal.style.display = 'flex';
+
+  var log = window._sessionLog || [];
+  var risposte = log.filter(function(e){ return e.tipo === 'quiz_risposta'; });
+
+  if (log.length < 2 || risposte.length === 0) {
+    body.innerHTML = '<div style="padding:12px;font-size:14px;color:var(--text2);line-height:1.7">Studia ancora un po\'! Fai qualche quiz e clicca qualche 💡 — poi torna qui per il tuo approfondimento personalizzato.</div>';
+    return;
+  }
+
+  var moduli = [];
+  risposte.forEach(function(e){ if(moduli.indexOf(e.modulo) === -1) moduli.push(e.modulo); });
+
+  var righe = log.map(function(e) {
+    if (e.tipo === 'lampada') return '- [' + e.modulo + '] ha cliccato 💡 su: "' + e.domanda + '"';
+    var lampada = e.usato_lampada ? ' + ha usato 💡' : '';
+    return '- [' + e.modulo + '] "' + e.domanda + '" → ' + (e.esito || '').toUpperCase() + lampada;
+  }).join('\n');
+
+  var prompt = 'Lo studente ha fatto questa sessione di studio (storico completo):\n\n'
+    + 'MODULI TOCCATI: ' + (moduli.join(', ') || 'nessuno') + '\n\n'
+    + 'DETTAGLIO ATTIVITA:\n' + (righe || 'Nessuna attivita registrata ancora.') + '\n\n'
+    + 'Genera un documento di approfondimento personalizzato. '
+    + 'Per ogni concetto dove ha fatto fatica (errore quiz o click lampada): '
+    + 'spiegalo da zero con linguaggio semplice e almeno un esempio pratico della vita reale. '
+    + 'Collega i concetti tra loro dove ha senso. '
+    + 'Alla fine dai 2-3 consigli su cosa studiare dopo. '
+    + 'Tono amichevole, mai accademico. Lunghezza: completo e dettagliato. '
+    + 'Rispondi in modo completo ma entro 900 token.';
+
+  var sys = 'Sei un tutor AI specializzato in AI/LLM che aiuta chi impara da zero. Generi documenti di approfondimento personalizzati basati sullo storico di studio dello studente. Usi sempre linguaggio semplice, esempi concreti della vita reale, tono incoraggiante. Mai gergo accademico. Rispondi in italiano.';
+
+  try {
+    var reply = await callClaude([{role:'user', content: prompt}], sys);
+    body.innerHTML = '<div style="font-size:13px;color:var(--text);line-height:1.75">' + reply.replace(/\n/g,'<br>') + '</div>';
+  } catch(err) {
+    body.innerHTML = '<div style="color:var(--red);font-size:13px">Errore: ' + err.message + '</div>';
+  }
+}
+
 window.addEventListener('DOMContentLoaded', function() {
   updateNavLocks();
   for (var p = 1; p <= 5; p++) renderUnlockQuiz(p);
   initDB();
 });
 </script>
-<!-- v5.1.0 — 💡 lampadina su ogni domanda quiz (sblocco + moduli): Claude spiega la domanda e guida il ragionamento senza rivelare la risposta. System prompt dedicato per Approfondisci (tono amichevole, no accademico). Fix JSON quiz. 2026-10 -->
+<!-- v5.2.0 — Session log: traccia quiz_risposta e lampada in window._sessionLog e Firestore (arrayUnion). Bottone "🧠 Analizza il mio studio" apre modal con documento personalizzato da Claude basato sullo storico. 2026-10 -->
 <div style="text-align:center;padding:32px 16px 24px;font-size:11px;color:var(--text3);letter-spacing:0.04em">
-  v5.1.0 · Studio LLM Dashboard · 2026-10 · <span style="opacity:0.6">Powered by Claude</span>
+  v5.2.0 · Studio LLM Dashboard · 2026-10 · <span style="opacity:0.6">Powered by Claude</span>
 </div>
 </body>
 </html>
