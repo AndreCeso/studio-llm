@@ -2021,13 +2021,10 @@ async function generateModuleQuiz(modId, topic) {
   container.innerHTML = '<div class="claude-loading">⏳ Claude prepara ripasso e quiz...</div>';
   try {
     var prompt = 'Argomento del modulo: ' + topic + '.\n\n'
-      + 'Crea un mini-ripasso flash (3 bullet) e 3 domande quiz STRETTAMENTE sui concetti spiegati in questo modulo.\n'
-      + 'NON introdurre tecnologie, strumenti o concetti esterni al modulo (es. no Python specifico, no framework, no DevOps se non è il topic).\n'
-      + 'Le domande devono essere comprensibili a chi sta imparando AI/LLM da zero.\n\n'
-      + 'Per ogni domanda valuta se introduce un concetto NON presente nel modulo (external:true) oppure no (external:false).\n'
-      + 'Se external:true, aggiungi "concetto_base": una spiegazione in 2-3 righe semplici con un esempio pratico della vita reale, SENZA gergo tecnico.\n\n'
-      + 'Rispondi SOLO con JSON valido:\n'
-      + '{"ripasso":["bullet 1 — concetto chiave","bullet 2","bullet 3"],"questions":[{"q":"domanda","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"spiegazione breve","external":false,"concetto_base":""}]}';
+      + 'Crea un mini-ripasso flash (3 bullet) e 3 domande quiz sui concetti di questo modulo.\n'
+      + 'Le domande devono essere comprensibili a chi impara AI/LLM da zero.\n\n'
+      + 'Rispondi SOLO con JSON valido, senza apostrofi nei valori stringa:\n'
+      + '{"ripasso":["bullet1","bullet2","bullet3"],"questions":[{"q":"domanda","options":["A) testo","B) testo","C) testo","D) testo"],"correct":0,"explanation":"spiegazione breve"}]}';
     var r = await fetch('/.netlify/functions/claude', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -2039,7 +2036,24 @@ async function generateModuleQuiz(modId, topic) {
     var data = await r.json();
     var text = data.content[0].text;
     var jsonMatch = text.match(/\{[\s\S]*\}/);
-    var parsed = JSON.parse(jsonMatch[0]);
+    var parsed;
+    try {
+      parsed = JSON.parse(jsonMatch[0]);
+    } catch(e) {
+      // JSON malformato: riprova con prompt semplificato senza campi extra
+      var r2 = await fetch('/.netlify/functions/claude', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          system: 'Rispondi SOLO con JSON valido. Nessun testo fuori dal JSON. Nessun apostrofo nei valori stringa: usa solo virgole e punti.',
+          messages: [{role:'user', content: 'Argomento: ' + topic + '. Crea 3 bullet ripasso e 3 domande quiz. JSON: {"ripasso":["bullet1","bullet2","bullet3"],"questions":[{"q":"domanda","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"spiegazione","external":false,"concetto_base":""}]}'}]
+        })
+      });
+      var data2 = await r2.json();
+      var text2 = data2.content[0].text;
+      var m2 = text2.match(/\{[\s\S]*\}/);
+      parsed = JSON.parse(m2[0]);
+    }
     // Build ripasso flash
     var html = '';
     if (parsed.ripasso && parsed.ripasso.length) {
@@ -2050,20 +2064,18 @@ async function generateModuleQuiz(modId, topic) {
       });
       html += '</div>';
     }
-    // Reset dizionari globali lampada
-    window._lampadaTesti = {};
-    window._lampadaExternal = {};
+    // Salva domande globalmente per la lampada
+    window._quizDomande = {};
     // Build quiz questions
     parsed.questions.forEach(function(q, qi) {
       var qId = modId+'_q'+(qi+1);
-      window._lampadaTesti[qId] = (q.external && q.concetto_base) ? q.concetto_base : (q.explanation || '');
-      window._lampadaExternal[qId] = q.external ? true : false;
+      window._quizDomande[qId] = q.q;
       html += '<div class="quiz-q" style="margin-bottom:18px">';
       html += '<div style="font-size:13px;font-weight:500;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px">';
       html += '<span>'+(qi+1)+'. '+q.q+'</span>';
-      html += '<button class="lampada-btn" onclick="toggleConcetto(\''+qId+'-concetto\')" title="Clicca per spiegazione">💡</button>';
+      html += '<button class="lampada-btn" onclick="spiegaDomanda(\''+qId+'\')" title="Non capisco questa domanda — spiegamela">💡</button>';
       html += '</div>';
-      html += '<div class="concetto-box" id="'+qId+'-concetto" style="display:none"></div>';
+      html += '<div class="concetto-box" id="'+qId+'-concetto" style="display:none"><span style="font-size:11px;color:var(--text3);font-style:italic">⏳ Sto chiedendo a Claude...</span></div>';
       html += '<div class="quiz-options">';
       q.options.forEach(function(opt, oi) {
         var isCorrect = oi === q.correct;
@@ -2087,18 +2099,27 @@ var _lampadaExternal = {};
 function toggleConcetto(id) {
   var el = document.getElementById(id);
   if (!el) return;
-  if (el.style.display === 'none' || el.style.display === '') {
-    // Popola al primo click
-    if (!el.dataset.filled) {
-      var qId = id.replace('-concetto','');
-      var testo = (window._lampadaTesti && window._lampadaTesti[qId]) || '';
-      var isExt = window._lampadaExternal && window._lampadaExternal[qId];
-      el.innerHTML = (isExt ? '<strong style="color:var(--orange);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:8px">⚠️ Concetto non nel modulo</strong>' : '') + testo.replace(/\n/g,'<br>');
-      el.dataset.filled = '1';
-    }
-    el.style.display = 'block';
-  } else {
-    el.style.display = 'none';
+  el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
+}
+
+async function spiegaDomanda(qId) {
+  var el = document.getElementById(qId+'-concetto');
+  if (!el) return;
+  // Se già aperto, chiudi
+  if (el.style.display === 'block') { el.style.display = 'none'; return; }
+  // Se già caricato, riapri
+  if (el.dataset.filled) { el.style.display = 'block'; return; }
+  // Prima volta: mostra loader e chiedi a Claude
+  el.style.display = 'block';
+  el.innerHTML = '<span style="font-size:11px;color:var(--text3);font-style:italic">⏳ Claude sta leggendo la domanda...</span>';
+  var domanda = (window._quizDomande && window._quizDomande[qId]) || '';
+  try {
+    var sys = 'Sei un tutor che aiuta chi impara AI/LLM da zero. Il tuo compito e aiutare lo studente a CAPIRE e RISPONDERE a una domanda di quiz, senza mai rivelare la risposta corretta. Rispondi in italiano, tono amichevole, max 4-5 righe. Struttura: 1) spiega cosa chiede la domanda in parole semplici, 2) dai un suggerimento per ragionare ("pensa a...", "ricorda che..."). Non dire mai quale opzione e corretta.';
+    var reply = await callClaude([{role:'user', content: 'Domanda del quiz: ' + domanda + '\n\nAiutami a capire cosa chiede e come ragionare per rispondere, senza dirmi la risposta.'}], sys);
+    el.innerHTML = reply.replace(/\n/g,'<br>');
+    el.dataset.filled = '1';
+  } catch(err) {
+    el.innerHTML = '<span style="color:var(--red);font-size:12px">Errore: ' + err.message + '</span>';
   }
 }
 
