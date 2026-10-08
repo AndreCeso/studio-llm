@@ -212,6 +212,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .chunk-item{padding:4px 8px;border-radius:4px;font-size:11px;font-family:var(--mono);cursor:default;transition:all 0.2s}
 .sim-row{display:flex;flex-direction:column;gap:8px}
 .sim-pair{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:border-color 0.15s}
+.lampada-btn{background:none;border:none;cursor:pointer;font-size:15px;padding:0 2px;line-height:1;opacity:0.75;transition:opacity 0.15s;flex-shrink:0;margin-top:1px}.lampada-btn:hover{opacity:1}
+.concetto-box{background:linear-gradient(135deg,rgba(255,200,60,0.08),rgba(255,160,0,0.06));border:1px solid rgba(255,180,0,0.3);border-radius:8px;padding:11px 14px;margin-bottom:10px;font-size:12px;color:var(--text);line-height:1.7}
 .sim-pair:hover{border-color:var(--border2)}
 .sim-label{font-size:12px;color:var(--text2);flex:1}
 .sim-score{font-size:14px;font-weight:700;min-width:42px;text-align:right}
@@ -2018,15 +2020,19 @@ async function generateModuleQuiz(modId, topic) {
   if (!container) return;
   container.innerHTML = '<div class="claude-loading">⏳ Claude prepara ripasso e quiz...</div>';
   try {
-    var prompt = 'Argomento: ' + topic + '.\n\n'
-      + 'Crea un mini-ripasso flash (3 bullet) e 3 domande quiz. '
+    var prompt = 'Argomento del modulo: ' + topic + '.\n\n'
+      + 'Crea un mini-ripasso flash (3 bullet) e 3 domande quiz STRETTAMENTE sui concetti spiegati in questo modulo.\n'
+      + 'NON introdurre tecnologie, strumenti o concetti esterni al modulo (es. no Python specifico, no framework, no DevOps se non è il topic).\n'
+      + 'Le domande devono essere comprensibili a chi sta imparando AI/LLM da zero.\n\n'
+      + 'Per ogni domanda valuta se introduce un concetto NON presente nel modulo (external:true) oppure no (external:false).\n'
+      + 'Se external:true, aggiungi "concetto_base": una spiegazione in 2-3 righe semplici con un esempio pratico della vita reale, SENZA gergo tecnico.\n\n'
       + 'Rispondi SOLO con JSON valido:\n'
-      + '{"ripasso":["bullet 1 — concetto chiave","bullet 2","bullet 3"],"questions":[{"q":"domanda","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"spiegazione breve"}]}';
+      + '{"ripasso":["bullet 1 — concetto chiave","bullet 2","bullet 3"],"questions":[{"q":"domanda","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"spiegazione breve","external":false,"concetto_base":""}]}';
     var r = await fetch('/.netlify/functions/claude', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        system: 'Sei un generatore di quiz tecnici. Rispondi SOLO con JSON valido.',
+        system: 'Sei un tutor AI che genera quiz per chi impara da zero. Crei domande chiare, ancorate ai concetti del modulo, con linguaggio semplice. Rispondi SOLO con JSON valido, nessun testo fuori dal JSON.',
         messages: [{role:'user', content: prompt}]
       })
     });
@@ -2048,7 +2054,17 @@ async function generateModuleQuiz(modId, topic) {
     parsed.questions.forEach(function(q, qi) {
       var qId = modId+'_q'+(qi+1);
       html += '<div class="quiz-q" style="margin-bottom:18px">';
-      html += '<div style="font-size:13px;font-weight:500;margin-bottom:9px">'+(qi+1)+'. '+q.q+'</div>';
+      // Header domanda con eventuale badge 💡 se concetto esterno
+      html += '<div style="font-size:13px;font-weight:500;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px">';
+      html += '<span>'+(qi+1)+'. '+q.q+'</span>';
+      if (q.external) {
+        html += '<button class="lampada-btn" onclick="toggleConcetto(\''+qId+'-concetto\')" title="Questo concetto non è nel modulo — clicca per una spiegazione semplice">💡</button>';
+      }
+      html += '</div>';
+      // Box concetto base (visibile solo se external)
+      if (q.external && q.concetto_base) {
+        html += '<div class="concetto-box" id="'+qId+'-concetto" style="display:none">'+q.concetto_base+'</div>';
+      }
       html += '<div class="quiz-options">';
       q.options.forEach(function(opt, oi) {
         var isCorrect = oi === q.correct;
@@ -2056,7 +2072,7 @@ async function generateModuleQuiz(modId, topic) {
       });
       html += '</div>';
       html += '<div class="quiz-feedback" id="'+qId+'-fb" style="display:none;margin-top:6px"></div>';
-      html += '<div style="font-size:11px;color:var(--text3);margin-top:4px;display:none" id="'+qId+'-exp">💡 '+q.explanation+'</div>';
+      html += '<div style="font-size:11px;color:var(--text3);margin-top:4px;display:none" id="'+qId+'-exp">→ '+q.explanation+'</div>';
       html += '</div>';
     });
     html += '<button class="btn-primary" style="margin-top:8px" onclick="generateModuleQuiz(\''+modId+'\',\''+topic.replace(/'/g,"\\'")+'\')" >🔄 Nuovo quiz</button>';
@@ -2065,6 +2081,11 @@ async function generateModuleQuiz(modId, topic) {
     container.innerHTML = '<div style="color:var(--red);font-size:13px">Errore: '+err.message+'</div>'
       + '<button class="btn-primary" onclick="generateModuleQuiz(\''+modId+'\',\''+topic.replace(/'/g,"\\'")+'\')">Riprova</button>';
   }
+}
+
+function toggleConcetto(id) {
+  var el = document.getElementById(id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
 function answerModQ(btn, isCorrect, qId) {
