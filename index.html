@@ -309,6 +309,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 /* ANALIZZA BTN */
 .analizza-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--font);transition:opacity 0.15s}
 .analizza-btn:hover{opacity:0.88}
+.tutor-fab{position:fixed;bottom:24px;right:24px;z-index:200;display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:50px;background:linear-gradient(135deg,#2eb87a,#1a9e65);color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:var(--font);box-shadow:0 4px 20px rgba(46,184,122,0.4);transition:transform 0.15s,box-shadow 0.15s;letter-spacing:0.01em}
+.tutor-fab:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(46,184,122,0.55)}
 
 /* RESPONSIVE */
 @media(max-width:700px){
@@ -2365,7 +2367,12 @@ async function inviaApprofondimento() {
   msgs.innerHTML += '<div id="chat-loading-' + Date.now() + '" style="font-size:12px;color:var(--text3);font-style:italic;margin-bottom:10px">⏳ Claude sta elaborando...</div>';
   var loadingId = msgs.lastElementChild.id;
   _chatHistory.push({role:'user', content: domanda});
-  var sysAppro = 'Sei un tutor amichevole che aiuta chi sta imparando l\'AI e i modelli LLM da zero. L\'utente sta studiando il modulo "' + _currentModTitle + '" (argomento: ' + _currentModTopic + '). Rispondi in italiano con un tono semplice e incoraggiante, senza gergo accademico. Sii conciso (max 3-4 paragrafi), usa esempi concreti e pratici. Se l\'utente sbaglia o ha un\'idea imprecisa, correggilo gentilmente.';
+  var sysAppro = 'Sei un tutor AI specializzato in AI e LLM. '
+    + 'L\'utente sta approfondendo il modulo "' + _currentModTitle + '" (argomento: ' + _currentModTopic + '). '
+    + 'Rispondi in italiano. Quando spieghi un concetto: vai in profondita, usa terminologia tecnica ma spiegala sempre quando appare, porta almeno un esempio pratico concreto della vita reale. '
+    + 'Non essere superficiale — se il concetto e complesso, spiegalo per bene. '
+    + 'Tono incoraggiante, mai accademico o freddo. '
+    + 'Se l\'utente ha un\'idea imprecisa, correggilo gentilmente con la spiegazione corretta.';
   try {
     var reply = await callClaude(_chatHistory, sysAppro);
     _chatHistory.push({role:'assistant', content: reply});
@@ -2731,15 +2738,102 @@ async function analizzaStudio() {
   }
 }
 
+// ── TUTOR PERSONALE ───────────────────────────────────────────────
+var _tutorHistory = [];
+
+function apriTutorPersonale() {
+  _tutorHistory = [];
+  var modal = document.getElementById('claude-modal');
+  var title = document.getElementById('claude-modal-title');
+  var body = document.getElementById('claude-modal-body');
+  var footer = document.getElementById('claude-modal-footer');
+  title.textContent = '🤖 Tutor personale';
+
+  // Build context summary
+  var completati = [];
+  if (window._modNames) {
+    Object.keys(window._modNames).forEach(function(k) {
+      if (window.doneSet && window.doneSet.has(k)) completati.push(window._modNames[k]);
+    });
+  }
+  var log = window._sessionLog || [];
+  var errori = log.filter(function(e){ return e.tipo === 'quiz_risposta' && e.esito === 'errato'; });
+  var lampade = log.filter(function(e){ return e.tipo === 'lampada'; });
+
+  var contestoRighe = [];
+  if (completati.length) contestoRighe.push('Moduli completati: ' + completati.join(', ') + '.');
+  else contestoRighe.push('Nessun modulo ancora completato — sta iniziando il percorso.');
+  if (errori.length) contestoRighe.push('Domande sbagliate in questa sessione: ' + errori.map(function(e){ return '"' + e.domanda + '"'; }).join('; ') + '.');
+  if (lampade.length) contestoRighe.push('Ha chiesto aiuto 💡 su: ' + lampade.map(function(e){ return '"' + e.domanda + '"'; }).join('; ') + '.');
+
+  window._tutorSys = 'Sei il tutor personale di Andrea, uno studente che sta imparando AI e LLM da zero partendo da basi di programmazione. '
+    + 'Contesto attuale dello studente: ' + contestoRighe.join(' ')
+    + ' Rispondi in italiano. '
+    + 'Quando spieghi un concetto: vai in profondità, usa terminologia tecnica ma spiegala sempre la prima volta che appare, porta almeno un esempio pratico concreto della vita reale. '
+    + 'Non essere superficiale — se il concetto è complesso, spiegalo per bene, anche in più paragrafi se serve. '
+    + 'Se il concetto ha un\'analogia con qualcosa di quotidiano, usala. '
+    + 'Tono amichevole e incoraggiante, mai accademico o freddo. '
+    + 'Puoi rispondere a qualsiasi domanda su AI, LLM, machine learning, coding o concetti collegati al percorso di studio. '
+    + 'Se l\'utente ha un\'idea imprecisa, correggilo gentilmente con la spiegazione corretta.';
+
+  body.innerHTML = '<div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px">'
+    + '<span style="font-weight:600;color:var(--green)">Ciao! Sono il tuo tutor personale.</span> Chiedimi qualsiasi cosa su AI, LLM o i concetti che stai studiando — rispondo in modo approfondito con esempi concreti.'
+    + (completati.length ? '<br><span style="font-size:11px;color:var(--text3)">Conosco il tuo percorso: ' + completati.length + ' moduli completati.</span>' : '')
+    + '</div>'
+    + '<div id="tutor-chat" style="display:flex;flex-direction:column;gap:10px;max-height:280px;overflow-y:auto;margin-bottom:12px"></div>';
+
+  footer.innerHTML = '<div style="display:flex;gap:8px;width:100%;align-items:center">'
+    + '<input id="tutor-input" type="text" placeholder="Es: Cos\'è l\'attention mechanism?" style="flex:1;padding:9px 13px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:var(--font);outline:none" onkeydown="if(event.key===\'Enter\')inviaMessaggioTutor()">'
+    + '<button onclick="inviaMessaggioTutor()" style="padding:9px 16px;border-radius:8px;background:var(--green);color:#fff;font-weight:600;border:none;cursor:pointer;font-family:var(--font);font-size:13px;white-space:nowrap">Invia</button>'
+    + '<button onclick="closeModal()" style="padding:9px 14px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text2);cursor:pointer;font-family:var(--font);font-size:13px">✕</button>'
+    + '</div>';
+
+  modal.style.display = 'flex';
+  setTimeout(function(){ var el = document.getElementById('tutor-input'); if(el) el.focus(); }, 100);
+}
+
+async function inviaMessaggioTutor() {
+  var input = document.getElementById('tutor-input');
+  var chat = document.getElementById('tutor-chat');
+  if (!input || !chat) return;
+  var testo = input.value.trim();
+  if (!testo) return;
+  input.value = '';
+
+  // Aggiungi bubble utente
+  chat.innerHTML += '<div style="align-self:flex-end;background:var(--accent-dim);border:1px solid rgba(91,141,239,0.25);border-radius:10px 10px 2px 10px;padding:8px 12px;font-size:13px;color:var(--text);max-width:85%">' + testo + '</div>';
+  // Placeholder risposta
+  var pid = 'tp-' + Date.now();
+  chat.innerHTML += '<div id="' + pid + '" style="align-self:flex-start;background:var(--bg3);border:1px solid var(--border);border-radius:10px 10px 10px 2px;padding:8px 12px;font-size:13px;color:var(--text2);max-width:90%"><span style="font-style:italic;opacity:0.6">⏳ sto pensando...</span></div>';
+  chat.scrollTop = chat.scrollHeight;
+
+  _tutorHistory.push({role: 'user', content: testo});
+
+  try {
+    var reply = await callClaude(_tutorHistory, window._tutorSys);
+    _tutorHistory.push({role: 'assistant', content: reply});
+    var bubble = document.getElementById(pid);
+    if (bubble) {
+      bubble.style.color = 'var(--text)';
+      bubble.innerHTML = reply.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+    }
+  } catch(err) {
+    var bubble = document.getElementById(pid);
+    if (bubble) bubble.innerHTML = '<span style="color:var(--red)">Errore: ' + err.message + '</span>';
+  }
+  chat.scrollTop = chat.scrollHeight;
+}
+
 window.addEventListener('DOMContentLoaded', function() {
   updateNavLocks();
   for (var p = 1; p <= 5; p++) renderUnlockQuiz(p);
   initDB();
 });
 </script>
-<!-- v5.2.0 — Session log: traccia quiz_risposta e lampada in window._sessionLog e Firestore (arrayUnion). Bottone "🧠 Analizza il mio studio" apre modal con documento personalizzato da Claude basato sullo storico. 2026-10 -->
+<!-- v5.3.0 — Aggiunto "🤖 Tutor personale" floating button con contesto completo (moduli completati + sessionLog). 2026-10 -->
+<button class="tutor-fab" onclick="apriTutorPersonale()" title="Chiedi qualsiasi cosa al tuo tutor AI">🤖 Tutor personale</button>
 <div style="text-align:center;padding:32px 16px 24px;font-size:11px;color:var(--text3);letter-spacing:0.04em">
-  v5.2.0 · Studio LLM Dashboard · 2026-10 · <span style="opacity:0.6">Powered by Claude</span>
+  v5.3.0 · Studio LLM Dashboard · 2026-10 · <span style="opacity:0.6">Powered by Claude</span>
 </div>
 </body>
 </html>
