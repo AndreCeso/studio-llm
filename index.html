@@ -722,6 +722,31 @@ REGOLE ASSOLUTE:<br>
 
   <!-- QUIZ SBLOCCO FASE 1 -->
   <div class="unlock-quiz" id="uq1">
+    <h3>🔓 Quiz di Sblocco — Fase 1</h3>
+    <p class="sub">3 domande per sbloccare la Fase 2: RAG. Servono almeno 2/3.</p>
+    <div class="quiz-q"><p>1. In un LLM, che cos'è un token?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'wrong','u1q1',1)">Sempre una parola intera, come in un dizionario</button>
+      <button class="quiz-opt" onclick="uq(this,'correct','u1q1',1)">Un pezzo di testo, spesso più corto di una parola</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u1q1',1)">Il punteggio di similarità tra due documenti</button>
+    </div><div class="quiz-feedback" id="u1q1-fb-correct ok">✅ Esatto! «Straordinario» può valere più token, «gatto» uno solo. Il modello lavora su questi pezzi, non sulle parole.</div>
+    <div class="quiz-feedback" id="u1q1-fb-wrong ko">❌ I token sono pezzi di testo, non per forza parole intere. La context window si misura in token.</div></div>
+
+    <div class="quiz-q"><p>2. Perché un assistente che cita procedure usa una temperatura bassa, per esempio 0.1?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'correct','u1q2',1)">Per avere risposte stabili e ripetibili, poco casuali</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u1q2',1)">Per inventare varianti diverse a ogni richiesta</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u1q2',1)">Per allungare la context window</button>
+    </div><div class="quiz-feedback" id="u1q2-fb-correct ok">✅ Sì. Una temperatura vicina a 0 rende la risposta quasi deterministica: la procedura resta la stessa.</div>
+    <div class="quiz-feedback" id="u1q2-fb-wrong ko">❌ La temperatura controlla la casualità. Un valore basso (0.1) tiene la risposta stabile; un valore alto la rende più variabile.</div></div>
+
+    <div class="quiz-q"><p>3. A cosa serve un embedding?</p><div class="quiz-options">
+      <button class="quiz-opt" onclick="uq(this,'wrong','u1q3',1)">A scegliere la temperatura del modello</button>
+      <button class="quiz-opt" onclick="uq(this,'wrong','u1q3',1)">A contare i token di un prompt</button>
+      <button class="quiz-opt" onclick="uq(this,'correct','u1q3',1)">A trasformare un testo in un vettore per confrontarne il significato</button>
+    </div><div class="quiz-feedback" id="u1q3-fb-correct ok">✅ Esatto! Due frasi vicine nel significato hanno vettori con cosine similarity alta, anche se le parole sono diverse.</div>
+    <div class="quiz-feedback" id="u1q3-fb-wrong ko">❌ L'embedding è il vettore del significato. Serve alla ricerca semantica, non alla temperatura né al conteggio dei token.</div></div>
+
+    <div id="u1-result" class="unlock-result"></div>
+    <button class="unlock-next-btn" id="u1-next" onclick="goPhaseUnlocked(1)">Sblocca Fase 2: RAG →</button>
   </div>
 </div>
 
@@ -1856,8 +1881,6 @@ firebase.initializeApp(firebaseConfig);
 var db = firebase.firestore();
 var DOC_REF = db.collection('users').doc('andrea');
 
-var SYSTEM_PROMPT = "Sei un tutor AI per un developer RPA di Accenture che studia per diventare full stack LLM developer. L'utente si chiama Andrea. Rispondi sempre in italiano. Sei conciso ma preciso. Non menzionare progetti specifici dei clienti.";
-
 // ── SESSION LOG ───────────────────────────────────────────────────
 window._sessionLog = [];
 window._lampadeUsate = {};
@@ -1970,105 +1993,40 @@ var uqTotal = {1:3,2:3,3:3,4:3,5:3};
 var doneModules = {};
 var projectStepsDone = {};
 
-// ── QUIZ UNLOCK (API-based) ───────────────────────────────────────
-var phaseTopics = {
-  1: "LLM fondamenti: token, temperatura, context window, allucinazioni, prompt engineering base, system prompt, chain of thought, embedding, cosine similarity, vector database",
-  2: "RAG pipeline: chunking, sliding window, embedding, retrieval, LangChain, RAGAS, faithfulness, relevancy",
-  3: "FastAPI, Docker, containerizzazione, REST API, CI/CD GitHub Actions, Terraform",
-  4: "AWS Bedrock, Azure OpenAI, Google Vertex AI, MLOps, monitoring LLM, costi API",
-  5: "AI security, prompt injection, jailbreaking, PII, GDPR, AI Act, LangSmith, Phoenix, caching semantico"
-};
-
-var activeQuizzes = {};
-
-async function renderUnlockQuiz(phase) {
-  var container = document.getElementById('uq' + phase);
-  if (!container) return;
-  container.innerHTML = '<div class="claude-loading">⏳ Claude genera le domande...</div>';
-  var topic = phaseTopics[phase];
-  try {
-    var prompt = 'Genera esattamente 3 domande a risposta multipla (A/B/C/D) per testare la comprensione di: ' + topic + '. '
-      + 'Rispondi SOLO con JSON valido, nessun testo prima o dopo, in questo formato esatto: '
-      + '{"questions":[{"q":"testo domanda","options":["A) testo","B) testo","C) testo","D) testo"],"correct":0,"explanation":"perché la risposta A è corretta"}]}. '
-      + 'correct è l\'indice 0-3 della risposta corretta. Le domande devono essere pratiche e concrete, non banali.';
-    var r = await fetch('/.netlify/functions/claude', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        system: 'Sei un generatore di quiz tecnici. Rispondi SOLO con JSON valido, mai testo aggiuntivo.',
-        messages: [{role:'user', content: prompt}]
-      })
-    });
-    var data = await r.json();
-    var text = data.content && data.content[0] && data.content[0].text ? data.content[0].text : '';
-    // extract JSON even if wrapped in markdown code blocks
-    var jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('JSON non trovato');
-    var parsed = JSON.parse(jsonMatch[0]);
-    activeQuizzes[phase] = parsed.questions;
-    uqScores[phase] = 0;
-    uqTotal[phase] = parsed.questions.length;
-    // reset answers for this phase
-    Object.keys(uqAnswers).forEach(function(k){ if(k.startsWith('u'+phase+'q')) delete uqAnswers[k]; });
-    var html = '<h3 style="font-size:15px;font-weight:600;margin-bottom:16px">🔓 Quiz di Sblocco — Fase ' + phase + '</h3>';
-    if (!window._quizDomande) window._quizDomande = {};
-    parsed.questions.forEach(function(q, qi) {
-      var qId = 'u'+phase+'q'+(qi+1);
-      window._quizDomande[qId] = q.q;
-      html += '<div class="quiz-q" style="margin-bottom:20px">';
-      html += '<div style="font-size:13px;font-weight:500;margin-bottom:10px;color:var(--text);display:flex;align-items:flex-start;gap:8px">';
-      html += '<span>'+(qi+1)+'. '+q.q+'</span>';
-      html += '<button class="lampada-btn" onclick="spiegaDomanda(\''+qId+'\')" title="Aiutami a capire questa domanda">💡</button>';
-      html += '</div>';
-      html += '<div class="concetto-box" id="'+qId+'-concetto" style="display:none"></div>';
-      html += '<div class="quiz-options">';
-      q.options.forEach(function(opt, oi) {
-        var isCorrect = oi === q.correct ? "'correct'" : "'wrong'";
-        html += '<button class="quiz-opt" onclick="uq(this,'+isCorrect+',\''+qId+'\','+phase+','+oi+')">' + opt + '</button>';
-      });
-      html += '</div>';
-      html += '<div class="quiz-feedback" id="'+qId+'-fb" style="display:none"></div>';
-      html += '<div style="font-size:11px;color:var(--text3);margin-top:6px;display:none" id="'+qId+'-exp">💡 '+q.explanation+'</div>';
-      html += '</div>';
-    });
-    html += '<div id="u'+phase+'-result" class="unlock-result"></div>';
-    html += '<button class="unlock-next-btn" id="u'+phase+'-next" onclick="goPhaseUnlocked('+phase+')">Sblocca Fase '+(phase+1)+' →</button>';
-    html += '<button class="btn-primary" style="margin-top:8px;width:100%" onclick="renderUnlockQuiz('+phase+')">🔄 Nuove domande</button>';
-    container.innerHTML = html;
-  } catch(err) {
-    container.innerHTML = '<div style="color:var(--red);font-size:13px">Errore generazione quiz: '+err.message+'</div>'
-      + '<button class="btn-primary" onclick="renderUnlockQuiz('+phase+')" style="margin-top:8px">Riprova</button>';
-  }
-}
-
+// ── QUIZ DI SBLOCCO (HTML statico, niente chiamata a Claude) ─────
 function uq(btn, result, qId, phase, optIdx) {
   if(uqAnswers[qId]) return;
   uqAnswers[qId] = result;
+  if (typeof uqScores[phase] !== 'number') uqScores[phase] = 0;
   var opts = btn.closest('.quiz-options').querySelectorAll('.quiz-opt');
   opts.forEach(o => o.classList.add('disabled'));
   btn.classList.add(result);
-  // feedback
-  var qi = parseInt(qId.replace('u'+phase+'q','')) - 1;
-  var q = activeQuizzes[phase] ? activeQuizzes[phase][qi] : null;
-  var fbEl = document.getElementById(qId+'-fb');
-  if(fbEl) {
-    var fbText = result==='correct' ? '✅ Esatto!' : '❌ Risposta errata.';
-    fbEl.textContent = fbText;
-    fbEl.className = 'quiz-feedback show ' + (result==='correct'?'ok':'ko');
-    fbEl.style.display = 'block';
+  var fbOk = document.querySelector('[id^="' + qId + '-fb-correct"]');
+  var fbKo = document.querySelector('[id^="' + qId + '-fb-wrong"]');
+  if (fbOk || fbKo) {
+    if (result === 'correct' && fbOk) fbOk.classList.add('show', 'ok');
+    if (result !== 'correct' && fbKo) fbKo.classList.add('show', 'ko');
+  } else {
+    var fbEl = document.getElementById(qId+'-fb');
+    if(fbEl) {
+      fbEl.textContent = result==='correct' ? '✅ Esatto!' : '❌ Risposta errata.';
+      fbEl.className = 'quiz-feedback show ' + (result==='correct'?'ok':'ko');
+      fbEl.style.display = 'block';
+    }
   }
   var expEl = document.getElementById(qId+'-exp');
   if(expEl) expEl.style.display = 'block';
   if(result === 'correct') {
     uqScores[phase]++;
   } else {
-    // evidenzia la risposta corretta
     opts.forEach(o => { if(o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) o.classList.add('correct'); });
   }
   var phaseQs = Object.keys(uqAnswers).filter(k => k.startsWith('u'+phase+'q'));
   if(phaseQs.length >= uqTotal[phase]) evaluateUnlock(phase);
-  // Traccia evento in _sessionLog
-  var domanda = (window._quizDomande && window._quizDomande[qId]) || '';
+  var domanda = '';
+  var wrap = btn.closest('.quiz-q');
+  if (wrap && wrap.querySelector('p')) domanda = wrap.querySelector('p').textContent.trim();
+  if (!domanda && window._quizDomande && window._quizDomande[qId]) domanda = window._quizDomande[qId];
   var eventoUq = {
     ts: Date.now(),
     tipo: 'quiz_risposta',
@@ -2087,39 +2045,21 @@ async function generateModuleQuiz(modId, topic) {
   if (!container) return;
   container.innerHTML = '<div class="claude-loading">⏳ Claude prepara ripasso e quiz...</div>';
   try {
-    var prompt = 'Argomento del modulo: ' + topic + '.\n\n'
-      + 'Crea un mini-ripasso flash (3 bullet) e 3 domande quiz sui concetti di questo modulo.\n'
-      + 'Le domande devono essere comprensibili a chi impara AI/LLM da zero.\n\n'
-      + 'Rispondi SOLO con JSON valido, senza apostrofi nei valori stringa:\n'
-      + '{"ripasso":["bullet1","bullet2","bullet3"],"questions":[{"q":"domanda","options":["A) testo","B) testo","C) testo","D) testo"],"correct":0,"explanation":"spiegazione breve"}]}';
-    var r = await fetch('/.netlify/functions/claude', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        system: 'Sei un tutor AI che genera quiz per chi impara da zero. Crei domande chiare, ancorate ai concetti del modulo, con linguaggio semplice. Rispondi SOLO con JSON valido, nessun testo fuori dal JSON.',
-        messages: [{role:'user', content: prompt}]
-      })
-    });
-    var data = await r.json();
-    var text = data.content[0].text;
+    var text = await callClaude('quiz_modulo', { topic: topic });
     var jsonMatch = text.match(/\{[\s\S]*\}/);
     var parsed;
     try {
+      if (!jsonMatch) throw new Error('json');
       parsed = JSON.parse(jsonMatch[0]);
     } catch(e) {
-      // JSON malformato: riprova con prompt semplificato senza campi extra
-      var r2 = await fetch('/.netlify/functions/claude', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          system: 'Rispondi SOLO con JSON valido. Nessun testo fuori dal JSON. Nessun apostrofo nei valori stringa: usa solo virgole e punti.',
-          messages: [{role:'user', content: 'Argomento: ' + topic + '. Crea 3 bullet ripasso e 3 domande quiz. JSON: {"ripasso":["bullet1","bullet2","bullet3"],"questions":[{"q":"domanda","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"spiegazione","external":false,"concetto_base":""}]}'}]
-        })
-      });
-      var data2 = await r2.json();
-      var text2 = data2.content[0].text;
+      var text2 = await callClaude('quiz_modulo_retry', { topic: topic });
       var m2 = text2.match(/\{[\s\S]*\}/);
-      parsed = JSON.parse(m2[0]);
+      if (!m2) throw new Error('Risposta non valida. Riprova.');
+      try {
+        parsed = JSON.parse(m2[0]);
+      } catch (e2) {
+        throw new Error('Risposta non valida. Riprova.');
+      }
     }
     // Build ripasso flash
     var html = '';
@@ -2156,7 +2096,7 @@ async function generateModuleQuiz(modId, topic) {
     html += '<button class="btn-primary" style="margin-top:8px" onclick="generateModuleQuiz(\''+modId+'\',\''+topic.replace(/'/g,"\\'")+'\')" >🔄 Nuovo quiz</button>';
     container.innerHTML = html;
   } catch(err) {
-    container.innerHTML = '<div style="color:var(--red);font-size:13px">Errore: '+err.message+'</div>'
+    container.innerHTML = '<div style="color:var(--red);font-size:13px">Errore: '+erroreVisibile(err)+'</div>'
       + '<button class="btn-primary" onclick="generateModuleQuiz(\''+modId+'\',\''+topic.replace(/'/g,"\\'")+'\')">Riprova</button>';
   }
 }
@@ -2195,12 +2135,11 @@ async function spiegaDomanda(qId) {
   window._sessionLog.push(lampadaEvento);
   _saveEventToFirebase(lampadaEvento);
   try {
-    var sys = 'Sei un tutor che aiuta chi impara AI/LLM da zero. Il tuo compito e aiutare lo studente a CAPIRE e RISPONDERE a una domanda di quiz, senza mai rivelare la risposta corretta. Rispondi in italiano, tono amichevole, max 4-5 righe. Struttura: 1) spiega cosa chiede la domanda in parole semplici, 2) dai un suggerimento per ragionare ("pensa a...", "ricorda che..."). Non dire mai quale opzione e corretta.';
-    var reply = await callClaude([{role:'user', content: 'Domanda del quiz: ' + domanda + '\n\nAiutami a capire cosa chiede e come ragionare per rispondere, senza dirmi la risposta.'}], sys);
+    var reply = await callClaude('spiega_domanda', { content: domanda });
     el.innerHTML = reply.replace(/\n/g,'<br>');
     el.dataset.filled = '1';
   } catch(err) {
-    el.innerHTML = '<span style="color:var(--red);font-size:12px">Errore: ' + err.message + '</span>';
+    el.innerHTML = '<span style="color:var(--red);font-size:12px">Errore: ' + erroreVisibile(err) + '</span>';
   }
 }
 
@@ -2229,18 +2168,42 @@ function answerModQ(btn, isCorrect, qId) {
   _saveEventToFirebase(evento);
 }
 
+function resetUnlockQuiz(phase) {
+  var container = document.getElementById('uq' + phase);
+  if (!container) return;
+  uqScores[phase] = 0;
+  Object.keys(uqAnswers).forEach(function(k) {
+    if (k.indexOf('u' + phase + 'q') === 0) delete uqAnswers[k];
+  });
+  container.querySelectorAll('.quiz-opt').forEach(function(o) {
+    o.classList.remove('disabled', 'correct', 'wrong');
+  });
+  container.querySelectorAll('.quiz-feedback').forEach(function(f) {
+    f.classList.remove('show', 'ok', 'ko');
+    f.style.display = '';
+  });
+  var resultEl = document.getElementById('u' + phase + '-result');
+  var nextBtn = document.getElementById('u' + phase + '-next');
+  if (resultEl) {
+    resultEl.textContent = '';
+    resultEl.className = 'unlock-result';
+  }
+  if (nextBtn) nextBtn.style.display = 'none';
+}
+
 function evaluateUnlock(phase) {
   var score = uqScores[phase];
   var resultEl = document.getElementById('u'+phase+'-result');
   var nextBtn = document.getElementById('u'+phase+'-next');
+  if (!resultEl || !nextBtn) return;
   if(score >= 2) {
     resultEl.textContent = '✅ '+score+'/3 — Ottimo! Fase successiva sbloccata.';
     resultEl.className = 'unlock-result pass';
     nextBtn.style.display = 'block';
   } else {
-    resultEl.textContent = '❌ '+score+'/3 — Non ancora. Rileggi i moduli, tra 5 secondi ricarico nuove domande.';
+    resultEl.textContent = '❌ '+score+'/3 — Non ancora. Rileggi i moduli, tra 5 secondi riparti dalle stesse domande.';
     resultEl.className = 'unlock-result fail';
-    setTimeout(function(){ renderUnlockQuiz(phase); }, 5000);
+    setTimeout(function(){ resetUnlockQuiz(phase); }, 5000);
   }
 }
 
@@ -2322,15 +2285,48 @@ function goPhase(idx, btn) {
   saveProgress(idx);
 }
 
-async function callClaude(messages, systemOverride) {
-  var r = await fetch('/.netlify/functions/claude', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ system: systemOverride || SYSTEM_PROMPT, messages: messages })
-  });
-  var data = await r.json();
-  return data.content && data.content[0] && data.content[0].text
-    ? data.content[0].text : JSON.stringify(data);
+function erroreVisibile(err) {
+  var msg = err && typeof err.message === 'string' ? err.message.trim() : '';
+  if (msg && msg.length <= 140 && msg.indexOf('\n') === -1 && msg.indexOf('<') === -1 && !/error|exception|token|syntax|unexpected|anthropic|api.key/i.test(msg)) {
+    return msg;
+  }
+  return 'Qualcosa è andato storto. Riprova.';
+}
+
+function testoDaRisposta(data) {
+  var blocks = data && data.content;
+  if (!blocks || !blocks.length) return '';
+  for (var i = 0; i < blocks.length; i++) {
+    if (blocks[i] && typeof blocks[i].text === 'string' && blocks[i].text) return blocks[i].text;
+  }
+  return '';
+}
+
+async function callClaude(mode, extra) {
+  var body = { mode: mode };
+  if (extra) {
+    ['messages', 'title', 'topic', 'context', 'content'].forEach(function(k) {
+      if (extra[k] !== undefined) body[k] = extra[k];
+    });
+  }
+  var r;
+  try {
+    r = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+  } catch (e) {
+    throw new Error('Non riesco a rispondere ora. Riprova tra poco.');
+  }
+  var data = null;
+  try { data = await r.json(); } catch (e) { data = null; }
+  if (!r.ok) {
+    throw new Error((data && typeof data.error === 'string' && data.error) || 'Non riesco a rispondere ora. Riprova tra poco.');
+  }
+  var text = testoDaRisposta(data);
+  if (!text) throw new Error('Risposta non disponibile.');
+  return text;
 }
 
 function closeModal() {
@@ -2367,21 +2363,15 @@ async function inviaApprofondimento() {
   msgs.innerHTML += '<div id="chat-loading-' + Date.now() + '" style="font-size:12px;color:var(--text3);font-style:italic;margin-bottom:10px">⏳ Claude sta elaborando...</div>';
   var loadingId = msgs.lastElementChild.id;
   _chatHistory.push({role:'user', content: domanda});
-  var sysAppro = 'Sei un tutor AI specializzato in AI e LLM. '
-    + 'L\'utente sta approfondendo il modulo "' + _currentModTitle + '" (argomento: ' + _currentModTopic + '). '
-    + 'Rispondi in italiano. Quando spieghi un concetto: vai in profondita, usa terminologia tecnica ma spiegala sempre quando appare, porta almeno un esempio pratico concreto della vita reale. '
-    + 'Non essere superficiale — se il concetto e complesso, spiegalo per bene. '
-    + 'Tono incoraggiante, mai accademico o freddo. '
-    + 'Se l\'utente ha un\'idea imprecisa, correggilo gentilmente con la spiegazione corretta.';
   try {
-    var reply = await callClaude(_chatHistory, sysAppro);
+    var reply = await callClaude('approfondisci', { title: _currentModTitle, topic: _currentModTopic, messages: _chatHistory });
     _chatHistory.push({role:'assistant', content: reply});
     var loadEl = document.getElementById(loadingId);
     if (loadEl) loadEl.outerHTML = '<div style="background:var(--bg3);border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px;color:var(--text);line-height:1.7"><span style="font-size:10px;color:var(--accent);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;display:block;margin-bottom:4px">Claude</span>' + reply.replace(/\n/g,'<br>') + '</div>';
     msgs.scrollTop = msgs.scrollHeight;
   } catch(err) {
     var loadEl2 = document.getElementById(loadingId);
-    if (loadEl2) loadEl2.outerHTML = '<div style="color:var(--red);font-size:13px;margin-bottom:10px">Errore: ' + err.message + '</div>';
+    if (loadEl2) loadEl2.outerHTML = '<div style="color:var(--red);font-size:13px;margin-bottom:10px">Errore: ' + erroreVisibile(err) + '</div>';
   }
   var f = document.getElementById('appro-input');
   if (f) f.focus();
@@ -2415,23 +2405,15 @@ async function esercitati(modTitle, modTopic) {
   footer.innerHTML = '';
   modal.style.display = 'flex';
   try {
-    var prompt = 'Crea un esercizio pratico su: ' + modTopic + '. Contesto: developer in banca che costruisce un assistente AI interno.\n\n'
-      + 'Rispondi SOLO con JSON valido in questo formato:\n'
-      + '{"scenario":"descrizione situazione concreta max 3 righe","steps":["step 1 cosa fare","step 2","step 3","step 4"],"prompt_da_copiare":"il prompt esatto da incollare su Claude per fare questo esercizio","suggerimento":"cosa osservare o imparare"}\n\n'
-      + 'I passi devono essere pratici e fattibili su claude.ai. Il prompt deve essere pronto da copiare-incollare.';
-    var r = await fetch('/.netlify/functions/claude', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        system: 'Sei un trainer tecnico. Crei esercizi pratici. Rispondi SOLO con JSON valido.',
-        messages: [{role:'user', content: prompt}]
-      })
-    });
-    var data = await r.json();
-    var text = data.content && data.content[0] ? data.content[0].text : '';
+    var text = await callClaude('esercizio', { title: modTitle, topic: modTopic });
     var jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Formato non valido');
-    var ex = JSON.parse(jsonMatch[0]);
+    if (!jsonMatch) throw new Error('Risposta non valida. Riprova.');
+    var ex;
+    try {
+      ex = JSON.parse(jsonMatch[0]);
+    } catch (e) {
+      throw new Error('Risposta non valida. Riprova.');
+    }
     var stepsHtml = (ex.steps || []).map(function(s,i){
       return '<div class="ex-step"><div class="ex-step-n">'+(i+1)+'</div><div class="ex-step-text">'+s+'</div></div>';
     }).join('');
@@ -2455,7 +2437,7 @@ async function esercitati(modTitle, modTopic) {
     window._currentExPrompt = promptText;
     footer.innerHTML = '<button class="btn-primary" style="width:100%" onclick="nuovoEsercizio()">🔄 Nuovo esercizio</button>';
   } catch(err) {
-    body.innerHTML = '<div style="color:var(--red);font-size:13px">Errore: ' + err.message + '</div>';
+    body.innerHTML = '<div style="color:var(--red);font-size:13px">Errore: ' + erroreVisibile(err) + '</div>';
     footer.innerHTML = '<button class="btn-primary" onclick="esercitati(\'' + modTitle + '\',\'' + modTopic.replace(/'/g,"\\'") + '\')">Riprova</button>';
   }
 }
@@ -2485,13 +2467,13 @@ async function inviaRisposta() {
   footer.innerHTML = '<div class="claude-loading">⏳ Claude valuta...</div>';
   _esercitaHistory.push({role:'user', content: risposta});
   try {
-    var feedback = await callClaude(_esercitaHistory);
+    var feedback = await callClaude('default', { messages: _esercitaHistory });
     _esercitaHistory.push({role:'assistant', content: feedback});
     body.innerHTML += '<div class="claude-reply" style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px"><strong style="color:var(--accent)">La tua risposta:</strong><br>' + risposta.replace(/\n/g,'<br>') + '</div>'
       + '<div class="claude-reply" style="margin-top:8px"><strong style="color:var(--green)">Feedback:</strong><br>' + feedback.replace(/\n/g,'<br>') + '</div>';
     footer.innerHTML = '<button class="btn-primary" onclick="nuovoEsercizio()">🔄 Nuovo esercizio</button>';
   } catch(err) {
-    footer.innerHTML = '<div style="color:var(--red)">Errore: ' + err.message + '</div>';
+    footer.innerHTML = '<div style="color:var(--red)">Errore: ' + erroreVisibile(err) + '</div>';
   }
 }
 
@@ -2717,24 +2699,14 @@ async function analizzaStudio() {
     return '- [' + e.modulo + '] "' + e.domanda + '" → ' + (e.esito || '').toUpperCase() + lampada;
   }).join('\n');
 
-  var prompt = 'Lo studente ha fatto questa sessione di studio (storico completo):\n\n'
-    + 'MODULI TOCCATI: ' + (moduli.join(', ') || 'nessuno') + '\n\n'
-    + 'DETTAGLIO ATTIVITA:\n' + (righe || 'Nessuna attivita registrata ancora.') + '\n\n'
-    + 'Genera un documento di approfondimento personalizzato. '
-    + 'Per ogni concetto dove ha fatto fatica (errore quiz o click lampada): '
-    + 'spiegalo da zero con linguaggio semplice e almeno un esempio pratico della vita reale. '
-    + 'Collega i concetti tra loro dove ha senso. '
-    + 'Alla fine dai 2-3 consigli su cosa studiare dopo. '
-    + 'Tono amichevole, mai accademico. Lunghezza: completo e dettagliato. '
-    + 'Rispondi in modo completo ma entro 900 token.';
-
-  var sys = 'Sei un tutor AI specializzato in AI/LLM che aiuta chi impara da zero. Generi documenti di approfondimento personalizzati basati sullo storico di studio dello studente. Usi sempre linguaggio semplice, esempi concreti della vita reale, tono incoraggiante. Mai gergo accademico. Rispondi in italiano.';
-
   try {
-    var reply = await callClaude([{role:'user', content: prompt}], sys);
+    var reply = await callClaude('analisi', {
+      context: moduli.join(', ') || 'nessuno',
+      content: righe || 'Nessuna attivita registrata ancora.'
+    });
     body.innerHTML = '<div style="font-size:13px;color:var(--text);line-height:1.75">' + reply.replace(/\n/g,'<br>') + '</div>';
   } catch(err) {
-    body.innerHTML = '<div style="color:var(--red);font-size:13px">Errore: ' + err.message + '</div>';
+    body.innerHTML = '<div style="color:var(--red);font-size:13px">Errore: ' + erroreVisibile(err) + '</div>';
   }
 }
 
@@ -2766,15 +2738,7 @@ function apriTutorPersonale() {
   if (errori.length) contestoRighe.push('Domande sbagliate in questa sessione: ' + errori.map(function(e){ return '"' + e.domanda + '"'; }).join('; ') + '.');
   if (lampade.length) contestoRighe.push('Ha chiesto aiuto 💡 su: ' + lampade.map(function(e){ return '"' + e.domanda + '"'; }).join('; ') + '.');
 
-  window._tutorSys = 'Sei il tutor personale di Andrea, uno studente che sta imparando AI e LLM da zero partendo da basi di programmazione. '
-    + 'Contesto attuale dello studente: ' + contestoRighe.join(' ')
-    + ' Rispondi in italiano. '
-    + 'Quando spieghi un concetto: vai in profondità, usa terminologia tecnica ma spiegala sempre la prima volta che appare, porta almeno un esempio pratico concreto della vita reale. '
-    + 'Non essere superficiale — se il concetto è complesso, spiegalo per bene, anche in più paragrafi se serve. '
-    + 'Se il concetto ha un\'analogia con qualcosa di quotidiano, usala. '
-    + 'Tono amichevole e incoraggiante, mai accademico o freddo. '
-    + 'Puoi rispondere a qualsiasi domanda su AI, LLM, machine learning, coding o concetti collegati al percorso di studio. '
-    + 'Se l\'utente ha un\'idea imprecisa, correggilo gentilmente con la spiegazione corretta.';
+  window._tutorContext = contestoRighe.join(' ');
 
   body.innerHTML = '<div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px">'
     + '<span style="font-weight:600;color:var(--green)">Ciao! Sono il tuo tutor personale.</span> Chiedimi qualsiasi cosa su AI, LLM o i concetti che stai studiando — rispondo in modo approfondito con esempi concreti.'
@@ -2810,7 +2774,7 @@ async function inviaMessaggioTutor() {
   _tutorHistory.push({role: 'user', content: testo});
 
   try {
-    var reply = await callClaude(_tutorHistory, window._tutorSys);
+    var reply = await callClaude('tutor', { context: window._tutorContext || '', messages: _tutorHistory });
     _tutorHistory.push({role: 'assistant', content: reply});
     var bubble = document.getElementById(pid);
     if (bubble) {
@@ -2819,14 +2783,13 @@ async function inviaMessaggioTutor() {
     }
   } catch(err) {
     var bubble = document.getElementById(pid);
-    if (bubble) bubble.innerHTML = '<span style="color:var(--red)">Errore: ' + err.message + '</span>';
+    if (bubble) bubble.innerHTML = '<span style="color:var(--red)">Errore: ' + erroreVisibile(err) + '</span>';
   }
   chat.scrollTop = chat.scrollHeight;
 }
 
 window.addEventListener('DOMContentLoaded', function() {
   updateNavLocks();
-  for (var p = 1; p <= 5; p++) renderUnlockQuiz(p);
   initDB();
 });
 </script>
